@@ -128,7 +128,7 @@ src/
   env.ts                      # Environment validation (Zod)
 docs/
   PLAN.md                     # V1 MVP plan (Phases 0–13, all complete)
-  PLANV2.md                   # Post-MVP roadmap (Phases 14+)
+  PLANV4.md                   # Post-MVP roadmap (Phases 14+)
   TESTING.md                  # Testing and verification guide
   adr/                        # 8 architecture decision records
   phase-0/                    # Requirements, epics, NFRs, gates

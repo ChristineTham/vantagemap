@@ -2,7 +2,7 @@
 
 **Status: COMPLETE** — All 13 phases delivered. V1 MVP is feature-complete and deployed.
 
-For post-MVP roadmap (Phases 14+), see [PLANV2.md](PLANV2.md).
+For post-MVP roadmap (Phases 14+), see [PLANV4.md](PLANV4.md).
 
 ---
 
@@ -305,7 +305,7 @@ Phase 4.2 → Phase 10 ✅ (User Management)
 Phase 5 + 8 → Phase 11 ✅ (Governance)
 ```
 
-All V1 phases complete. For V2 roadmap (Phases 14–17), see [PLANV2.md](PLANV2.md).
+All V1 phases complete. For V2 roadmap (Phases 14–17), see [PLANV4.md](PLANV4.md).
 
 ---
 
@@ -340,7 +340,7 @@ All V1 phases complete. For V2 roadmap (Phases 14–17), see [PLANV2.md](PLANV2.
 | Styling               | Tailwind CSS v4 + Rosely palette + shadcn/ui Base UI (see [DESIGN.md](../DESIGN.md)) | Already chosen and documented; not re-evaluated                                                       |
 | API strategy          | REST-first (MVP), GraphQL added in Phase 12                                          | REST is simpler for vibe-coding agents; GraphQL deferred until schema is stable                       |
 | Custom fields         | JSONB columns with validation                                                        | Avoids per-customer schema migrations; flexible for early product-market fit                          |
-| MVP boundary          | Phases 0–13 are V1 MVP; Phases 14+ moved to [PLANV2.md](PLANV2.md)                   | Core platform complete before enterprise SSO and advanced features                                    |
+| MVP boundary          | Phases 0–13 are V1 MVP; Phases 14+ moved to [PLANV4.md](PLANV4.md)                   | Core platform complete before enterprise SSO and advanced features                                    |
 | MVP deployment cost   | Zero monetary cost using free tiers                                                  | MVP must deploy without budget approval; validates product-market fit before spending                 |
 | Technology preference | Open-source first at every layer                                                     | Avoid vendor lock-in; commercial services only when free tier exists and no OSS alternative is viable |
 | Production hosting    | Azure preferred, GCP second, AWS third                                               | Enterprise alignment; application code is cloud-agnostic, only configuration differs                  |

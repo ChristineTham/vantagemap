@@ -150,7 +150,7 @@ src/
   env.ts                  # Environment validation (Zod)
 docs/
   PLAN.md                 # V1 plan (Phases 0–13, all complete)
-  PLANV2.md               # Post-MVP roadmap (Phases 14+)
+  PLANV4.md               # Post-MVP roadmap (Phases 14+)
   TESTING.md              # Testing and verification guide
   adr/                    # 8 architecture decision records
   phase-0/                # Requirements, epics, NFRs, gates
@@ -163,7 +163,7 @@ docs/
 | [AGENTS.md](AGENTS.md)                             | Project guidelines and coding conventions |
 | [DESIGN.md](DESIGN.md)                             | Rosely colour palette and design system   |
 | [docs/PLAN.md](docs/PLAN.md)                       | V1 MVP implementation plan (complete)     |
-| [docs/PLANV2.md](docs/PLANV2.md)                   | Post-MVP roadmap                          |
+| [docs/PLANV4.md](docs/PLANV4.md)                   | Post-MVP roadmap                          |
 | [docs/TESTING.md](docs/TESTING.md)                 | Testing and verification procedures       |
 | [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | Setup and onboarding guide                |
 | [docs/MODEL.md](docs/MODEL.md)                     | Canonical data model                      |

@@ -6,6 +6,7 @@
     "check": "SKIP_ENV_VALIDATION=true; npm run lint && npm run type-check && npm run format:check && npm test && npm run build",
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
