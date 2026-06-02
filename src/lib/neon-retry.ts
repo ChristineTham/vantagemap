@@ -49,10 +49,7 @@ function isTransient(err: unknown): boolean {
  * const rows = await withRetry(() => db.select().from(users));
  * ```
  */
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options?: RetryOptions
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> {
   const { retries, baseDelay, maxDelay } = { ...DEFAULT_OPTIONS, ...options };
 
   let lastError: unknown;

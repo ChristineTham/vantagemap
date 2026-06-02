@@ -9,15 +9,15 @@ The codebase correctly uses Neon's HTTP driver for serverless/edge compatibility
 
 ## Configuration (All Correct)
 
-| Aspect | Status | Notes |
-|--------|--------|-------|
-| Driver | ✅ | `neon()` HTTP — correct for Vercel serverless |
-| ORM | ✅ | `drizzle-orm/neon-http` — correct pairing |
-| Lazy init | ✅ | Proxy pattern avoids build-time errors |
-| Env validation | ✅ | `@t3-oss/env-nextjs` + Zod |
-| Schema-as-code | ✅ | Drizzle schema in `src/db/schema/` |
-| Migrations | ✅ | `drizzle-orm/neon-http/migrator` |
-| Auth connection | ✅ | Shares single `db` instance (efficient) |
+| Aspect          | Status | Notes                                         |
+| --------------- | ------ | --------------------------------------------- |
+| Driver          | ✅     | `neon()` HTTP — correct for Vercel serverless |
+| ORM             | ✅     | `drizzle-orm/neon-http` — correct pairing     |
+| Lazy init       | ✅     | Proxy pattern avoids build-time errors        |
+| Env validation  | ✅     | `@t3-oss/env-nextjs` + Zod                    |
+| Schema-as-code  | ✅     | Drizzle schema in `src/db/schema/`            |
+| Migrations      | ✅     | `drizzle-orm/neon-http/migrator`              |
+| Auth connection | ✅     | Shares single `db` instance (efficient)       |
 
 ## Why HTTP Driver Is Correct
 
@@ -67,6 +67,7 @@ Prevents accidental unencrypted connections. Neon requires SSL.
 **File:** `.env.example`
 
 Added comments explaining:
+
 - When to use pooled vs direct connections
 - How to add `-pooler` suffix for TCP/WebSocket use
 - That HTTP driver doesn't need pooler
@@ -76,12 +77,14 @@ Added comments explaining:
 **File:** `src/lib/neon-retry.ts`
 
 Neon recommends retry logic for HTTP queries to handle brief connection drops during maintenance/scaling. The utility:
+
 - Retries up to 3 times with exponential backoff + jitter
 - Only retries transient errors (network failures, 502/503, cold start timeouts)
 - Non-transient errors (SQL errors, auth failures) throw immediately
 - Zero external dependencies
 
 **Usage:**
+
 ```typescript
 import { withRetry } from "@/lib/neon-retry";
 
@@ -93,13 +96,13 @@ const users = await withRetry(() => db.select().from(usersTable));
 
 ## Recommendations NOT Implemented (No Action Needed)
 
-| Recommendation | Why Skipped |
-|---------------|-------------|
-| Connection pooling (`-pooler`) | Not needed — HTTP driver is stateless |
-| WebSocket driver | Not needed — no interactive transactions |
-| `neonConfig.webSocketConstructor` | Not applicable to HTTP driver |
-| Separate auth DB connection | Single instance is more efficient |
-| `drizzle-kit` direct connection | Already correct — HTTP driver doesn't use pooler |
+| Recommendation                    | Why Skipped                                      |
+| --------------------------------- | ------------------------------------------------ |
+| Connection pooling (`-pooler`)    | Not needed — HTTP driver is stateless            |
+| WebSocket driver                  | Not needed — no interactive transactions         |
+| `neonConfig.webSocketConstructor` | Not applicable to HTTP driver                    |
+| Separate auth DB connection       | Single instance is more efficient                |
+| `drizzle-kit` direct connection   | Already correct — HTTP driver doesn't use pooler |
 
 ## Package Version Note
 

@@ -18,7 +18,7 @@ VantageMap is an enterprise architecture and business strategy platform. It give
 
 | Route           | View                              | Description                                                      |
 | --------------- | --------------------------------- | ---------------------------------------------------------------- |
-| `/`             | Dashboard                         | Summary cards, health charts, reporting widgets                   |
+| `/`             | Dashboard                         | Summary cards, health charts, reporting widgets                  |
 | `/capabilities` | Business Capability Map           | Hierarchical capability tree with health indicators              |
 | `/applications` | Application Portfolio             | Filterable table with fit scores, lifecycle, TIME classification |
 | `/strategy`     | Strategy Map (Balanced Scorecard) | Objectives by perspective, linked KPIs and initiatives           |

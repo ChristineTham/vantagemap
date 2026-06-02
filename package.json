@@ -1,8 +1,9 @@
 {
   "name": "vantagemap",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
+    "check": "SKIP_ENV_VALIDATION=true; npm run lint && npm run type-check && npm run format:check && npm test && npm run build",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
