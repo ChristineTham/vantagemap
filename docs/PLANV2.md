@@ -51,15 +51,15 @@ Advanced capabilities from [ADMIN.md](ADMIN.md), [USE-CASES.md](USE-CASES.md), a
 
 Production readiness and enterprise-grade operational requirements.
 
-| Step | Title                           | Scope                                                                                                                                                          | Depends on    |
-| ---- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 16.1 | Load testing and tuning         | K6 or Artillery load tests targeting NFR thresholds (p95 <250ms read, <400ms write). Database query optimization. Connection pool tuning.                      | Phase 13      |
-| 16.2 | End-to-end test suite           | Playwright E2E tests for critical user flows: login, CRUD, search, bulk operations, admin workflows.                                                          | Phase 10–13   |
-| 16.3 | Observability production setup  | Sentry project config, Pino → log aggregator pipeline, OpenTelemetry traces, alerting rules for error rate and latency.                                       | ADR-008       |
-| 16.4 | Azure deployment pipeline       | Azure App Service deployment config, managed PostgreSQL migration from Neon, GitHub Actions CD pipeline, staging environment.                                 | ADR-007       |
-| 16.5 | Backup and disaster recovery    | Automated database backups (24h RPO), point-in-time recovery, tested restore runbook (4h RTO target).                                                         | Phase 3       |
-| 16.6 | Security hardening              | Dependency vulnerability scanning (Snyk/GitHub Dependabot), CSRF protection review, rate limiting tuning, penetration test checklist.                         | Phase 10      |
-| 16.7 | Internationalization (i18n)     | Extract all user-facing strings. Set up next-intl or similar. Initial locale: English. Structure for adding locales without code changes.                      | Phase 8       |
+| Step | Title                          | Scope                                                                                                                                     | Depends on  |
+| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 16.1 | Load testing and tuning        | K6 or Artillery load tests targeting NFR thresholds (p95 <250ms read, <400ms write). Database query optimization. Connection pool tuning. | Phase 13    |
+| 16.2 | End-to-end test suite          | Playwright E2E tests for critical user flows: login, CRUD, search, bulk operations, admin workflows.                                      | Phase 10–13 |
+| 16.3 | Observability production setup | Sentry project config, Pino → log aggregator pipeline, OpenTelemetry traces, alerting rules for error rate and latency.                   | ADR-008     |
+| 16.4 | Azure deployment pipeline      | Azure App Service deployment config, managed PostgreSQL migration from Neon, GitHub Actions CD pipeline, staging environment.             | ADR-007     |
+| 16.5 | Backup and disaster recovery   | Automated database backups (24h RPO), point-in-time recovery, tested restore runbook (4h RTO target).                                     | Phase 3     |
+| 16.6 | Security hardening             | Dependency vulnerability scanning (Snyk/GitHub Dependabot), CSRF protection review, rate limiting tuning, penetration test checklist.     | Phase 10    |
+| 16.7 | Internationalization (i18n)    | Extract all user-facing strings. Set up next-intl or similar. Initial locale: English. Structure for adding locales without code changes. | Phase 8     |
 
 ---
 
@@ -67,12 +67,12 @@ Production readiness and enterprise-grade operational requirements.
 
 Enterprise multi-tenant capabilities for SaaS deployment.
 
-| Step | Title                         | Scope                                                                                                                                           | Depends on |
-| ---- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 17.1 | Workspace isolation           | Full tenant isolation at database level (row-level security or schema-per-tenant). Data leak prevention between workspaces.                    | 14.4       |
-| 17.2 | Usage metering and billing    | Track API calls, storage, users per workspace. Usage dashboard for admins. Integration hooks for billing systems.                              | Phase 12   |
-| 17.3 | White-label and theming       | Per-workspace branding (logo, colors, custom domain). Theme configuration UI. CSS variable override system.                                    | 15.5       |
-| 17.4 | Data residency and compliance | Regional database placement options. Data export for GDPR requests. Audit trail for compliance reporting.                                      | 16.5       |
+| Step | Title                         | Scope                                                                                                                       | Depends on |
+| ---- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 17.1 | Workspace isolation           | Full tenant isolation at database level (row-level security or schema-per-tenant). Data leak prevention between workspaces. | 14.4       |
+| 17.2 | Usage metering and billing    | Track API calls, storage, users per workspace. Usage dashboard for admins. Integration hooks for billing systems.           | Phase 12   |
+| 17.3 | White-label and theming       | Per-workspace branding (logo, colors, custom domain). Theme configuration UI. CSS variable override system.                 | 15.5       |
+| 17.4 | Data residency and compliance | Regional database placement options. Data export for GDPR requests. Audit trail for compliance reporting.                   | 16.5       |
 
 ---
 
@@ -91,12 +91,12 @@ V1 MVP Complete (Phases 0–13)
 
 ## Prioritization Guidance
 
-| Priority | Phases | Trigger                                          |
-| -------- | ------ | ------------------------------------------------ |
-| P1       | 16     | Before production deployment to first customer   |
-| P2       | 14     | When enterprise customer requires SSO/SCIM       |
-| P3       | 15     | Feature requests from pilot users                |
-| P4       | 17     | When SaaS model is validated                     |
+| Priority | Phases | Trigger                                        |
+| -------- | ------ | ---------------------------------------------- |
+| P1       | 16     | Before production deployment to first customer |
+| P2       | 14     | When enterprise customer requires SSO/SCIM     |
+| P3       | 15     | Feature requests from pilot users              |
+| P4       | 17     | When SaaS model is validated                   |
 
 ---
 
@@ -104,11 +104,11 @@ V1 MVP Complete (Phases 0–13)
 
 These remain active throughout V2 development:
 
-| Concern             | Scope                                                                                         |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| Observability       | Structured logging, distributed tracing, error tracking, alerting                             |
-| Performance         | API p95 <250 ms (read), <400 ms (write). Pagination. Query budgets. Cache strategy.           |
-| Security            | Secret management, input validation, CSRF, rate limiting, dependency scanning                 |
-| Reliability         | 99.5% availability, idempotent writes, backup/restore (24h RPO, 4h RTO)                      |
-| Instruction updates | Keep `.github/instructions/` and `.github/skills/` accurate for new phases                   |
-| Testing             | Unit, integration, and E2E tests. Every step includes tests.                                  |
+| Concern             | Scope                                                                               |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| Observability       | Structured logging, distributed tracing, error tracking, alerting                   |
+| Performance         | API p95 <250 ms (read), <400 ms (write). Pagination. Query budgets. Cache strategy. |
+| Security            | Secret management, input validation, CSRF, rate limiting, dependency scanning       |
+| Reliability         | 99.5% availability, idempotent writes, backup/restore (24h RPO, 4h RTO)             |
+| Instruction updates | Keep `.github/instructions/` and `.github/skills/` accurate for new phases          |
+| Testing             | Unit, integration, and E2E tests. Every step includes tests.                        |

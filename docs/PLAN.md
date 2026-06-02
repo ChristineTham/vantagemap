@@ -331,19 +331,19 @@ All V1 phases complete. For V2 roadmap (Phases 14–17), see [PLANV2.md](PLANV2.
 
 ### Decisions
 
-| Decision              | Choice                                                                               | Rationale                                                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| Delivery strategy     | Incremental, backend-first                                                           | Each step produces working output; backend APIs stabilize before frontend consumes them                             |
-| Implementation mode   | Vibe coding (AI agent per step)                                                      | Steps are self-contained with clear scope, inputs, outputs, and acceptance criteria                                 |
-| Tech stack            | Decided in Phase 1; see `docs/adr/`                                                  | PostgreSQL 16, Drizzle ORM, Better Auth, REST route handlers, Inngest, PG FTS, Sentry+Pino                          |
-| Frontend framework    | Next.js 16 App Router (confirmed in AGENTS.md)                                       | Already chosen and documented; not re-evaluated                                                                     |
-| Styling               | Tailwind CSS v4 + Rosely palette + shadcn/ui Base UI (see [DESIGN.md](../DESIGN.md)) | Already chosen and documented; not re-evaluated                                                                     |
-| API strategy          | REST-first (MVP), GraphQL added in Phase 12                                          | REST is simpler for vibe-coding agents; GraphQL deferred until schema is stable                                     |
-| Custom fields         | JSONB columns with validation                                                        | Avoids per-customer schema migrations; flexible for early product-market fit                                        |
-| MVP boundary          | Phases 0–13 are V1 MVP; Phases 14+ moved to [PLANV2.md](PLANV2.md)                   | Core platform complete before enterprise SSO and advanced features                                                  |
-| MVP deployment cost   | Zero monetary cost using free tiers                                                  | MVP must deploy without budget approval; validates product-market fit before spending                               |
-| Technology preference | Open-source first at every layer                                                     | Avoid vendor lock-in; commercial services only when free tier exists and no OSS alternative is viable               |
-| Production hosting    | Azure preferred, GCP second, AWS third                                               | Enterprise alignment; application code is cloud-agnostic, only configuration differs                                |
+| Decision              | Choice                                                                               | Rationale                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Delivery strategy     | Incremental, backend-first                                                           | Each step produces working output; backend APIs stabilize before frontend consumes them               |
+| Implementation mode   | Vibe coding (AI agent per step)                                                      | Steps are self-contained with clear scope, inputs, outputs, and acceptance criteria                   |
+| Tech stack            | Decided in Phase 1; see `docs/adr/`                                                  | PostgreSQL 16, Drizzle ORM, Better Auth, REST route handlers, Inngest, PG FTS, Sentry+Pino            |
+| Frontend framework    | Next.js 16 App Router (confirmed in AGENTS.md)                                       | Already chosen and documented; not re-evaluated                                                       |
+| Styling               | Tailwind CSS v4 + Rosely palette + shadcn/ui Base UI (see [DESIGN.md](../DESIGN.md)) | Already chosen and documented; not re-evaluated                                                       |
+| API strategy          | REST-first (MVP), GraphQL added in Phase 12                                          | REST is simpler for vibe-coding agents; GraphQL deferred until schema is stable                       |
+| Custom fields         | JSONB columns with validation                                                        | Avoids per-customer schema migrations; flexible for early product-market fit                          |
+| MVP boundary          | Phases 0–13 are V1 MVP; Phases 14+ moved to [PLANV2.md](PLANV2.md)                   | Core platform complete before enterprise SSO and advanced features                                    |
+| MVP deployment cost   | Zero monetary cost using free tiers                                                  | MVP must deploy without budget approval; validates product-market fit before spending                 |
+| Technology preference | Open-source first at every layer                                                     | Avoid vendor lock-in; commercial services only when free tier exists and no OSS alternative is viable |
+| Production hosting    | Azure preferred, GCP second, AWS third                                               | Enterprise alignment; application code is cloud-agnostic, only configuration differs                  |
 
 ---
 

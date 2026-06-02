@@ -48,7 +48,7 @@ VantageMap is an open-source enterprise architecture and business strategy platf
 | **Technology Radar**        | `/radar`        | ThoughtWorks-style radar across Adopt / Trial / Assess / Hold rings      |
 | **Strategic Roadmap**       | `/roadmap`      | Gantt-style timeline of all strategic initiatives                        |
 | **Reports & Analytics**     | `/reports`      | Portfolio health, TIME, 6R, obsolescence, coverage analysis              |
-| **Cross-Entity Search**     | `/search`       | Full-text search with faceted filtering across all entity types           |
+| **Cross-Entity Search**     | `/search`       | Full-text search with faceted filtering across all entity types          |
 | **Governance Hub**          | `/governance`   | Quality seal, tags, surveys, data stewardship                            |
 | **Administration**          | `/admin/*`      | User management, roles, API tokens, technical users                      |
 | **User Profile**            | `/profile`      | Account settings, password change, notifications                         |
@@ -85,23 +85,23 @@ See [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) for full setup instructio
 
 ## Tech Stack
 
-| Layer          | Technology                                                                      |
-| -------------- | ------------------------------------------------------------------------------- |
-| Framework      | Next.js 16.2.6 (App Router)                                                     |
-| Language       | TypeScript 6 (strict mode)                                                      |
-| UI Library     | React 19.2.6                                                                    |
-| Styling        | Tailwind CSS v4 + [Rosely design system](DESIGN.md)                             |
-| Components     | shadcn/ui (Base UI variant) — 13 primitives                                     |
-| Icons          | Lucide React                                                                    |
-| Charts         | Recharts 3 (dynamically loaded)                                                 |
-| Database       | PostgreSQL 16 (hosted on Neon)                                                  |
-| ORM            | Drizzle ORM (22 tables, 28 enums)                                               |
-| Auth           | Better Auth (email/password, sessions, RBAC)                                    |
-| API            | REST (29 route groups) + GraphQL                                                |
-| Search         | PostgreSQL Full-Text Search                                                     |
-| Integrations   | Webhooks (HMAC-signed), CSV import/export, OpenAPI 3.1                          |
-| Testing        | Vitest 4 (487+ tests)                                                           |
-| Hosting        | Vercel Hobby (MVP), Azure App Service (production)                              |
+| Layer        | Technology                                             |
+| ------------ | ------------------------------------------------------ |
+| Framework    | Next.js 16.2.6 (App Router)                            |
+| Language     | TypeScript 6 (strict mode)                             |
+| UI Library   | React 19.2.6                                           |
+| Styling      | Tailwind CSS v4 + [Rosely design system](DESIGN.md)    |
+| Components   | shadcn/ui (Base UI variant) — 13 primitives            |
+| Icons        | Lucide React                                           |
+| Charts       | Recharts 3 (dynamically loaded)                        |
+| Database     | PostgreSQL 16 (hosted on Neon)                         |
+| ORM          | Drizzle ORM (22 tables, 28 enums)                      |
+| Auth         | Better Auth (email/password, sessions, RBAC)           |
+| API          | REST (29 route groups) + GraphQL                       |
+| Search       | PostgreSQL Full-Text Search                            |
+| Integrations | Webhooks (HMAC-signed), CSV import/export, OpenAPI 3.1 |
+| Testing      | Vitest 4 (487+ tests)                                  |
+| Hosting      | Vercel Hobby (MVP), Azure App Service (production)     |
 
 ## Project Structure
 
@@ -158,20 +158,20 @@ docs/
 
 ## Documentation
 
-| Document                                    | Purpose                                      |
-| ------------------------------------------- | -------------------------------------------- |
-| [AGENTS.md](AGENTS.md)                      | Project guidelines and coding conventions    |
-| [DESIGN.md](DESIGN.md)                      | Rosely colour palette and design system      |
-| [docs/PLAN.md](docs/PLAN.md)                | V1 MVP implementation plan (complete)        |
-| [docs/PLANV2.md](docs/PLANV2.md)            | Post-MVP roadmap                             |
-| [docs/TESTING.md](docs/TESTING.md)          | Testing and verification procedures          |
-| [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | Setup and onboarding guide             |
-| [docs/MODEL.md](docs/MODEL.md)              | Canonical data model                         |
-| [docs/UAM.md](docs/UAM.md)                  | User access management model                 |
-| [docs/USER-GUIDE.md](docs/USER-GUIDE.md)    | End-user workflow guide                      |
-| [docs/DEVELOPER.md](docs/DEVELOPER.md)      | API and integration reference                |
-| [docs/ADMIN.md](docs/ADMIN.md)              | Administration features                      |
-| [docs/adr/](docs/adr/README.md)             | Architecture decision records                |
+| Document                                           | Purpose                                   |
+| -------------------------------------------------- | ----------------------------------------- |
+| [AGENTS.md](AGENTS.md)                             | Project guidelines and coding conventions |
+| [DESIGN.md](DESIGN.md)                             | Rosely colour palette and design system   |
+| [docs/PLAN.md](docs/PLAN.md)                       | V1 MVP implementation plan (complete)     |
+| [docs/PLANV2.md](docs/PLANV2.md)                   | Post-MVP roadmap                          |
+| [docs/TESTING.md](docs/TESTING.md)                 | Testing and verification procedures       |
+| [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | Setup and onboarding guide                |
+| [docs/MODEL.md](docs/MODEL.md)                     | Canonical data model                      |
+| [docs/UAM.md](docs/UAM.md)                         | User access management model              |
+| [docs/USER-GUIDE.md](docs/USER-GUIDE.md)           | End-user workflow guide                   |
+| [docs/DEVELOPER.md](docs/DEVELOPER.md)             | API and integration reference             |
+| [docs/ADMIN.md](docs/ADMIN.md)                     | Administration features                   |
+| [docs/adr/](docs/adr/README.md)                    | Architecture decision records             |
 
 ## 📄 License
 
