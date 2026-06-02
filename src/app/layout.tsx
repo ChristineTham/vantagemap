@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans, Noto_Serif, Noto_Sans_Mono } from "next/font/google";
-import { Sidebar } from "@/components/Sidebar";
 import { AuthSessionProvider } from "@/components/AuthSessionProvider";
+import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
 const notoSans = Noto_Sans({
@@ -46,10 +46,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-full bg-background font-sans text-foreground">
+      <body className="flex min-h-full bg-white font-sans text-foreground">
         <AuthSessionProvider>
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <AppShell>{children}</AppShell>
         </AuthSessionProvider>
       </body>
     </html>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { Layers, AppWindow, Target, Radar, GanttChart, AlertTriangle } from "lucide-react";
 import {
@@ -17,14 +18,30 @@ import {
   DashboardChartsLazy as DashboardCharts,
   ReportingChartsLazy as ReportingCharts,
 } from "@/components/LazyCharts";
+import { auth } from "@/lib/auth-server";
+import { LandingPage } from "@/components/LandingPage";
 
 export const metadata: Metadata = {
-  title: "Dashboard – VantageMap",
+  title: "VantageMap — Enterprise Architecture Platform",
   description:
-    "Enterprise architecture overview: capabilities, applications, strategy, and roadmap.",
+    "Map business capabilities to applications, align technology with strategy, and govern your portfolio with clarity.",
 };
 
 export default async function HomePage() {
+  // Server-side auth check — show landing page for unauthenticated visitors
+  let session = null;
+  try {
+    session = await auth.api.getSession({
+      headers: await headers(),
+    });
+  } catch {
+    // Auth check failed — treat as unauthenticated
+  }
+
+  if (!session) {
+    return <LandingPage />;
+  }
+
   const [capabilities, applications, objectives, initiatives, itComponents] = await Promise.all([
     getCapabilities(),
     getApplications(),

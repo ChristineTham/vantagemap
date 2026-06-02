@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-rosely-cream px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="font-serif text-3xl font-bold text-rosely-plum">VantageMap</h1>
