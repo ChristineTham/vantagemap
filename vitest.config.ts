@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
+    // e2e/ is Playwright's territory — keep it out of the Vitest unit run.
+    exclude: ["**/node_modules/**", "**/.next/**", "e2e/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
