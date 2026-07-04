@@ -14,6 +14,7 @@ import { sql as rawSql } from "drizzle-orm";
 import * as schema from "./schema";
 import { auth } from "../lib/auth-server";
 import { buildEnterpriseArchitectureTypes } from "../lib/templates/enterprise-architecture";
+import { VALID_RELATIONSHIP_PAIRS } from "../lib/relationship-rules";
 
 /** Password for the seeded demo accounts (development only). */
 const SEED_PASSWORD = "Password123!";
@@ -1297,6 +1298,19 @@ async function seed() {
     definition: { types: eaTypes } as Record<string, unknown>,
     appliedAt: new Date(),
   });
+
+  // Relationship rules (dynamic validation) from the master pair list.
+  await db
+    .insert(schema.relationshipRules)
+    .values(
+      VALID_RELATIONSHIP_PAIRS.map((p) => ({
+        sourceTypeKey: p.source,
+        targetTypeKey: p.target,
+        relationshipType: p.type,
+        isActive: true,
+      }))
+    )
+    .onConflictDoNothing();
 
   console.log("\n✅ Seed complete!");
   console.log("\n🔑 Demo sign-in credentials:");
