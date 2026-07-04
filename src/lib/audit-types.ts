@@ -33,7 +33,13 @@ export type AuditTargetType =
   | "User"
   | "Todo"
   | "Comment"
-  | "Import";
+  | "Import"
+  | "Document"
+  | "DocumentConfig"
+  | "Decision"
+  | "Milestone"
+  // PLANV3 dynamic document types are audited by their type key (free-form string).
+  | (string & {});
 
 /** Audit action types matching the audit_action PostgreSQL enum. */
 export type AuditAction = "create" | "update" | "delete";
