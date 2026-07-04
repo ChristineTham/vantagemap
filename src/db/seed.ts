@@ -15,6 +15,7 @@ import * as schema from "./schema";
 import { auth } from "../lib/auth-server";
 import { buildEnterpriseArchitectureTypes } from "../lib/templates/enterprise-architecture";
 import { VALID_RELATIONSHIP_PAIRS } from "../lib/relationship-rules";
+import { BUILTIN_DOCUMENT_COLUMNS } from "../lib/document-schema";
 
 /** Password for the seeded demo accounts (development only). */
 const SEED_PASSWORD = "Password123!";
@@ -1311,6 +1312,46 @@ async function seed() {
       }))
     )
     .onConflictDoNothing();
+
+  // ── Data cutover: mirror the seeded legacy rows into the unified `documents`
+  // table so the dynamic document pages are populated with the same data. Row
+  // ids are preserved so existing relationships (which reference them) line up.
+  console.log("  → Mirroring legacy rows into unified documents table");
+  const DOC_COLUMN_KEYS = new Set<string>([
+    ...BUILTIN_DOCUMENT_COLUMNS,
+    "id",
+    "createdAt",
+    "updatedAt",
+    "customFields",
+  ]);
+  const legacySources: { table: unknown; typeKey: string }[] = [
+    { table: schema.businessCapabilities, typeKey: "BusinessCapability" },
+    { table: schema.organizations, typeKey: "Organization" },
+    { table: schema.businessContexts, typeKey: "BusinessContext" },
+    { table: schema.applications, typeKey: "Application" },
+    { table: schema.dataObjects, typeKey: "DataObject" },
+    { table: schema.interfaces, typeKey: "Interface" },
+    { table: schema.strategicObjectives, typeKey: "StrategicObjective" },
+    { table: schema.initiatives, typeKey: "Initiative" },
+    { table: schema.platforms, typeKey: "Platform" },
+    { table: schema.techCategories, typeKey: "TechCategory" },
+    { table: schema.itComponents, typeKey: "ITComponent" },
+    { table: schema.providers, typeKey: "Provider" },
+  ];
+  for (const { table, typeKey } of legacySources) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (await db.select().from(table as any)) as Record<string, unknown>[];
+    if (rows.length === 0) continue;
+    const values = rows.map((row) => {
+      const v: Record<string, unknown> = { typeKey };
+      for (const [k, val] of Object.entries(row)) {
+        if (DOC_COLUMN_KEYS.has(k)) v[k] = val;
+      }
+      return v;
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await db.insert(schema.documents).values(values as any);
+  }
 
   console.log("\n✅ Seed complete!");
   console.log("\n🔑 Demo sign-in credentials:");
