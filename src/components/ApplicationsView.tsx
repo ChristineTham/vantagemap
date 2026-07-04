@@ -168,7 +168,7 @@ export function ApplicationsView({ applications }: ApplicationsViewProps) {
             setPage(1);
           }}
           aria-label="Filter by health status"
-          className="rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
+          className="rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
         >
           <option value="all">All Health</option>
           <option value="Excellent">Excellent</option>
@@ -184,7 +184,7 @@ export function ApplicationsView({ applications }: ApplicationsViewProps) {
             setPage(1);
           }}
           aria-label="Filter by lifecycle phase"
-          className="rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
+          className="rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
         >
           <option value="all">All Lifecycle</option>
           <option value="Plan">Plan</option>

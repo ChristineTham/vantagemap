@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, Filter, Loader2 } from "lucide-react";
+import { Search, Filter, Loader2, Bookmark, BookmarkPlus, Trash2, ChevronDown } from "lucide-react";
 import { cn, clientAuthHeaders } from "@/lib/utils";
 import { FACT_SHEET_CONFIGS } from "@/lib/fact-sheet-config";
 import { HealthBadge } from "@/components/StatusBadge";
@@ -27,6 +27,14 @@ interface GroupedResult {
   results: SearchResult[];
 }
 
+interface SavedSearch {
+  id: string;
+  name: string;
+  query: string | null;
+  entityTypes: string[] | null;
+  filters: Record<string, string> | null;
+}
+
 interface SearchPageViewProps {
   initialQuery: string;
   initialTypes: string[];
@@ -45,6 +53,99 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
   const [showFilters, setShowFilters] = useState(initialTypes.length > 0);
   const [isPending, startTransition] = useTransition();
   const [hasSearched, setHasSearched] = useState(!!initialQuery);
+
+  // ── Saved searches ──────────────────────────────────────────────────────
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
+  const [savedMenuOpen, setSavedMenuOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const savedMenuRef = useRef<HTMLDivElement>(null);
+
+  const loadSavedSearches = useCallback(async () => {
+    try {
+      const res = await fetch("/api/saved-searches", {
+        headers: { ...clientAuthHeaders() },
+      });
+      if (!res.ok) return;
+      const body = await res.json();
+      setSavedSearches(body.data ?? []);
+    } catch {
+      // Non-critical: leave saved searches empty on failure.
+    }
+  }, []);
+
+  useEffect(() => {
+    // Load-on-mount fetch; setState happens after an await, not synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadSavedSearches();
+  }, [loadSavedSearches]);
+
+  // Close the saved-searches menu on outside click.
+  useEffect(() => {
+    if (!savedMenuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (savedMenuRef.current && !savedMenuRef.current.contains(e.target as Node)) {
+        setSavedMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [savedMenuOpen]);
+
+  const handleSaveSearch = async () => {
+    if (!query.trim() || saving) return;
+    setSaving(true);
+    try {
+      const defaultName = query.trim().slice(0, 60);
+      const name = typeof window !== "undefined"
+        ? window.prompt("Name this saved search", defaultName)
+        : defaultName;
+      if (name === null) return; // user cancelled
+      const trimmedName = name.trim() || defaultName;
+      const res = await fetch("/api/saved-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...clientAuthHeaders() },
+        body: JSON.stringify({
+          name: trimmedName,
+          query: query.trim(),
+          entityTypes: selectedTypes.length > 0 ? selectedTypes : null,
+        }),
+      });
+      if (res.ok) await loadSavedSearches();
+    } catch {
+      // Non-critical: swallow so the search UI stays responsive.
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const applySavedSearch = (saved: SavedSearch) => {
+    setSavedMenuOpen(false);
+    const nextQuery = saved.query ?? "";
+    const nextTypes = saved.entityTypes ?? [];
+    setQuery(nextQuery);
+    setSelectedTypes(nextTypes);
+    setPage(1);
+    setShowFilters(nextTypes.length > 0);
+    setHasSearched(!!nextQuery.trim());
+    doSearch(nextQuery, nextTypes, 1);
+    const params = new URLSearchParams();
+    if (nextQuery.trim()) params.set("q", nextQuery.trim());
+    if (nextTypes.length > 0) params.set("types", nextTypes.join(","));
+    router.push(`/search?${params}`);
+  };
+
+  const handleDeleteSavedSearch = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(`/api/saved-searches/${id}`, {
+        method: "DELETE",
+        headers: { ...clientAuthHeaders() },
+      });
+      if (res.ok) setSavedSearches((prev) => prev.filter((s) => s.id !== id));
+    } catch {
+      // Non-critical.
+    }
+  };
 
   const doSearch = useCallback(async (q: string, types: string[], p: number) => {
     if (!q.trim()) {
@@ -85,7 +186,6 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
   // Search on mount if query provided
   useEffect(() => {
     if (initialQuery) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       doSearch(initialQuery, initialTypes, initialPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,7 +253,7 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search all fact sheets…"
             className={cn(
-              "w-full rounded-lg border border-rosely-blush bg-white py-2.5 pl-10 pr-4 text-sm text-rosely-night",
+              "w-full rounded-lg border border-rosely-blush bg-card py-2.5 pl-10 pr-4 text-sm text-rosely-night",
               "placeholder:text-rosely-mist",
               "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30",
               "transition-colors"
@@ -169,7 +269,7 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
             "rounded-lg border px-3 py-2 text-sm transition-colors",
             showFilters
               ? "border-rosely-lilac bg-rosely-petal text-rosely-plum"
-              : "border-rosely-blush bg-white text-rosely-dusk hover:border-rosely-lilac"
+              : "border-rosely-blush bg-card text-rosely-dusk hover:border-rosely-lilac"
           )}
         >
           <Filter className="size-4" />
@@ -184,9 +284,99 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
         </button>
       </form>
 
+      {/* Saved Searches Toolbar */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleSaveSearch}
+          disabled={!query.trim() || saving}
+          aria-label="Save this search"
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-card px-3 py-1.5 text-xs font-medium text-rosely-dusk transition-colors",
+            "hover:border-rosely-lilac hover:text-rosely-plum",
+            "disabled:opacity-50 disabled:hover:border-rosely-blush disabled:hover:text-rosely-dusk"
+          )}
+        >
+          {saving ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <BookmarkPlus className="size-3.5" />
+          )}
+          Save this search
+        </button>
+
+        <div ref={savedMenuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setSavedMenuOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={savedMenuOpen}
+            aria-label="Saved searches"
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-card px-3 py-1.5 text-xs font-medium text-rosely-dusk transition-colors",
+              "hover:border-rosely-lilac hover:text-rosely-plum"
+            )}
+          >
+            <Bookmark className="size-3.5" />
+            Saved searches
+            {savedSearches.length > 0 && (
+              <span className="rounded-full bg-rosely-petal px-1.5 py-0.5 text-[10px] font-semibold text-rosely-plum">
+                {savedSearches.length}
+              </span>
+            )}
+            <ChevronDown className="size-3.5" />
+          </button>
+
+          {savedMenuOpen && (
+            <div
+              role="menu"
+              aria-label="Saved searches"
+              className="absolute left-0 z-20 mt-1 max-h-80 w-72 overflow-auto rounded-lg border border-rosely-blush bg-card p-1 shadow-lg"
+            >
+              {savedSearches.length === 0 ? (
+                <p className="px-3 py-3 text-xs text-rosely-mist">
+                  No saved searches yet. Run a search and choose &quot;Save this search&quot;.
+                </p>
+              ) : (
+                savedSearches.map((saved) => (
+                  <div
+                    key={saved.id}
+                    role="menuitem"
+                    tabIndex={0}
+                    onClick={() => applySavedSearch(saved)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        applySavedSearch(saved);
+                      }
+                    }}
+                    className="group flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 text-left hover:bg-rosely-cream focus:bg-rosely-cream focus:outline-none"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-medium text-rosely-night">{saved.name}</p>
+                      {saved.query && (
+                        <p className="truncate text-[11px] text-rosely-mist">{saved.query}</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteSavedSearch(e, saved.id)}
+                      aria-label={`Delete saved search ${saved.name}`}
+                      className="shrink-0 rounded p-1 text-rosely-mist opacity-0 transition-opacity hover:text-rosely-rose group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Type Filters */}
       {showFilters && (
-        <div className="rounded-xl border border-rosely-blush bg-white p-4">
+        <div className="rounded-xl border border-rosely-blush bg-card p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-rosely-dusk">Filter by type:</span>
             {selectedTypes.length > 0 && (
@@ -225,7 +415,7 @@ export function SearchPageView({ initialQuery, initialTypes, initialPage }: Sear
       )}
 
       {!isPending && hasSearched && results.length === 0 && (
-        <div className="rounded-xl border border-dashed border-rosely-blush bg-white px-6 py-12 text-center">
+        <div className="rounded-xl border border-dashed border-rosely-blush bg-card px-6 py-12 text-center">
           <Search className="mx-auto mb-3 size-10 text-rosely-mist" />
           <h3 className="text-sm font-medium text-rosely-night">No results found</h3>
           <p className="mt-1 text-xs text-rosely-mist">
@@ -277,7 +467,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   return (
     <Link
       href={`/${slug}/${result.id}`}
-      className="block rounded-xl border border-rosely-blush bg-white p-4 hover:border-rosely-lilac hover:shadow-sm transition-all"
+      className="block rounded-xl border border-rosely-blush bg-card p-4 hover:border-rosely-lilac hover:shadow-sm transition-all"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">

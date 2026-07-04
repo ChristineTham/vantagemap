@@ -62,7 +62,7 @@ npm install        # install deps
 npm run dev        # dev server (http://localhost:3000)
 npm run build      # production build
 npm run lint       # ESLint
-npm run test       # Vitest (487+ tests)
+npm run test       # Vitest (569 tests)
 npm run type-check # TypeScript strict
 npm run db:migrate # run database migrations
 npm run db:seed    # populate sample data
@@ -91,16 +91,16 @@ See [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) for full setup instructio
 | Language     | TypeScript 6 (strict mode)                             |
 | UI Library   | React 19.2.6                                           |
 | Styling      | Tailwind CSS v4 + [Rosely design system](DESIGN.md)    |
-| Components   | shadcn/ui (Base UI variant) — 13 primitives            |
+| Components   | shadcn/ui (Radix UI primitives) — 13 primitives        |
 | Icons        | Lucide React                                           |
 | Charts       | Recharts 3 (dynamically loaded)                        |
 | Database     | PostgreSQL 16 (hosted on Neon)                         |
-| ORM          | Drizzle ORM (22 tables, 28 enums)                      |
+| ORM          | Drizzle ORM (31 app tables + 5 Better Auth, 27 enums)  |
 | Auth         | Better Auth (email/password, sessions, RBAC)           |
 | API          | REST (29 route groups) + GraphQL                       |
 | Search       | PostgreSQL Full-Text Search                            |
 | Integrations | Webhooks (HMAC-signed), CSV import/export, OpenAPI 3.1 |
-| Testing      | Vitest 4 (487+ tests)                                  |
+| Testing      | Vitest 4 (569 tests)                                   |
 | Hosting      | Vercel Hobby (MVP), Azure App Service (production)     |
 
 ## Project Structure
@@ -129,7 +129,7 @@ src/
     DataTable.tsx         # Reusable data table
     ...                   # 40+ shared components
   db/
-    schema/               # 13 schema files, 22 tables, 28 enums
+    schema/               # 13 schema files, 31 app tables (36 incl. Better Auth), 27 enums
     index.ts              # Neon HTTP connection
     migrate.ts            # Migration runner
     seed.ts               # Idempotent seed script
@@ -146,7 +146,7 @@ src/
     rbac.ts               # Role-based access control
     reports.ts            # Reporting aggregation queries
     webhook-engine.ts     # Webhook delivery engine
-  middleware.ts           # Auth route protection
+  proxy.ts                # Auth route protection (Next.js proxy)
   env.ts                  # Environment validation (Zod)
 docs/
   PLAN.md                 # V1 plan (Phases 0–13, all complete)

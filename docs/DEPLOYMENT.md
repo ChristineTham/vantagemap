@@ -229,6 +229,18 @@ In the Vercel project settings → **"Environment Variables"** tab, add the foll
 | `BETTER_AUTH_URL` | `https://your-project.vercel.app` | Production | No |
 | `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` | Production | No |
 
+### Optional Variables
+
+| Name | Purpose | Sensitive |
+|------|---------|-----------|
+| `CRON_SECRET` | Shared secret guarding the webhook-retry cron endpoint (`GET /api/cron/webhooks`, scheduled in `vercel.json`). If unset, the endpoint refuses to run. Generate with `openssl rand -base64 32`. | Yes (encrypted) |
+| `RESEND_API_KEY` | Enables transactional email (password reset, verification, notifications) via [Resend](https://resend.com). When unset, emails are logged in development and skipped (never logging tokens) in production. | Yes (encrypted) |
+| `EMAIL_FROM` | From-address for transactional email, e.g. `VantageMap <no-reply@yourdomain.com>`. | No |
+
+> **Security headers** (CSP, HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) are applied for every route by `next.config.ts` — host-agnostic, so they also apply on Azure. The CSP allows `cdn.jsdelivr.net` for the Scalar API-reference page at `/api/docs`.
+
+> **Database migrations** — `npm run db:migrate` (run automatically by `vercel-build`) applies the full schema, including the Better Auth tables (`user`, `session`, `account`, `verification`, `rate_limit`) and all application tables. A fresh database is fully provisioned by this one command.
+
 ### Setting Each Variable
 
 1. **DATABASE_URL**

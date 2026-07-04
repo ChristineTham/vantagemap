@@ -297,8 +297,8 @@ CREATE TABLE "audit_entries" (
 	"actor_type" varchar(50) DEFAULT 'user' NOT NULL,
 	"actor_display_name" varchar(255),
 	"action" "audit_action" NOT NULL,
-	"target_type" "fact_sheet_type" NOT NULL,
-	"target_id" uuid NOT NULL,
+	"target_type" varchar(64) NOT NULL,
+	"target_id" varchar(255) NOT NULL,
 	"target_display_name" varchar(255),
 	"diff" jsonb,
 	"request_context" jsonb,
@@ -338,11 +338,201 @@ CREATE TABLE "workspaces" (
 	CONSTRAINT "workspaces_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
+CREATE TABLE "account" (
+	"id" text PRIMARY KEY NOT NULL,
+	"account_id" text NOT NULL,
+	"provider_id" text NOT NULL,
+	"user_id" text NOT NULL,
+	"access_token" text,
+	"refresh_token" text,
+	"id_token" text,
+	"access_token_expires_at" timestamp with time zone,
+	"refresh_token_expires_at" timestamp with time zone,
+	"scope" text,
+	"password" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "rate_limit" (
+	"id" text PRIMARY KEY NOT NULL,
+	"key" text,
+	"count" integer,
+	"last_request" bigint
+);
+--> statement-breakpoint
+CREATE TABLE "session" (
+	"id" text PRIMARY KEY NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"token" text NOT NULL,
+	"ip_address" text,
+	"user_agent" text,
+	"user_id" text NOT NULL,
+	"impersonated_by" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "session_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
+CREATE TABLE "user" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"email_verified" boolean DEFAULT false NOT NULL,
+	"image" text,
+	"avatar_url" text,
+	"role" text,
+	"banned" boolean,
+	"ban_reason" text,
+	"ban_expires" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "user_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
+CREATE TABLE "verification" (
+	"id" text PRIMARY KEY NOT NULL,
+	"identifier" text NOT NULL,
+	"value" text NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "api_tokens" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"token_hash" varchar(64) NOT NULL,
+	"prefix" varchar(12) NOT NULL,
+	"user_id" uuid NOT NULL,
+	"workspace_id" uuid NOT NULL,
+	"expires_at" timestamp with time zone,
+	"last_used_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "api_tokens_token_hash_unique" UNIQUE("token_hash")
+);
+--> statement-breakpoint
+CREATE TABLE "comments" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_id" uuid NOT NULL,
+	"author_id" uuid NOT NULL,
+	"parent_id" uuid,
+	"content" text NOT NULL,
+	"mentions" jsonb,
+	"edited_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "quality_seal_transitions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_id" uuid NOT NULL,
+	"from_state" varchar(50) NOT NULL,
+	"to_state" varchar(50) NOT NULL,
+	"actor_id" uuid NOT NULL,
+	"reason" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "survey_questions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"survey_id" uuid NOT NULL,
+	"question_text" text NOT NULL,
+	"question_type" varchar(50) DEFAULT 'text' NOT NULL,
+	"options" jsonb,
+	"target_field" varchar(255),
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"required" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "survey_responses" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"survey_id" uuid NOT NULL,
+	"question_id" uuid NOT NULL,
+	"respondent_id" uuid NOT NULL,
+	"value" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "surveys" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"description" text,
+	"created_by_id" uuid NOT NULL,
+	"fact_sheet_type" "fact_sheet_type",
+	"fact_sheet_id" uuid,
+	"status" varchar(50) DEFAULT 'draft' NOT NULL,
+	"closes_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "todos" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_id" uuid NOT NULL,
+	"title" varchar(500) NOT NULL,
+	"description" text,
+	"assignee_id" uuid,
+	"created_by_id" uuid NOT NULL,
+	"done" boolean DEFAULT false NOT NULL,
+	"due_date" timestamp with time zone,
+	"completed_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "webhook_deliveries" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"webhook_id" uuid NOT NULL,
+	"event" varchar(100) NOT NULL,
+	"payload" jsonb NOT NULL,
+	"status_code" integer,
+	"response_body" text,
+	"status" varchar(20) DEFAULT 'pending' NOT NULL,
+	"attempts" integer DEFAULT 0 NOT NULL,
+	"max_attempts" integer DEFAULT 3 NOT NULL,
+	"next_retry_at" timestamp with time zone,
+	"error_message" text,
+	"duration_ms" integer,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"completed_at" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "webhooks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"url" text NOT NULL,
+	"events" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"secret" text,
+	"active" boolean DEFAULT true NOT NULL,
+	"name" varchar(255),
+	"description" text,
+	"created_by" uuid,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "kpis" ADD CONSTRAINT "kpis_objective_id_strategic_objectives_id_fk" FOREIGN KEY ("objective_id") REFERENCES "public"."strategic_objectives"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tag_assignments" ADD CONSTRAINT "tag_assignments_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tags" ADD CONSTRAINT "tags_tag_group_id_tag_groups_id_fk" FOREIGN KEY ("tag_group_id") REFERENCES "public"."tag_groups"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_workspace_roles" ADD CONSTRAINT "user_workspace_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_workspace_roles" ADD CONSTRAINT "user_workspace_roles_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "api_tokens" ADD CONSTRAINT "api_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "comments" ADD CONSTRAINT "comments_author_id_users_id_fk" FOREIGN KEY ("author_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "quality_seal_transitions" ADD CONSTRAINT "quality_seal_transitions_actor_id_users_id_fk" FOREIGN KEY ("actor_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "survey_questions" ADD CONSTRAINT "survey_questions_survey_id_surveys_id_fk" FOREIGN KEY ("survey_id") REFERENCES "public"."surveys"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "survey_responses" ADD CONSTRAINT "survey_responses_survey_id_surveys_id_fk" FOREIGN KEY ("survey_id") REFERENCES "public"."surveys"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "survey_responses" ADD CONSTRAINT "survey_responses_question_id_survey_questions_id_fk" FOREIGN KEY ("question_id") REFERENCES "public"."survey_questions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "survey_responses" ADD CONSTRAINT "survey_responses_respondent_id_users_id_fk" FOREIGN KEY ("respondent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "surveys" ADD CONSTRAINT "surveys_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "todos" ADD CONSTRAINT "todos_assignee_id_users_id_fk" FOREIGN KEY ("assignee_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "todos" ADD CONSTRAINT "todos_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_webhook_id_webhooks_id_fk" FOREIGN KEY ("webhook_id") REFERENCES "public"."webhooks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_relationships_source" ON "relationships" USING btree ("source_type","source_id");--> statement-breakpoint
 CREATE INDEX "idx_relationships_target" ON "relationships" USING btree ("target_type","target_id");--> statement-breakpoint
 CREATE INDEX "idx_relationships_type" ON "relationships" USING btree ("relationship_type");--> statement-breakpoint
@@ -355,4 +545,27 @@ CREATE INDEX "idx_audit_action" ON "audit_entries" USING btree ("action");--> st
 CREATE INDEX "idx_audit_created_at" ON "audit_entries" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "idx_audit_actor_time" ON "audit_entries" USING btree ("actor_id","created_at");--> statement-breakpoint
 CREATE INDEX "idx_uwr_user" ON "user_workspace_roles" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_uwr_workspace" ON "user_workspace_roles" USING btree ("workspace_id");
+CREATE INDEX "idx_uwr_workspace" ON "user_workspace_roles" USING btree ("workspace_id");--> statement-breakpoint
+CREATE INDEX "idx_account_user" ON "account" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_session_user" ON "session" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_verification_identifier" ON "verification" USING btree ("identifier");--> statement-breakpoint
+CREATE INDEX "idx_api_tokens_hash" ON "api_tokens" USING btree ("token_hash");--> statement-breakpoint
+CREATE INDEX "idx_api_tokens_user" ON "api_tokens" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_api_tokens_workspace" ON "api_tokens" USING btree ("workspace_id");--> statement-breakpoint
+CREATE INDEX "idx_comments_entity" ON "comments" USING btree ("fact_sheet_type","fact_sheet_id");--> statement-breakpoint
+CREATE INDEX "idx_comments_author" ON "comments" USING btree ("author_id");--> statement-breakpoint
+CREATE INDEX "idx_comments_parent" ON "comments" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX "idx_qs_transitions_entity" ON "quality_seal_transitions" USING btree ("fact_sheet_type","fact_sheet_id");--> statement-breakpoint
+CREATE INDEX "idx_survey_questions_survey" ON "survey_questions" USING btree ("survey_id");--> statement-breakpoint
+CREATE INDEX "idx_survey_responses_survey" ON "survey_responses" USING btree ("survey_id");--> statement-breakpoint
+CREATE INDEX "idx_survey_responses_respondent" ON "survey_responses" USING btree ("respondent_id");--> statement-breakpoint
+CREATE INDEX "idx_surveys_creator" ON "surveys" USING btree ("created_by_id");--> statement-breakpoint
+CREATE INDEX "idx_surveys_entity" ON "surveys" USING btree ("fact_sheet_type","fact_sheet_id");--> statement-breakpoint
+CREATE INDEX "idx_todos_entity" ON "todos" USING btree ("fact_sheet_type","fact_sheet_id");--> statement-breakpoint
+CREATE INDEX "idx_todos_assignee" ON "todos" USING btree ("assignee_id");--> statement-breakpoint
+CREATE INDEX "idx_todos_created_by" ON "todos" USING btree ("created_by_id");--> statement-breakpoint
+CREATE INDEX "deliveries_webhook_id_idx" ON "webhook_deliveries" USING btree ("webhook_id");--> statement-breakpoint
+CREATE INDEX "deliveries_status_idx" ON "webhook_deliveries" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "deliveries_next_retry_idx" ON "webhook_deliveries" USING btree ("next_retry_at");--> statement-breakpoint
+CREATE INDEX "webhooks_active_idx" ON "webhooks" USING btree ("active");--> statement-breakpoint
+CREATE INDEX "webhooks_created_by_idx" ON "webhooks" USING btree ("created_by");

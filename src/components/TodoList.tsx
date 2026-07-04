@@ -70,10 +70,11 @@ export function TodoList({ todos, onToggle, onCreate, readOnly = false }: TodoLi
 
       {/* New todo form */}
       {showNew && (
-        <div className="border border-rosely-blush rounded-lg p-3 bg-white shadow-sm flex flex-col gap-2">
+        <div className="border border-rosely-blush rounded-lg p-3 bg-card shadow-sm flex flex-col gap-2">
           <input
             type="text"
             placeholder="What needs to be done?"
+            aria-label="To-do title"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             className="w-full px-3 py-2 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac"

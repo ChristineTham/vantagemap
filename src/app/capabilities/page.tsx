@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getCapabilities } from "@/lib/data";
 import type { BusinessCapability } from "@/lib/types";
 import { HealthIndicator } from "@/components/HealthIndicator";
@@ -29,7 +30,7 @@ export default async function CapabilitiesPage() {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-rosely-night">Business Capabilities</h1>
-          <p className="text-sm text-rosely-mist mt-1">
+          <p className="text-sm text-rosely-dusk mt-1">
             Hierarchical view of enterprise business capabilities.
           </p>
         </div>
@@ -48,7 +49,7 @@ export default async function CapabilitiesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-rosely-night">Business Capabilities</h1>
-          <p className="text-sm text-rosely-mist mt-1">
+          <p className="text-sm text-rosely-dusk mt-1">
             {capabilities.length} capabilities across {level1.length} domains
           </p>
         </div>
@@ -76,16 +77,23 @@ export default async function CapabilitiesPage() {
         {level1.map((l1) => {
           const l2Children = getChildren(l1.id, level2);
           return (
-            <div key={l1.id} className="rounded-xl border-2 border-rosely-plum/30 bg-white p-4">
+            <div key={l1.id} className="rounded-xl border-2 border-rosely-plum/30 bg-card p-4">
               {/* Level 1 header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-rosely-night">{l1.name}</h2>
+                  <h2 className="text-base font-semibold text-rosely-night">
+                    <Link
+                      href={`/capabilities/${l1.id}`}
+                      className="rounded-sm hover:text-rosely-plum hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      {l1.name}
+                    </Link>
+                  </h2>
                   <HealthIndicator health={l1.health} showLabel />
                 </div>
                 <LifecycleTag lifecycle={l1.lifecycle} />
               </div>
-              {l1.description && <p className="text-xs text-rosely-mist mb-3">{l1.description}</p>}
+              {l1.description && <p className="text-xs text-rosely-dusk mb-3">{l1.description}</p>}
 
               {/* Level 2 grid */}
               {l2Children.length > 0 && (
@@ -98,7 +106,14 @@ export default async function CapabilitiesPage() {
                         className="rounded-lg border border-rosely-cornflower/30 bg-rosely-cream/30 p-3"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-sm font-medium text-rosely-night">{l2.name}</h3>
+                          <h3 className="text-sm font-medium text-rosely-night">
+                            <Link
+                              href={`/capabilities/${l2.id}`}
+                              className="rounded-sm hover:text-rosely-plum hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              {l2.name}
+                            </Link>
+                          </h3>
                           <HealthIndicator health={l2.health} />
                         </div>
 
@@ -106,14 +121,15 @@ export default async function CapabilitiesPage() {
                         {l3Children.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
                             {l3Children.map((l3) => (
-                              <span
+                              <Link
                                 key={l3.id}
-                                className="inline-flex items-center gap-1 rounded border border-rosely-mist/30 bg-white px-2 py-0.5 text-xs text-rosely-dusk"
+                                href={`/capabilities/${l3.id}`}
+                                className="inline-flex items-center gap-1 rounded border border-rosely-mist/30 bg-card px-2 py-0.5 text-xs text-rosely-dusk transition-colors hover:border-rosely-plum/40 hover:text-rosely-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                 title={l3.description || l3.name}
                               >
                                 <HealthIndicator health={l3.health} />
                                 {l3.name}
-                              </span>
+                              </Link>
                             ))}
                           </div>
                         )}

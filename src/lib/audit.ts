@@ -14,7 +14,7 @@
 import { db } from "@/db";
 import { auditEntries } from "@/db/schema";
 import type { AuthContext } from "@/lib/auth";
-import type { FactSheetType, AuditAction } from "./audit-types";
+import type { AuditTargetType, AuditAction } from "./audit-types";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,8 +23,8 @@ export interface AuditLogParams {
   auth: AuthContext;
   /** The mutation type. */
   action: AuditAction;
-  /** The fact sheet type being acted on. */
-  targetType: FactSheetType;
+  /** The entity type being acted on. */
+  targetType: AuditTargetType;
   /** The ID of the entity being acted on. */
   targetId: string;
   /** Display name of the target for human-readable logs. */
@@ -41,7 +41,7 @@ export interface FailedAuthLogParams {
   /** The action that was denied. */
   action: AuditAction;
   /** The target type. */
-  targetType: FactSheetType;
+  targetType: AuditTargetType;
   /** The target ID (if known). */
   targetId?: string;
   /** Reason for the denial. */
@@ -131,6 +131,13 @@ export async function writeAuditLog(params: AuditLogParams): Promise<void> {
     console.error("[Audit] Failed to write audit log:", err);
   }
 }
+
+/**
+ * Alias of {@link writeAuditLog} for auditing non-fact-sheet mutations
+ * (webhooks, surveys, API tokens, admin actions). Same table and semantics;
+ * the distinct name documents intent at the call site.
+ */
+export const auditMutation = writeAuditLog;
 
 /**
  * Write an audit log entry for a failed authorization attempt.

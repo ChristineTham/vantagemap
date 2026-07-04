@@ -7,7 +7,7 @@ import { cn, clientAuthHeaders } from "@/lib/utils";
 import { FACT_SHEET_CONFIGS } from "@/lib/fact-sheet-config";
 import { HealthBadge } from "@/components/StatusBadge";
 import { LifecycleTag } from "@/components/LifecycleTag";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface SearchHit {
   id: string;
@@ -84,6 +84,8 @@ export function SearchModal({ onClose }: SearchModalProps) {
       }}
     >
       <DialogContent className="top-[15vh] translate-y-0 max-w-xl rounded-2xl p-0 gap-0 overflow-hidden">
+        <DialogTitle className="sr-only">Search fact sheets</DialogTitle>
+
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-rosely-blush">
           {searching ? (
@@ -97,11 +99,19 @@ export function SearchModal({ onClose }: SearchModalProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search all fact sheets…"
+            aria-label="Search all fact sheets"
             className={cn(
               "flex-1 bg-transparent text-sm text-rosely-night placeholder:text-rosely-mist",
               "focus:outline-none"
             )}
           />
+        </div>
+
+        {/* Results count — announced to assistive tech */}
+        <div aria-live="polite" className="sr-only">
+          {hasSearched && !searching
+            ? `${results.length} result${results.length === 1 ? "" : "s"} for ${query}`
+            : ""}
         </div>
 
         {/* Results */}

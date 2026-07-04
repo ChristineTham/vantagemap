@@ -34,7 +34,7 @@ export function RelationshipList({ relationships, entityType, entityId }: Relati
         </h3>
         <button
           onClick={() => setShowAdd(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-white px-3 py-1.5 text-xs font-medium text-rosely-dusk hover:border-rosely-lilac hover:text-rosely-night transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-card px-3 py-1.5 text-xs font-medium text-rosely-dusk hover:border-rosely-lilac hover:text-rosely-night transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Relationship
@@ -43,7 +43,7 @@ export function RelationshipList({ relationships, entityType, entityId }: Relati
 
       {/* Relationship Groups */}
       {relationships.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-rosely-blush bg-white px-6 py-8 text-center">
+        <div className="rounded-xl border border-dashed border-rosely-blush bg-card px-6 py-8 text-center">
           <p className="text-sm text-rosely-mist">No relationships defined yet.</p>
           <button
             onClick={() => setShowAdd(true)}
@@ -58,7 +58,7 @@ export function RelationshipList({ relationships, entityType, entityId }: Relati
           {Array.from(grouped.entries()).map(([relType, rels]) => (
             <div
               key={relType}
-              className="rounded-xl border border-rosely-blush bg-white overflow-hidden"
+              className="rounded-xl border border-rosely-blush bg-card overflow-hidden"
             >
               <div className="border-b border-rosely-blush bg-rosely-cream/30 px-4 py-2">
                 <span className="text-xs font-semibold text-rosely-dusk uppercase tracking-wide">

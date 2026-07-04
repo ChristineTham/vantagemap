@@ -18,6 +18,7 @@ import {
   itComponentsApi,
   techCategoriesApi,
   organizationsApi,
+  businessContextsApi,
   dataObjectsApi,
   interfacesApi,
   providersApi,
@@ -328,7 +329,7 @@ export async function getEntityByTypeAndId(
       Interface: interfacesApi,
       Provider: providersApi,
       Platform: platformsApi,
-      BusinessContext: { getById: async () => ({ data: null }) },
+      BusinessContext: businessContextsApi,
     };
 
     const client = apiClientMap[type];

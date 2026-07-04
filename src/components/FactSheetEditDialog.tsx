@@ -99,15 +99,19 @@ export function FactSheetEditDialog({
       }}
     >
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="sticky top-0 z-10 border-b border-rosely-blush bg-white px-6 py-4 rounded-t-xl">
+        <DialogHeader className="sticky top-0 z-10 border-b border-rosely-blush bg-card px-6 py-4 rounded-t-xl">
           <DialogTitle className="text-lg font-semibold text-rosely-night">
             Edit {config.displayName}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6">
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 flex flex-col gap-6"
+          aria-describedby={error ? "edit-form-error" : undefined}
+        >
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" id="edit-form-error">
               <AlertCircle className="size-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
@@ -169,28 +173,36 @@ function FormField({
   onChange: (value: string) => void;
 }) {
   const baseInputClass = cn(
-    "w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night",
+    "w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night",
     "placeholder:text-rosely-mist",
     "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30",
     "transition-colors"
   );
 
   const isFullWidth = field.type === "textarea" || field.type === "url";
+  const fieldId = `edit-field-${field.key}`;
+  const helpId = field.helpText ? `${fieldId}-help` : undefined;
 
   return (
     <div className={cn(isFullWidth && "sm:col-span-2")}>
-      <label className="block text-xs font-medium text-rosely-dusk mb-1">
+      <label htmlFor={fieldId} className="block text-xs font-medium text-rosely-dusk mb-1">
         {field.label}
-        {field.required && <span className="text-rosely-rose ml-0.5">*</span>}
+        {field.required && (
+          <span className="text-rosely-rose ml-0.5" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
 
       {field.type === "select" ? (
         <select
+          id={fieldId}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={baseInputClass}
           required={field.required}
-          aria-label={field.label}
+          aria-required={field.required || undefined}
+          aria-describedby={helpId}
         >
           <option value="">— Select —</option>
           {field.options?.map((opt) => (
@@ -201,15 +213,19 @@ function FormField({
         </select>
       ) : field.type === "textarea" ? (
         <textarea
+          id={fieldId}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
           rows={3}
           className={baseInputClass}
           required={field.required}
+          aria-required={field.required || undefined}
+          aria-describedby={helpId}
         />
       ) : (
         <input
+          id={fieldId}
           type={
             field.type === "number"
               ? "number"
@@ -224,10 +240,16 @@ function FormField({
           placeholder={field.placeholder}
           className={baseInputClass}
           required={field.required}
+          aria-required={field.required || undefined}
+          aria-describedby={helpId}
         />
       )}
 
-      {field.helpText && <p className="mt-1 text-xs text-rosely-mist">{field.helpText}</p>}
+      {field.helpText && (
+        <p id={helpId} className="mt-1 text-xs text-rosely-mist">
+          {field.helpText}
+        </p>
+      )}
     </div>
   );
 }

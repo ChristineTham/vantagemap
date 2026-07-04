@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+      <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
         <h2 className="text-xl font-bold text-rosely-night">Invalid Link</h2>
         <p className="mt-2 text-sm text-rosely-mist">
           This password reset link is invalid or has expired.
@@ -72,7 +72,7 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+      <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
         <div className="flex flex-col items-center text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-rosely-teal/20">
             <KeyRound className="size-6 text-rosely-teal" />
@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
       <h2 className="text-xl font-bold text-rosely-night">Set New Password</h2>
       <p className="mt-1 text-sm text-rosely-mist">Enter your new password below</p>
 

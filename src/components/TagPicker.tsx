@@ -122,7 +122,7 @@ export function TagPicker({
 
       {/* Tag picker dropdown */}
       {showPicker && (
-        <div className="border border-rosely-blush rounded-lg p-3 bg-white shadow-sm">
+        <div className="border border-rosely-blush rounded-lg p-3 bg-card shadow-sm">
           <input
             type="text"
             placeholder="Search tags..."

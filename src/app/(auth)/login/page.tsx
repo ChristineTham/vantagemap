@@ -10,10 +10,21 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Only allow same-origin relative redirects. Rejects absolute URLs (`https://…`),
+ * protocol-relative (`//evil.com`), and anything not starting with a single `/`,
+ * preventing an open-redirect via `?callbackUrl=`.
+ */
+function safeCallbackUrl(raw: string | null): string {
+  if (!raw) return "/";
+  if (!raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\")) return "/";
+  return raw;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +58,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
       <h2 className="text-xl font-bold text-rosely-night">Sign In</h2>
       <p className="mt-1 text-sm text-rosely-mist">Enter your credentials to access VantageMap</p>
 

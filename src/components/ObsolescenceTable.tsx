@@ -30,7 +30,7 @@ const RISK_BADGE_STYLES: Record<string, string> = {
 export function ObsolescenceTable({ items }: { items: ObsolescenceRiskItem[] }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border border-rosely-blush bg-white p-5">
+      <div className="rounded-xl border border-rosely-blush bg-card p-5">
         <h3 className="text-sm font-semibold text-rosely-night mb-3">Obsolescence Risk Details</h3>
         <p className="text-center text-sm text-rosely-mist py-8">
           No items with end-of-life or end-of-support dates tracked.
@@ -40,7 +40,7 @@ export function ObsolescenceTable({ items }: { items: ObsolescenceRiskItem[] }) 
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-5">
+    <div className="rounded-xl border border-rosely-blush bg-card p-5">
       <h3 className="text-sm font-semibold text-rosely-night mb-1">Obsolescence Risk Details</h3>
       <p className="text-xs text-rosely-mist mb-4">
         {items.length} items tracked — sorted by risk severity

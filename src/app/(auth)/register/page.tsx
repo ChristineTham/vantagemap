@@ -59,7 +59,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
       <h2 className="text-xl font-bold text-rosely-night">Create Account</h2>
       <p className="mt-1 text-sm text-rosely-mist">Sign up to start using VantageMap</p>
 

@@ -30,3 +30,29 @@ export const CapabilityCoverageChartLazy = dynamic(
     loading: () => <Skeleton className="h-60" />,
   }
 );
+
+// ── Phase 13.5–13.7 extended report sections ────────────────────────────────
+
+export const RoadmapImpactSectionLazy = dynamic(
+  () => import("@/components/ReportsExtended").then((m) => m.RoadmapImpactSection),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-80" />,
+  }
+);
+
+export const DataQualitySectionLazy = dynamic(
+  () => import("@/components/ReportsExtended").then((m) => m.DataQualitySection),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-80" />,
+  }
+);
+
+export const AdoptionSectionLazy = dynamic(
+  () => import("@/components/ReportsExtended").then((m) => m.AdoptionSection),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-80" />,
+  }
+);

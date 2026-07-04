@@ -12,6 +12,10 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { sql as rawSql } from "drizzle-orm";
 import * as schema from "./schema";
+import { auth } from "../lib/auth-server";
+
+/** Password for the seeded demo accounts (development only). */
+const SEED_PASSWORD = "Password123!";
 
 // ── Setup ───────────────────────────────────────────────────────────────────
 
@@ -33,6 +37,11 @@ async function seed() {
   console.log("  → Truncating existing data");
   await db.execute(
     rawSql`TRUNCATE TABLE
+      "session",
+      "account",
+      "verification",
+      "rate_limit",
+      "user",
       audit_entries,
       subscriptions,
       tag_assignments,
@@ -95,6 +104,23 @@ async function seed() {
     { userId: adminUser.id, workspaceId: workspace.id, role: "Admin" },
     { userId: memberUser.id, workspaceId: workspace.id, role: "Member" },
   ]);
+
+  // Create Better Auth credentials so the seeded users can actually sign in.
+  // The app `users` rows above hold workspace roles; Better Auth holds the
+  // password. They are linked by email. The create hook is idempotent, so it
+  // will find the existing app users rather than duplicating them.
+  for (const account of [
+    { email: "admin@vantagemap.dev", name: "Admin User" },
+    { email: "member@vantagemap.dev", name: "Member User" },
+  ]) {
+    try {
+      await auth.api.signUpEmail({
+        body: { email: account.email, password: SEED_PASSWORD, name: account.name },
+      });
+    } catch (err) {
+      console.warn(`  ! Could not create auth account for ${account.email}:`, err);
+    }
+  }
 
   // ── 2. Business Capabilities (hierarchical, 3 levels) ──────────────────
 
@@ -1210,6 +1236,9 @@ async function seed() {
   ]);
 
   console.log("\n✅ Seed complete!");
+  console.log("\n🔑 Demo sign-in credentials:");
+  console.log(`   Admin:  admin@vantagemap.dev  /  ${SEED_PASSWORD}`);
+  console.log(`   Member: member@vantagemap.dev /  ${SEED_PASSWORD}`);
 }
 
 // ── Run ─────────────────────────────────────────────────────────────────────

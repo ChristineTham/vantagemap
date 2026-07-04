@@ -41,7 +41,7 @@ VantageMap is an enterprise architecture and business strategy platform. It give
 - **TypeScript 6** — strict mode
 - **Tailwind CSS v4** — configured via `@import "tailwindcss"` in globals.css (NOT `@tailwind` directives)
 - **Rosely colour palette** — custom CSS variables + Tailwind theme; see [DESIGN.md](DESIGN.md)
-- **shadcn/ui (Base UI variant)** — installed in `src/components/ui/` (dialog, alert-dialog, button, input, label, badge, alert, separator, skeleton, dropdown-menu, card, select, textarea)
+- **shadcn/ui (Radix UI primitives)** — installed in `src/components/ui/` (dialog, alert-dialog, button, input, label, badge, alert, separator, skeleton, dropdown-menu, card, select, textarea); the interactive components build on `@radix-ui/*` primitives (the default shadcn/ui stack)
 - **Lucide React** — icon set
 - **Recharts 3** — chart library (loaded dynamically with `next/dynamic`)
 
@@ -49,7 +49,7 @@ VantageMap is an enterprise architecture and business strategy platform. It give
 
 - **PostgreSQL 16** — primary database ([ADR-001](docs/adr/001-database.md))
 - **Neon Serverless** — HTTP driver (`@neondatabase/serverless`), stateless queries ([review](docs/review-neon.md))
-- **Drizzle ORM** — schema-as-code, SQL-like queries, 22 tables, 28 enums ([ADR-002](docs/adr/002-orm.md))
+- **Drizzle ORM** — schema-as-code, SQL-like queries, 31 application tables (plus 5 Better Auth core tables = 36 total), 27 enums ([ADR-002](docs/adr/002-orm.md))
 - **Better Auth** — email/password auth, sessions, RBAC, API tokens ([ADR-003](docs/adr/003-authentication.md))
 - **Next.js Route Handlers (REST)** — 29 API route groups ([ADR-004](docs/adr/004-api-layer.md))
 - **GraphQL** — query endpoint with relationship traversal and depth limiting
@@ -69,7 +69,7 @@ npm install        # install deps
 npm run dev        # dev server (http://localhost:3000)
 npm run build      # production build
 npm run lint       # ESLint
-npm run test       # Vitest (487+ tests)
+npm run test       # Vitest (569 tests across 18 test files)
 npm run type-check # TypeScript strict
 npm run db:migrate # run database migrations
 npm run db:seed    # populate sample data
@@ -82,7 +82,7 @@ npm run db:studio  # Drizzle Studio GUI
 src/
   app/
     page.tsx                  # Dashboard
-    layout.tsx                # Root layout (Sidebar + main)
+    layout.tsx                # Root layout (wraps children in <AppShell>)
     (auth)/                   # Login, register, forgot/reset password
     admin/                    # User management, roles, API tokens
     governance/               # Quality seal, surveys, tags
@@ -103,7 +103,7 @@ src/
     ...                       # 40+ shared components
   db/
     index.ts                  # Neon HTTP connection (Proxy pattern)
-    schema/                   # 13 schema files, 22 tables
+    schema/                   # 13 schema files (+ index barrel), 31 application tables (36 incl. Better Auth)
     migrate.ts                # Migration runner
     seed.ts                   # Idempotent seed script
   lib/
@@ -124,7 +124,7 @@ src/
     reports.ts                # Reporting aggregation queries
     types.ts                  # Shared TypeScript types
     webhook-engine.ts         # Webhook delivery engine
-  middleware.ts               # Auth route protection
+  proxy.ts                    # Auth route protection (Next.js proxy, exports proxy())
   env.ts                      # Environment validation (Zod)
 docs/
   PLAN.md                     # V1 MVP plan (Phases 0–13, all complete)
@@ -143,7 +143,7 @@ docs/
 - Database: `src/db/schema/` — Drizzle schema-as-code
 - API routes: `src/app/api/<resource>/route.ts` — REST with standard envelope
 - Path alias: `@/` maps to `src/`
-- Layout: `src/app/layout.tsx` wraps every page with `<Sidebar />` + `<main>`
+- Layout: `src/app/layout.tsx` wraps every page in `<AppShell>` (`src/components/AppShell.tsx`), which renders `<Sidebar />` + `<main>` for authenticated users and full-width `<main>` for unauthenticated/pending states
 - Environment: validated at startup via `src/env.ts` (skip with `SKIP_ENV_VALIDATION=true`)
 
 ## Key Conventions

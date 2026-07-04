@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+      <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
         <div className="flex flex-col items-center text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-rosely-teal/20">
             <Mail className="size-6 text-rosely-teal" />
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-rosely-blush bg-card p-8 shadow-sm">
       <h2 className="text-xl font-bold text-rosely-night">Reset Password</h2>
       <p className="mt-1 text-sm text-rosely-mist">
         Enter your email and we&apos;ll send you a reset link

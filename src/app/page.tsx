@@ -228,7 +228,7 @@ function SummaryCard({
   return (
     <Link
       href={href}
-      className="rounded-xl border border-rosely-blush bg-white p-4 hover:border-rosely-lilac hover:shadow-sm transition-all"
+      className="rounded-xl border border-rosely-blush bg-card p-4 hover:border-rosely-lilac hover:shadow-sm transition-all"
     >
       <div className="flex items-center justify-between">
         {icon}
@@ -253,7 +253,7 @@ function NavCard({
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-xl border border-rosely-blush bg-white p-5 hover:border-rosely-lilac hover:shadow-sm transition-all"
+      className="flex items-start gap-3 rounded-xl border border-rosely-blush bg-card p-5 hover:border-rosely-lilac hover:shadow-sm transition-all"
     >
       <div className="mt-0.5">{icon}</div>
       <div>

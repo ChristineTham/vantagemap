@@ -6,7 +6,7 @@
  */
 
 import { pgTable, uuid, varchar, text, timestamp, jsonb, index } from "drizzle-orm/pg-core";
-import { auditActionEnum, factSheetTypeEnum } from "./enums";
+import { auditActionEnum } from "./enums";
 
 export const auditEntries = pgTable(
   "audit_entries",
@@ -21,9 +21,10 @@ export const auditEntries = pgTable(
     // What
     action: auditActionEnum("action").notNull(),
 
-    // Target
-    targetType: factSheetTypeEnum("target_type").notNull(),
-    targetId: uuid("target_id").notNull(),
+    // Target — varchar (not the fact_sheet_type enum) so governance, integration,
+    // and admin entities (Webhook, Survey, ApiToken, User, …) can also be audited.
+    targetType: varchar("target_type", { length: 64 }).notNull(),
+    targetId: varchar("target_id", { length: 255 }).notNull(),
     targetDisplayName: varchar("target_display_name", { length: 255 }),
 
     // Diff

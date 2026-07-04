@@ -7,10 +7,15 @@
  * change password, and manage notification preferences.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthSession } from "@/components/AuthSessionProvider";
 import { authClient } from "@/lib/auth-client";
+import {
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  type NotificationPreferences,
+} from "@/lib/api";
 import { User, Lock, Bell, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -60,7 +65,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-lg border border-rosely-blush bg-white p-1">
+      <div className="mb-6 flex gap-1 rounded-lg border border-rosely-blush bg-card p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -113,7 +118,7 @@ function ProfileTab({ user }: { user: { name: string; email: string } }) {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-6">
+    <div className="rounded-xl border border-rosely-blush bg-card p-6">
       <h2 className="text-lg font-bold text-rosely-night">Personal Information</h2>
       <p className="mt-1 text-sm text-rosely-mist">Update your name and display preferences</p>
 
@@ -213,7 +218,7 @@ function PasswordTab() {
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-6">
+    <div className="rounded-xl border border-rosely-blush bg-card p-6">
       <h2 className="text-lg font-bold text-rosely-night">Change Password</h2>
       <p className="mt-1 text-sm text-rosely-mist">Update your password for security</p>
 
@@ -287,43 +292,69 @@ function PasswordTab() {
 
 // ── Notifications Tab ───────────────────────────────────────────────────────
 
-function getStoredNotifPrefs() {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("notification-preferences");
-    return raw ? (JSON.parse(raw) as Record<string, boolean>) : null;
-  } catch {
-    return null;
-  }
-}
+const DEFAULT_NOTIF_PREFS: NotificationPreferences = {
+  emailNotifs: true,
+  emailOnSubscribedChange: true,
+  emailOnMention: true,
+  weeklyDigest: false,
+  inAppEnabled: true,
+};
 
 function NotificationsTab() {
-  const [emailNotifs, setEmailNotifs] = useState(() => getStoredNotifPrefs()?.emailNotifs ?? true);
-  const [factSheetChanges, setFactSheetChanges] = useState(
-    () => getStoredNotifPrefs()?.factSheetChanges ?? true
-  );
-  const [subscriptionAlerts, setSubscriptionAlerts] = useState(
-    () => getStoredNotifPrefs()?.subscriptionAlerts ?? true
-  );
-  const [weeklyDigest, setWeeklyDigest] = useState(
-    () => getStoredNotifPrefs()?.weeklyDigest ?? false
-  );
+  const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIF_PREFS);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSave() {
+  useEffect(() => {
+    let active = true;
+    getNotificationPreferences()
+      .then((res) => {
+        if (active) setPrefs(res.data);
+      })
+      .catch(() => {
+        if (active) setError("Failed to load preferences");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function set<K extends keyof NotificationPreferences>(key: K, value: boolean) {
+    setPrefs((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSave() {
     setSaving(true);
-    const prefs = { emailNotifs, factSheetChanges, subscriptionAlerts, weeklyDigest };
-    localStorage.setItem("notification-preferences", JSON.stringify(prefs));
-    setTimeout(() => {
-      setSaving(false);
+    setError(null);
+    setSuccess(false);
+    try {
+      const res = await updateNotificationPreferences(prefs);
+      setPrefs(res.data);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    }, 300);
+    } catch {
+      setError("Failed to save preferences");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-rosely-blush bg-card p-6">
+        <Skeleton className="h-6 w-48 rounded" />
+        <Skeleton className="mt-4 h-40 w-full rounded-lg" />
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-6">
+    <div className="rounded-xl border border-rosely-blush bg-card p-6">
       <h2 className="text-lg font-bold text-rosely-night">Notification Preferences</h2>
       <p className="mt-1 text-sm text-rosely-mist">Choose how you want to be notified</p>
 
@@ -333,30 +364,43 @@ function NotificationsTab() {
         </div>
       )}
 
+      {error && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="size-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="mt-6 flex flex-col gap-4">
+        <ToggleRow
+          label="In-App Notifications"
+          description="Show notifications inside VantageMap"
+          checked={prefs.inAppEnabled}
+          onChange={(v) => set("inAppEnabled", v)}
+        />
         <ToggleRow
           label="Email Notifications"
           description="Receive notifications via email"
-          checked={emailNotifs}
-          onChange={setEmailNotifs}
+          checked={prefs.emailNotifs}
+          onChange={(v) => set("emailNotifs", v)}
         />
         <ToggleRow
           label="Fact Sheet Changes"
-          description="Notify when fact sheets you subscribe to are modified"
-          checked={factSheetChanges}
-          onChange={setFactSheetChanges}
+          description="Email when fact sheets you subscribe to are modified"
+          checked={prefs.emailOnSubscribedChange}
+          onChange={(v) => set("emailOnSubscribedChange", v)}
         />
         <ToggleRow
-          label="Subscription Alerts"
-          description="Notify when you are assigned as responsible or accountable"
-          checked={subscriptionAlerts}
-          onChange={setSubscriptionAlerts}
+          label="Mentions & Assignments"
+          description="Email when you are mentioned or assigned as responsible or accountable"
+          checked={prefs.emailOnMention}
+          onChange={(v) => set("emailOnMention", v)}
         />
         <ToggleRow
           label="Weekly Digest"
           description="Receive a weekly summary of all changes"
-          checked={weeklyDigest}
-          onChange={setWeeklyDigest}
+          checked={prefs.weeklyDigest}
+          onChange={(v) => set("weeklyDigest", v)}
         />
       </div>
 

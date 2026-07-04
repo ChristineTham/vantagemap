@@ -17,9 +17,9 @@ import { Button } from "@/components/ui/button";
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-rosely-blush/50 bg-white/80 backdrop-blur-md">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-rosely-blush/50 bg-card/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex size-8 items-center justify-center rounded-lg bg-rosely-plum/10">
@@ -89,7 +89,7 @@ export function LandingPage() {
       </section>
 
       {/* Value Propositions */}
-      <section className="border-t border-rosely-blush/50 bg-white py-24">
+      <section className="border-t border-rosely-blush/50 bg-card py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold text-rosely-night">
@@ -209,7 +209,7 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="flex flex-col gap-3 bg-white p-8 transition-colors hover:bg-rosely-petal/20">
+    <div className="flex flex-col gap-3 bg-card p-8 transition-colors hover:bg-rosely-petal/20">
       <div className="flex size-10 items-center justify-center rounded-lg bg-rosely-plum/10 text-rosely-plum">
         {icon}
       </div>

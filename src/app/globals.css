@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 /* ── Rosely Core Palette Variables ──────────────────────────────────── */
+/*
+ * Text-safe tokens (WCAG AA ≥ 4.5:1 on white/card backgrounds):
+ *   --rosely0 (night) and --rosely1 (dusk) are the only tokens safe for
+ *   body / caption / label TEXT. --rosely3 (mist, #a49e9e ≈ 2.65:1) is for
+ *   placeholders, captions-as-decoration, borders and dividers only — do NOT
+ *   use it as a text colour. Accent hues (rose, flamingo, golden, teal,
+ *   periwinkle, cornflower, lilac) are for fills/icons; when used as text on a
+ *   tinted pill, pair them with rosely-night text (see ui/badge.tsx).
+ */
 :root {
   --rosely0: #27272a; /* Velvet Night   — primary text, headings     */
   --rosely1: #615f5f; /* Granite Gray   — secondary text, labels     */

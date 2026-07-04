@@ -13,10 +13,10 @@ const badgeVariants = cva(
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
           "border-transparent bg-rosely-rose/15 text-rosely-rose hover:bg-rosely-rose/25",
-        success: "border-transparent bg-rosely-teal/15 text-rosely-teal hover:bg-rosely-teal/25",
+        success: "border-transparent bg-rosely-teal/15 text-rosely-night hover:bg-rosely-teal/25",
         warning:
           "border-transparent bg-rosely-golden/15 text-rosely-night hover:bg-rosely-golden/25",
-        info: "border-transparent bg-rosely-periwinkle/15 text-rosely-periwinkle hover:bg-rosely-periwinkle/25",
+        info: "border-transparent bg-rosely-periwinkle/15 text-rosely-night hover:bg-rosely-periwinkle/25",
         outline: "border-rosely-blush text-rosely-dusk",
       },
     },

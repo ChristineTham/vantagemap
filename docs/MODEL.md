@@ -813,12 +813,24 @@ The VantageMap data model (`src/lib/data.ts`) maps to LeanIX fact sheets as foll
 | `StrategicObjective` + `KPI` | Objective                    | ✅ (simplified) |
 | `Initiative`                 | Initiative                   | ✅              |
 | `TechEntry`                  | IT Component + Tech Category | ✅ (merged)     |
-| `Interface`                  | Interface                    | ❌ not yet      |
-| `DataObject`                 | Data Object                  | ❌ not yet      |
-| `Organization`               | Organization                 | ❌ not yet      |
-| `Provider`                   | Provider                     | ❌ not yet      |
-| `Platform`                   | Platform                     | ❌ not yet      |
-| `BusinessContext`            | Business Context             | ❌ not yet      |
+| `Interface`                  | Interface                    | ✅              |
+| `DataObject`                 | Data Object                  | ✅              |
+| `Organization`               | Organization                 | ✅              |
+| `Provider`                   | Provider                     | ✅              |
+| `Platform`                   | Platform                     | ✅              |
+| `BusinessContext`            | Business Context             | ⚠️ schema only  |
+
+`Interface`, `DataObject`, `Organization`, `Provider`, and `Platform` are now fully
+implemented: each has a Drizzle table in `src/db/schema/`, a REST route group under
+`src/app/api/` (`/api/interfaces`, `/api/data-objects`, `/api/organizations`,
+`/api/providers`, `/api/platforms`), and a GraphQL type in `src/lib/graphql-schema.ts`
+(the Interface type is named `InterfaceFS` to avoid clashing with the GraphQL reserved
+word).
+
+`BusinessContext` is defined in `factSheetTypeEnum` and has a database table
+(`business_contexts`), and it appears in seed data, but it does **not** yet have a
+dedicated REST route or GraphQL type. It remains schema-only for V1 — see
+[docs/PLANV4.md](PLANV4.md) for the post-MVP roadmap.
 
 ---
 

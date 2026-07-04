@@ -50,35 +50,48 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   return (
     <div
-      className={cn("overflow-hidden rounded-xl border border-rosely-blush bg-white", className)}
+      className={cn("overflow-hidden rounded-xl border border-rosely-blush bg-card", className)}
     >
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-rosely-blush text-left">
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className={cn(
-                    "px-4 py-3 font-medium text-rosely-mist",
-                    col.sortable &&
-                      onSort &&
-                      "cursor-pointer select-none hover:text-rosely-night transition-colors",
-                    col.className
-                  )}
-                  onClick={col.sortable && onSort ? () => onSort(col.key) : undefined}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {col.header}
-                    {col.sortable && onSort && (
-                      <SortIcon
-                        active={sortBy === col.key}
-                        direction={sortBy === col.key ? sortDirection : undefined}
-                      />
+              {columns.map((col) => {
+                const isSortable = Boolean(col.sortable && onSort);
+                const isActive = sortBy === col.key;
+                const ariaSort: React.AriaAttributes["aria-sort"] = isSortable
+                  ? isActive
+                    ? sortDirection === "desc"
+                      ? "descending"
+                      : "ascending"
+                    : "none"
+                  : undefined;
+
+                return (
+                  <th
+                    key={col.key}
+                    scope="col"
+                    aria-sort={ariaSort}
+                    className={cn("px-4 py-3 font-medium text-rosely-mist", col.className)}
+                  >
+                    {isSortable ? (
+                      <button
+                        type="button"
+                        onClick={() => onSort!(col.key)}
+                        className="inline-flex items-center gap-1 select-none hover:text-rosely-night transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rosely-lilac/40 rounded"
+                      >
+                        {col.header}
+                        <SortIcon
+                          active={isActive}
+                          direction={isActive ? sortDirection : undefined}
+                        />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">{col.header}</span>
                     )}
-                  </span>
-                </th>
-              ))}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-rosely-petal">
@@ -94,9 +107,22 @@ export function DataTable<T>({
                   key={getRowKey(row)}
                   className={cn(
                     "hover:bg-rosely-petal/40 transition-colors",
-                    onRowClick && "cursor-pointer"
+                    onRowClick &&
+                      "cursor-pointer focus-within:bg-rosely-petal/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-rosely-lilac/40"
                   )}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  {...(onRowClick
+                    ? {
+                        tabIndex: 0,
+                        role: "button",
+                        onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        },
+                      }
+                    : {})}
                 >
                   {columns.map((col) => (
                     <td key={col.key} className={cn("px-4 py-3 text-rosely-night", col.className)}>

@@ -4,12 +4,15 @@
  * PATCH /api/admin/users/[id]/status — Archive or restore a user
  */
 
+import { after } from "next/server";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 import { requirePermission } from "@/lib/rbac";
 import { ok, notFound, badRequest, withErrorHandler, parseBody } from "@/lib/api-response";
+import { auditMutation } from "@/lib/audit";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { z } from "zod";
 
 const statusSchema = z.object({
@@ -48,6 +51,20 @@ export const PATCH = withErrorHandler(
       .update(users)
       .set({ status: status as "Active" | "Invited" | "Archived" })
       .where(eq(users.id, id));
+
+    if (isFeatureEnabled("FEATURE_AUDIT_LOGGING")) {
+      after(async () => {
+        await auditMutation({
+          auth: auth.auth,
+          action: "update",
+          targetType: "User",
+          targetId: id,
+          targetDisplayName: existing.name ?? existing.email,
+          diff: { status: { old: existing.status, new: status } },
+          request,
+        });
+      });
+    }
 
     return ok({ userId: id, status });
   }

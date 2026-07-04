@@ -168,14 +168,17 @@ export function BulkEditDialog({
 
               <div className="flex flex-col gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-rosely-dusk mb-1">
+                  <label
+                    htmlFor="bulk-lifecycle"
+                    className="block text-xs font-medium text-rosely-dusk mb-1"
+                  >
                     Lifecycle Phase
                   </label>
                   <select
+                    id="bulk-lifecycle"
                     value={lifecycle}
                     onChange={(e) => setLifecycle(e.target.value)}
-                    aria-label="Lifecycle Phase"
-                    className="w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
+                    className="w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                   >
                     <option value="">— No change —</option>
                     {lifecycleOptions.map((opt) => (
@@ -187,14 +190,17 @@ export function BulkEditDialog({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-rosely-dusk mb-1">
+                  <label
+                    htmlFor="bulk-health"
+                    className="block text-xs font-medium text-rosely-dusk mb-1"
+                  >
                     Health Status
                   </label>
                   <select
+                    id="bulk-health"
                     value={health}
                     onChange={(e) => setHealth(e.target.value)}
-                    aria-label="Health Status"
-                    className="w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
+                    className="w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                   >
                     <option value="">— No change —</option>
                     {healthOptions.map((opt) => (
@@ -206,13 +212,19 @@ export function BulkEditDialog({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-rosely-dusk mb-1">Owner</label>
+                  <label
+                    htmlFor="bulk-owner"
+                    className="block text-xs font-medium text-rosely-dusk mb-1"
+                  >
+                    Owner
+                  </label>
                   <input
+                    id="bulk-owner"
                     type="text"
                     value={owner}
                     onChange={(e) => setOwner(e.target.value)}
                     placeholder="Leave empty for no change"
-                    className="w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night placeholder:text-rosely-mist focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
+                    className="w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night placeholder:text-rosely-mist focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                   />
                 </div>
               </div>

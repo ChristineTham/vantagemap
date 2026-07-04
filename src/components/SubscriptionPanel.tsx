@@ -143,7 +143,7 @@ export function SubscriptionPanel({
 
       {/* Role picker */}
       {showRolePicker && (
-        <div className="border border-rosely-blush rounded-lg p-3 bg-white shadow-sm flex flex-col gap-1.5">
+        <div className="border border-rosely-blush rounded-lg p-3 bg-card shadow-sm flex flex-col gap-1.5">
           <p className="text-xs text-rosely-mist mb-2">Subscribe as:</p>
           {(["Responsible", "Accountable", "Observer"] as SubscriptionRole[]).map((role) => {
             const config = ROLE_CONFIG[role];

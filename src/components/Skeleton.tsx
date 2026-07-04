@@ -18,7 +18,7 @@ export function CardSkeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl border border-rosely-blush bg-white p-4",
+        "flex flex-col gap-3 rounded-xl border border-rosely-blush bg-card p-4",
         className
       )}
     >
@@ -39,7 +39,7 @@ export function TableSkeleton({
 }: SkeletonProps & { rows?: number; cols?: number }) {
   return (
     <div
-      className={cn("overflow-hidden rounded-xl border border-rosely-blush bg-white", className)}
+      className={cn("overflow-hidden rounded-xl border border-rosely-blush bg-card", className)}
     >
       {/* Header */}
       <div className="flex gap-4 border-b border-rosely-blush px-4 py-3">

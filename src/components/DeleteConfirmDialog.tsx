@@ -79,7 +79,7 @@ export function DeleteConfirmDialog({
           <AlertDialogDescription asChild>
             <div className="flex flex-col gap-4">
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" id="delete-error">
                   <AlertCircle className="size-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
@@ -90,15 +90,21 @@ export function DeleteConfirmDialog({
                 associated relationships.
               </p>
               <div>
-                <label className="block text-xs font-medium text-rosely-dusk mb-1">
+                <label
+                  htmlFor="delete-confirm-input"
+                  className="block text-xs font-medium text-rosely-dusk mb-1"
+                >
                   Type <span className="font-mono font-semibold">{entityName}</span> to confirm
                 </label>
                 <input
+                  id="delete-confirm-input"
                   type="text"
                   value={confirmText}
                   onChange={(e) => setConfirmText(e.target.value)}
+                  aria-invalid={error ? true : undefined}
+                  aria-describedby={error ? "delete-error" : undefined}
                   className={cn(
-                    "w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night",
+                    "w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night",
                     "placeholder:text-rosely-mist",
                     "focus:border-rosely-rose focus:outline-none focus:ring-2 focus:ring-rosely-rose/30",
                     "transition-colors"

@@ -58,7 +58,7 @@ export default async function GovernancePage() {
         {/* Tag Management */}
         <Link
           href="/governance/tags"
-          className="bg-white rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
+          className="bg-card rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
         >
           <Tags className="size-8 text-rosely-plum mb-3" />
           <h2 className="text-base font-semibold text-rosely-night group-hover:text-rosely-plum transition-colors">
@@ -72,7 +72,7 @@ export default async function GovernancePage() {
         {/* Quality Seal */}
         <Link
           href="/governance/quality-seal"
-          className="bg-white rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
+          className="bg-card rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
         >
           <ShieldCheck className="size-8 text-rosely-teal mb-3" />
           <h2 className="text-base font-semibold text-rosely-night group-hover:text-rosely-plum transition-colors">
@@ -86,7 +86,7 @@ export default async function GovernancePage() {
         {/* Surveys */}
         <Link
           href="/governance/surveys"
-          className="bg-white rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
+          className="bg-card rounded-xl border border-rosely-blush p-5 hover:border-rosely-lilac hover:shadow-sm transition-all group"
         >
           <ClipboardList className="size-8 text-rosely-periwinkle mb-3" />
           <h2 className="text-base font-semibold text-rosely-night group-hover:text-rosely-plum transition-colors">
@@ -100,19 +100,19 @@ export default async function GovernancePage() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Quality Approved</p>
           <p className="text-2xl font-bold text-rosely-teal mt-1">{stats.approved}</p>
         </div>
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Needs Review</p>
           <p className="text-2xl font-bold text-rosely-golden mt-1">{stats.needsReview}</p>
         </div>
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Active Surveys</p>
           <p className="text-2xl font-bold text-rosely-periwinkle mt-1">{stats.activeSurveys}</p>
         </div>
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Tag Groups</p>
           <p className="text-2xl font-bold text-rosely-plum mt-1">—</p>
         </div>

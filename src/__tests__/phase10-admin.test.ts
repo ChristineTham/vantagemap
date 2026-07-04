@@ -39,8 +39,16 @@ vi.mock("@/lib/rbac", () => ({
 
 vi.mock("@/lib/audit", () => ({
   writeAuditLog: vi.fn().mockResolvedValue(undefined),
+  auditMutation: vi.fn().mockResolvedValue(undefined),
   computeDiff: vi.fn().mockReturnValue(undefined),
 }));
+
+// `after()` schedules post-response work; outside a request scope it throws, so
+// stub it to a no-op (audit side effects are covered by the audit mock above).
+vi.mock("next/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/server")>();
+  return { ...actual, after: vi.fn() };
+});
 
 // ─── Module imports (after mocks) ──────────────────────────────────────────
 

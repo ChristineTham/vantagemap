@@ -96,7 +96,7 @@ export default async function QualitySealPage() {
         {groups.map((group) => {
           const Icon = group.icon;
           return (
-            <div key={group.state} className="bg-white rounded-xl border border-rosely-blush p-4">
+            <div key={group.state} className="bg-card rounded-xl border border-rosely-blush p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Icon className={`size-4 ${group.color}`} />
                 <p className="text-xs text-rosely-mist uppercase tracking-wider">{group.state}</p>
@@ -109,7 +109,7 @@ export default async function QualitySealPage() {
 
       {/* Review Queue */}
       {checkNeeded && checkNeeded.items.length > 0 && (
-        <div className="bg-white rounded-xl border border-rosely-blush p-5">
+        <div className="bg-card rounded-xl border border-rosely-blush p-5">
           <h2 className="text-base font-semibold text-rosely-night mb-4 flex items-center gap-2">
             <Clock className="size-5 text-rosely-golden" />
             Pending Review ({checkNeeded.items.length})
@@ -141,7 +141,7 @@ export default async function QualitySealPage() {
           .map((group) => {
             const Icon = group.icon;
             return (
-              <div key={group.state} className="bg-white rounded-xl border border-rosely-blush p-5">
+              <div key={group.state} className="bg-card rounded-xl border border-rosely-blush p-5">
                 <h2 className="text-base font-semibold text-rosely-night mb-3 flex items-center gap-2">
                   <Icon className={`size-5 ${group.color}`} />
                   {group.state} ({group.items.length})

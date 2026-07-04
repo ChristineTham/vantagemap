@@ -7,7 +7,7 @@
  * Auth required. Admin or webhook-owner only.
  */
 
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { count } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
@@ -15,9 +15,12 @@ import { webhooks } from "@/db/schema";
 import { withErrorHandler, ok, created, badRequest } from "@/lib/api-response";
 import { parseBody } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
+import { requirePermission } from "@/lib/rbac";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { parseListParams, buildPaginationMeta } from "@/lib/query";
-import { WEBHOOK_EVENTS } from "@/lib/webhook-engine";
+import { WEBHOOK_EVENTS, WEBHOOK_SAFE_COLUMNS } from "@/lib/webhook-engine";
+import { assertPublicUrl, SsrfError } from "@/lib/ssrf-guard";
+import { auditMutation } from "@/lib/audit";
 
 // ── Validation Schemas ──────────────────────────────────────────────────────
 
@@ -49,6 +52,10 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
   const authResult = await requireAuth(request);
   if (!authResult.ok) return authResult.response;
 
+  // Webhooks are workspace-integration configuration — Admin only.
+  const authz = requirePermission(authResult.auth, "manage_workspace");
+  if (!authz.ok) return authz.response;
+
   const { pagination } = parseListParams(new URL(request.url).searchParams);
   const { pageSize, offset } = pagination;
 
@@ -57,21 +64,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       .select({ value: count() })
       .from(webhooks)
       .then((r) => r[0]),
-    db
-      .select({
-        id: webhooks.id,
-        url: webhooks.url,
-        events: webhooks.events,
-        active: webhooks.active,
-        name: webhooks.name,
-        description: webhooks.description,
-        createdBy: webhooks.createdBy,
-        createdAt: webhooks.createdAt,
-        updatedAt: webhooks.updatedAt,
-      })
-      .from(webhooks)
-      .limit(pageSize)
-      .offset(offset),
+    db.select(WEBHOOK_SAFE_COLUMNS).from(webhooks).limit(pageSize).offset(offset),
   ]);
 
   const total = countResult?.value ?? 0;
@@ -102,6 +95,10 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   if (!authResult.ok) return authResult.response;
   const auth = authResult.auth;
 
+  // Webhooks are workspace-integration configuration — Admin only.
+  const authz = requirePermission(auth, "manage_workspace");
+  if (!authz.ok) return authz.response;
+
   const body = await parseBody(request, createWebhookSchema);
   if ("error" in body) return body.error;
 
@@ -118,6 +115,14 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     return badRequest("Webhook URL must use HTTPS in production");
   }
 
+  // SSRF guard — reject targets pointing at internal/private hosts.
+  try {
+    await assertPublicUrl(body.data.url);
+  } catch (err) {
+    if (err instanceof SsrfError) return badRequest(err.message);
+    throw err;
+  }
+
   const [webhook] = await db
     .insert(webhooks)
     .values({
@@ -129,7 +134,20 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       active: body.data.active,
       createdBy: auth.userId,
     })
-    .returning();
+    .returning(WEBHOOK_SAFE_COLUMNS);
+
+  if (isFeatureEnabled("FEATURE_AUDIT_LOGGING")) {
+    after(async () => {
+      await auditMutation({
+        auth,
+        action: "create",
+        targetType: "Webhook",
+        targetId: webhook.id,
+        targetDisplayName: webhook.name ?? webhook.url,
+        request,
+      });
+    });
+  }
 
   return created({ data: webhook });
 });

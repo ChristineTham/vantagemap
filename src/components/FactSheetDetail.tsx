@@ -23,6 +23,7 @@ import {
   createFactSheetComment,
   getFactSheetTodos,
   createFactSheetTodo,
+  updateTodo,
   getFactSheetSubscriptions,
   subscribeToFactSheet,
   unsubscribeFromFactSheet,
@@ -191,14 +192,14 @@ export function FactSheetDetail({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setShowEdit(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm font-medium text-rosely-dusk hover:border-rosely-lilac hover:text-rosely-night transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm font-medium text-rosely-dusk hover:border-rosely-lilac hover:text-rosely-night transition-colors"
           >
             <Pencil className="size-4" />
             Edit
           </button>
           <button
             onClick={() => setShowDelete(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm font-medium text-rosely-dusk hover:border-rosely-rose hover:text-rosely-rose transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm font-medium text-rosely-dusk hover:border-rosely-rose hover:text-rosely-rose transition-colors"
           >
             <Trash2 className="size-4" />
             Delete
@@ -224,29 +225,43 @@ export function FactSheetDetail({
 
       {/* Tabs */}
       <div className="border-b border-rosely-blush">
-        <nav className="flex gap-6" aria-label="Tabs">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "py-2 text-sm font-medium border-b-2 transition-colors",
-                activeTab === tab.id
-                  ? "border-rosely-plum text-rosely-plum"
-                  : "border-transparent text-rosely-mist hover:text-rosely-night"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <nav className="flex gap-6" role="tablist" aria-label="Fact sheet sections">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={isActive}
+                aria-current={isActive ? "page" : undefined}
+                aria-controls={`tabpanel-${tab.id}`}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "py-2 text-sm font-medium border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rosely-lilac/40 rounded-sm",
+                  isActive
+                    ? "border-rosely-plum text-rosely-plum"
+                    : "border-transparent text-rosely-mist hover:text-rosely-night"
+                )}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </nav>
       </div>
 
       {/* Tab Content */}
       {activeTab === "details" && (
-        <div className="flex flex-col gap-6">
+        <div
+          role="tabpanel"
+          id="tabpanel-details"
+          aria-labelledby="tab-details"
+          className="flex flex-col gap-6"
+        >
           {Array.from(fieldGroups.entries()).map(([group, fields]) => (
-            <div key={group} className="rounded-xl border border-rosely-blush bg-white p-5">
+            <div key={group} className="rounded-xl border border-rosely-blush bg-card p-5">
               <h3 className="text-sm font-semibold text-rosely-night mb-4">{group}</h3>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                 {fields.map((field) => (
@@ -263,7 +278,7 @@ export function FactSheetDetail({
 
           {/* Custom Fields */}
           {!!entity.customFields && Object.keys(entity.customFields as object).length > 0 && (
-            <div className="rounded-xl border border-rosely-blush bg-white p-5">
+            <div className="rounded-xl border border-rosely-blush bg-card p-5">
               <h3 className="text-sm font-semibold text-rosely-night mb-4">Custom Fields</h3>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                 {Object.entries(entity.customFields as Record<string, unknown>).map(
@@ -283,14 +298,17 @@ export function FactSheetDetail({
       )}
 
       {activeTab === "relationships" && (
-        <RelationshipList
-          relationships={relationships}
-          entityType={entityType}
-          entityId={entityId}
-        />
+        <div role="tabpanel" id="tabpanel-relationships" aria-labelledby="tab-relationships">
+          <RelationshipList
+            relationships={relationships}
+            entityType={entityType}
+            entityId={entityId}
+          />
+        </div>
       )}
 
       {activeTab === "governance" && (
+        <div role="tabpanel" id="tabpanel-governance" aria-labelledby="tab-governance">
         <GovernancePanel factSheetType={entityType} factSheetId={entityId} factSheetName={name}>
           {{
             seal: qualitySeal ? (
@@ -385,6 +403,7 @@ export function FactSheetDetail({
               <TodoList
                 todos={todos}
                 onToggle={async (id, done) => {
+                  // Optimistic update, then persist; roll back on failure.
                   setTodos((prev) =>
                     prev.map((t) =>
                       t.id === id
@@ -392,6 +411,17 @@ export function FactSheetDetail({
                         : t
                     )
                   );
+                  try {
+                    await updateTodo(id, { done });
+                  } catch {
+                    setTodos((prev) =>
+                      prev.map((t) =>
+                        t.id === id
+                          ? { ...t, done: !done, completedAt: !done ? new Date().toISOString() : null }
+                          : t
+                      )
+                    );
+                  }
                 }}
                 onCreate={async (title, assigneeId, dueDate) => {
                   try {
@@ -409,10 +439,16 @@ export function FactSheetDetail({
             ),
           }}
         </GovernancePanel>
+        </div>
       )}
 
       {activeTab === "audit" && (
-        <div className="rounded-xl border border-rosely-blush bg-white p-5">
+        <div
+          role="tabpanel"
+          id="tabpanel-audit"
+          aria-labelledby="tab-audit"
+          className="rounded-xl border border-rosely-blush bg-card p-5"
+        >
           <h3 className="text-sm font-semibold text-rosely-night mb-4">Recent Changes</h3>
           {!auditLoaded ? (
             <div className="flex flex-col gap-2">

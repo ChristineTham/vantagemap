@@ -85,15 +85,15 @@ export function SurveyListView({ initialSurveys }: SurveyListViewProps) {
     <div className="flex flex-col gap-6">
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Active</p>
           <p className="text-2xl font-bold text-rosely-teal mt-1">{activeSurveys.length}</p>
         </div>
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Draft</p>
           <p className="text-2xl font-bold text-rosely-mist mt-1">{draftSurveys.length}</p>
         </div>
-        <div className="bg-white rounded-xl border border-rosely-blush p-4">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4">
           <p className="text-xs text-rosely-mist uppercase tracking-wider">Closed</p>
           <p className="text-2xl font-bold text-rosely-dusk mt-1">{closedSurveys.length}</p>
         </div>
@@ -112,7 +112,7 @@ export function SurveyListView({ initialSurveys }: SurveyListViewProps) {
 
       {/* Create Form */}
       {showCreate && (
-        <div className="bg-white rounded-xl border border-rosely-blush p-5">
+        <div className="bg-card rounded-xl border border-rosely-blush p-5">
           <h2 className="text-base font-semibold text-rosely-night mb-4">New Survey</h2>
           {error && (
             <Alert variant="destructive" className="mb-4">
@@ -216,7 +216,7 @@ export function SurveyListView({ initialSurveys }: SurveyListViewProps) {
 
       {/* Survey List */}
       {surveys.length === 0 ? (
-        <div className="bg-white rounded-xl border border-rosely-blush p-8 text-center">
+        <div className="bg-card rounded-xl border border-rosely-blush p-8 text-center">
           <ClipboardList className="size-12 text-rosely-mist mx-auto mb-3" />
           <p className="text-sm font-medium text-rosely-night">No surveys yet</p>
           <p className="text-xs text-rosely-mist mt-1">
@@ -224,7 +224,7 @@ export function SurveyListView({ initialSurveys }: SurveyListViewProps) {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-rosely-blush divide-y divide-rosely-petal">
+        <div className="bg-card rounded-xl border border-rosely-blush divide-y divide-rosely-petal">
           {surveys.map((survey) => {
             const statusConf = STATUS_CONFIG[survey.status] ?? STATUS_CONFIG.draft;
             const StatusIcon = statusConf.icon;

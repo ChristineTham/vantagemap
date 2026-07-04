@@ -15,6 +15,7 @@
 import { eq, and, lte } from "drizzle-orm";
 import { db } from "@/db";
 import { webhooks, webhookDeliveries } from "@/db/schema";
+import { assertPublicUrl } from "@/lib/ssrf-guard";
 
 // ── Event Catalog ───────────────────────────────────────────────────────────
 
@@ -56,6 +57,22 @@ export const WEBHOOK_EVENTS = [
 ] as const;
 
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number];
+
+/**
+ * Column projection for webhook API responses. Deliberately excludes `secret`
+ * so the HMAC signing key is never disclosed to API consumers.
+ */
+export const WEBHOOK_SAFE_COLUMNS = {
+  id: webhooks.id,
+  url: webhooks.url,
+  events: webhooks.events,
+  active: webhooks.active,
+  name: webhooks.name,
+  description: webhooks.description,
+  createdBy: webhooks.createdBy,
+  createdAt: webhooks.createdAt,
+  updatedAt: webhooks.updatedAt,
+} as const;
 
 // ── Webhook Payload Type ────────────────────────────────────────────────────
 
@@ -164,6 +181,9 @@ async function attemptDelivery(
   let errorMessage: string | null = null;
 
   try {
+    // SSRF guard — reject targets that resolve to internal/private ranges.
+    await assertPublicUrl(url, { resolveDns: true });
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
@@ -172,10 +192,13 @@ async function attemptDelivery(
       headers,
       body: payloadStr,
       signal: controller.signal,
+      redirect: "error", // never follow redirects — a 30x could bounce to an internal host
     });
 
     clearTimeout(timeout);
     statusCode = response.status;
+    // Response bodies are not surfaced to API consumers (see routes), but we
+    // still record a short diagnostic slice for delivery troubleshooting.
     responseBody = (await response.text()).slice(0, 4096); // Truncate to 4KB
 
     if (response.ok) {

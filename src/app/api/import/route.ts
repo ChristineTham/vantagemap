@@ -1,24 +1,26 @@
 /**
- * Phase 12.4 — CSV Import Route Handler
+ * Phase 12.4 — CSV / XLSX Import Route Handler
  *
- * POST /api/import — Import fact sheets from CSV
+ * POST /api/import — Import fact sheets from CSV or Excel (.xlsx)
  *
  * Modes:
- *   - preview: Parse CSV and return validation results without persisting
- *   - execute: Parse CSV, validate, and upsert into database
+ *   - preview: Parse file and return validation results without persisting
+ *   - execute: Parse file, validate, and upsert into database
  *
  * Features:
  *   - Automatic column mapping (header names → DB columns)
+ *   - CSV and Excel (.xlsx) input, detected by extension / MIME type
  *   - Validation with per-row error reporting
  *   - Upsert (update if ID exists, insert if new)
  *   - Max file size: 5MB
  *   - Max rows: 10,000
  *
- * Requires `papaparse` npm package for CSV parsing.
+ * Requires `papaparse` (CSV parsing) and `xlsx` / SheetJS (Excel parsing).
  */
 
 import { NextRequest } from "next/server";
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -36,6 +38,7 @@ import {
 } from "@/db/schema";
 import { withErrorHandler, ok, badRequest } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
+import { requirePermission } from "@/lib/rbac";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { dispatchWebhookEvent } from "@/lib/webhook-engine";
 
@@ -92,6 +95,32 @@ const COLUMN_ALIASES: Record<string, string> = {
   version: "version",
 };
 
+/**
+ * DB columns that may be written via import. Deliberately excludes governance-
+ * and identity-controlled fields (`qualitySeal`, `createdBy`, timestamps): those
+ * must not be mass-assigned from an uploaded file. `id` is retained only so an
+ * upsert can match an existing row. Any CSV header that does not map to one of
+ * these is ignored rather than passed through to the database.
+ */
+const IMPORTABLE_COLUMNS = new Set<string>([
+  "id",
+  "name",
+  "description",
+  "lifecycle",
+  "health",
+  "owner",
+  "parentId",
+  "level",
+  "subtype",
+  "ring",
+  "quadrant",
+  "perspective",
+  "status",
+  "startDate",
+  "endDate",
+  "version",
+]);
+
 // ── POST /api/import ────────────────────────────────────────────────────────
 
 export const POST = withErrorHandler(async (request: NextRequest) => {
@@ -124,29 +153,88 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   if (!["preview", "execute"].includes(mode))
     return badRequest("mode must be 'preview' or 'execute'");
 
+  // Import writes (insert/update) fact sheets — require create permission.
+  // Preview only parses/validates the upload, so viewers may preview.
+  if (mode === "execute") {
+    const authz = requirePermission(auth, "create");
+    if (!authz.ok) return authz.response;
+  }
+
   // Size check
   if (file.size > MAX_FILE_SIZE) {
     return badRequest(`File size ${(file.size / 1024 / 1024).toFixed(1)}MB exceeds maximum of 5MB`);
   }
 
-  // Read and parse CSV
-  const text = await file.text();
-  const parsed = Papa.parse(text, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: (header: string) => {
-      const normalized = header.trim().toLowerCase();
-      return COLUMN_ALIASES[normalized] ?? normalized;
-    },
-  });
+  // Normalize a raw header into its canonical DB column name. Applied to both
+  // CSV and XLSX headers so column aliasing is identical across formats.
+  const normalizeHeader = (header: string): string => {
+    const normalized = header.trim().toLowerCase();
+    return COLUMN_ALIASES[normalized] ?? normalized;
+  };
 
-  if (parsed.errors.length > 0 && parsed.data.length === 0) {
-    return badRequest(`CSV parsing failed: ${parsed.errors[0]?.message}`);
+  // Detect Excel input by file extension / MIME type; everything else is CSV.
+  const fileName = (file.name ?? "").toLowerCase();
+  const isXlsx =
+    fileName.endsWith(".xlsx") ||
+    fileName.endsWith(".xlsm") ||
+    fileName.endsWith(".xlsb") ||
+    fileName.endsWith(".xls") ||
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.type === "application/vnd.ms-excel";
+
+  let rows: Record<string, string>[];
+
+  if (isXlsx) {
+    // Parse the first worksheet of the workbook into row objects, then feed
+    // those rows through the exact same normalization / whitelist / validation
+    // / upsert pipeline used for CSV below.
+    let workbook: XLSX.WorkBook;
+    try {
+      const buffer = await file.arrayBuffer();
+      workbook = XLSX.read(buffer, { type: "array" });
+    } catch (err) {
+      return badRequest(
+        `Excel parsing failed: ${err instanceof Error ? err.message : "unable to read workbook"}`
+      );
+    }
+
+    const sheetName = workbook.SheetNames[0];
+    if (!sheetName) return badRequest("Excel file contains no worksheets");
+    const sheet = workbook.Sheets[sheetName];
+
+    // Read all cells as strings so downstream trim()/validation matches CSV.
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+      defval: "",
+      raw: false,
+    });
+
+    // Apply the same header aliasing that Papa's transformHeader applies to CSV.
+    rows = rawRows.map((rawRow) => {
+      const mapped: Record<string, string> = {};
+      for (const [key, value] of Object.entries(rawRow)) {
+        const canonical = normalizeHeader(key);
+        mapped[canonical] = value == null ? "" : String(value);
+      }
+      return mapped;
+    });
+  } else {
+    // Read and parse CSV
+    const text = await file.text();
+    const parsed = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: normalizeHeader,
+    });
+
+    if (parsed.errors.length > 0 && parsed.data.length === 0) {
+      return badRequest(`CSV parsing failed: ${parsed.errors[0]?.message}`);
+    }
+
+    rows = parsed.data as Record<string, string>[];
   }
 
-  const rows = parsed.data as Record<string, string>[];
-
-  if (rows.length === 0) return badRequest("CSV file contains no data rows");
+  if (rows.length === 0) return badRequest("File contains no data rows");
   if (rows.length > MAX_ROWS)
     return badRequest(`Too many rows (${rows.length}). Maximum is ${MAX_ROWS}`);
 
@@ -164,9 +252,12 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       continue;
     }
 
-    // Build clean row with only valid columns
+    // Build clean row with only whitelisted, non-empty columns. Unknown or
+    // governance-controlled headers (qualitySeal, createdBy, …) are dropped so
+    // they cannot be mass-assigned from the uploaded file.
     const cleanRow: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(row)) {
+      if (!IMPORTABLE_COLUMNS.has(key)) continue;
       if (value !== undefined && value !== null && value.trim() !== "") {
         cleanRow[key] = value.trim();
       }

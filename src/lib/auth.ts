@@ -15,6 +15,7 @@
 import { db } from "@/db";
 import { users, userWorkspaceRoles, apiTokens } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { provisionAppUser } from "@/lib/auth-provision";
 import { unauthorized, type ApiErrorBody } from "@/lib/api-response";
 import type { NextResponse } from "next/server";
 import { auth } from "@/lib/auth-server";
@@ -120,7 +121,7 @@ async function authenticateWithToken(token: string): Promise<AuthResult> {
     });
 
     if (response && response.user) {
-      return resolveUserContext(response.user.id);
+      return resolveSessionContext(response.user);
     }
   } catch {
     // Fall through to API token check
@@ -183,7 +184,7 @@ async function authenticateWithSession(sessionToken: string): Promise<AuthResult
       };
     }
 
-    return resolveUserContext(response.user.id);
+    return resolveSessionContext(response.user);
   } catch {
     return {
       ok: false,
@@ -193,8 +194,38 @@ async function authenticateWithSession(sessionToken: string): Promise<AuthResult
 }
 
 /**
- * Resolve a user ID into a full AuthContext by querying the database.
- * Looks up the user and their workspace role.
+ * Resolve a Better Auth session user into an application AuthContext.
+ *
+ * Better Auth and the application `users` table are joined by email (their id
+ * spaces differ). If no application user exists yet — e.g. the first request
+ * right after sign-up — one is provisioned on the default workspace so the
+ * session can establish a role.
+ */
+async function resolveSessionContext(sessionUser: {
+  id: string;
+  email: string;
+  name?: string | null;
+}): Promise<AuthResult> {
+  const email = sessionUser.email.toLowerCase();
+
+  let [appUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+  if (!appUser) {
+    await provisionAppUser({ email, name: sessionUser.name ?? email });
+    [appUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  }
+
+  if (!appUser || appUser.status !== "Active") {
+    return { ok: false, response: unauthorized("User not found or inactive") };
+  }
+
+  return resolveUserContext(appUser.id);
+}
+
+/**
+ * Resolve an application user ID into a full AuthContext by querying the database.
+ * Used by the API-token and dev-bypass paths, which key off the application
+ * `users.id` (a UUID) rather than the Better Auth id.
  */
 async function resolveUserContext(userId: string): Promise<AuthResult> {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);

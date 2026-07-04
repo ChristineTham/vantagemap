@@ -93,7 +93,7 @@ export function QualitySealBadge({
 
       {/* Transition actions */}
       {showActions && (
-        <div className="border border-rosely-blush rounded-lg p-3 bg-white shadow-sm flex flex-col gap-2">
+        <div className="border border-rosely-blush rounded-lg p-3 bg-card shadow-sm flex flex-col gap-2">
           {selectedTransition === null ? (
             <>
               <p className="text-xs text-rosely-mist">Available actions:</p>

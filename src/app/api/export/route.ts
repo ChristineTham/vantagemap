@@ -1,20 +1,21 @@
 /**
- * Phase 12.5 — CSV Export Route Handler
+ * Phase 12.5 — CSV / XLSX Export Route Handler
  *
- * GET /api/export?type=Application&format=csv — Export fact sheets to CSV
+ * GET /api/export?type=Application&format=csv|xlsx — Export fact sheets
  *
  * Features:
- *   - Stream CSV download (no buffering large datasets in memory)
+ *   - CSV and Excel (.xlsx) download
  *   - Field selection via `fields` query param
  *   - Filter by name substring via `filter` query param
- *   - Supports CSV format (xlsx deferred to post-MVP with exceljs)
+ *   - `format` query param: `csv` (default) or `xlsx`
  *   - Content-Disposition header for browser download
  *
- * Requires `papaparse` npm package for CSV generation.
+ * Requires `papaparse` (CSV generation) and `xlsx` / SheetJS (Excel generation).
  */
 
 import { NextRequest } from "next/server";
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import { ilike } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -80,7 +81,8 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
 
   if (!type) return badRequest("type query parameter is required");
   if (!TABLE_MAP[type]) return badRequest(`Invalid type: ${type}`);
-  if (format !== "csv") return badRequest("Only CSV format is currently supported");
+  if (format !== "csv" && format !== "xlsx")
+    return badRequest("format must be 'csv' or 'xlsx'");
 
   const table = TABLE_MAP[type];
 
@@ -110,11 +112,6 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     });
   }
 
-  // Generate CSV
-  const csv = Papa.unparse(data as Record<string, unknown>[], {
-    header: true,
-  });
-
   // Dispatch webhook event (fire-and-forget)
   dispatchWebhookEvent(
     "bulk.export_completed",
@@ -126,8 +123,37 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     { userId: auth.userId }
   ).catch(() => {});
 
-  // Return as downloadable file
-  const filename = `${type.toLowerCase()}-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  const dateStamp = new Date().toISOString().slice(0, 10);
+
+  if (format === "xlsx") {
+    // Build a single-worksheet workbook and emit as a binary .xlsx download.
+    const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, type.slice(0, 31));
+    const buffer = XLSX.write(workbook, {
+      type: "array",
+      bookType: "xlsx",
+    }) as ArrayBuffer;
+
+    const filename = `${type.toLowerCase()}-export-${dateStamp}.xlsx`;
+
+    return new Response(buffer, {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  // Generate CSV (default)
+  const csv = Papa.unparse(data as Record<string, unknown>[], {
+    header: true,
+  });
+
+  const filename = `${type.toLowerCase()}-export-${dateStamp}.csv`;
 
   return new Response(csv, {
     status: 200,

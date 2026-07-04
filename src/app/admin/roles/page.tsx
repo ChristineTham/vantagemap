@@ -106,7 +106,7 @@ export default function RolesPage() {
       {/* Permission Matrix */}
       <div className="mb-8">
         <h2 className="mb-3 text-lg font-bold text-rosely-night">Permission Matrix</h2>
-        <div className="overflow-x-auto rounded-xl border border-rosely-blush bg-white">
+        <div className="overflow-x-auto rounded-xl border border-rosely-blush bg-card">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-rosely-blush">
@@ -151,7 +151,7 @@ export default function RolesPage() {
       {/* Role Assignments */}
       <div>
         <h2 className="mb-3 text-lg font-bold text-rosely-night">Current Assignments</h2>
-        <div className="rounded-xl border border-rosely-blush bg-white">
+        <div className="rounded-xl border border-rosely-blush bg-card">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-rosely-blush text-left text-rosely-mist">

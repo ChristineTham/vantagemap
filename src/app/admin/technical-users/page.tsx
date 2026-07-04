@@ -15,6 +15,24 @@ import { useAuthSession } from "@/components/AuthSessionProvider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/Skeleton";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -37,6 +55,7 @@ export default function TechnicalUsersPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newToken, setNewToken] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const fetchTokens = useCallback(async () => {
     try {
@@ -94,8 +113,16 @@ export default function TechnicalUsersPage() {
       {/* Show newly created token warning */}
       {newToken && <NewTokenBanner token={newToken} onDismiss={() => setNewToken(null)} />}
 
+      {/* Action error */}
+      {actionError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="size-4" />
+          <AlertDescription>{actionError}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Token List */}
-      <div className="rounded-xl border border-rosely-blush bg-white">
+      <div className="rounded-xl border border-rosely-blush bg-card">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-rosely-blush text-left text-rosely-mist">
@@ -126,7 +153,15 @@ export default function TechnicalUsersPage() {
               </tr>
             ) : (
               tokens.map((token) => (
-                <TokenRow key={token.id} token={token} onRevoke={fetchTokens} />
+                <TokenRow
+                  key={token.id}
+                  token={token}
+                  onRevoke={() => {
+                    setActionError(null);
+                    fetchTokens();
+                  }}
+                  onError={setActionError}
+                />
               ))
             )}
           </tbody>
@@ -134,16 +169,15 @@ export default function TechnicalUsersPage() {
       </div>
 
       {/* Create Modal */}
-      {showCreateModal && (
-        <CreateTokenModal
-          onClose={() => setShowCreateModal(false)}
-          onCreated={(token) => {
-            setNewToken(token);
-            fetchTokens();
-            setShowCreateModal(false);
-          }}
-        />
-      )}
+      <CreateTokenModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={(token) => {
+          setNewToken(token);
+          fetchTokens();
+          setShowCreateModal(false);
+        }}
+      />
     </div>
   );
 }
@@ -168,12 +202,12 @@ function NewTokenBanner({ token, onDismiss }: { token: string; onDismiss: () => 
             Copy your token now — it won&apos;t be shown again
           </p>
           <div className="mt-2 flex items-center gap-2">
-            <code className="flex-1 rounded-lg bg-white px-3 py-2 font-mono text-xs text-rosely-night border border-rosely-blush break-all">
+            <code className="flex-1 rounded-lg bg-card px-3 py-2 font-mono text-xs text-rosely-night border border-rosely-blush break-all">
               {token}
             </code>
             <button
               onClick={handleCopy}
-              className="shrink-0 rounded-lg border border-rosely-blush p-2 hover:bg-white transition-colors"
+              className="shrink-0 rounded-lg border border-rosely-blush p-2 hover:bg-card transition-colors"
               aria-label="Copy token"
             >
               {copied ? (
@@ -197,21 +231,35 @@ function NewTokenBanner({ token, onDismiss }: { token: string; onDismiss: () => 
 
 // ── Token Row ───────────────────────────────────────────────────────────────
 
-function TokenRow({ token, onRevoke }: { token: ApiToken; onRevoke: () => void }) {
+function TokenRow({
+  token,
+  onRevoke,
+  onError,
+}: {
+  token: ApiToken;
+  onRevoke: () => void;
+  onError: (message: string) => void;
+}) {
   const [revoking, setRevoking] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const isExpired = token.expiresAt && new Date(token.expiresAt) < new Date();
 
   async function handleRevoke() {
-    if (!confirm(`Revoke token "${token.name}"? This cannot be undone.`)) return;
     setRevoking(true);
     try {
-      await fetch(`/api/admin/tokens/${token.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/tokens/${token.id}`, { method: "DELETE" });
+      if (!res.ok && res.status !== 204) {
+        const data = await res.json().catch(() => null);
+        onError(data?.error?.message || `Failed to revoke token (${res.status})`);
+        return;
+      }
       onRevoke();
     } catch {
-      // silently fail
+      onError("An unexpected error occurred while revoking the token.");
     } finally {
       setRevoking(false);
+      setConfirmOpen(false);
     }
   }
 
@@ -243,13 +291,43 @@ function TokenRow({ token, onRevoke }: { token: ApiToken; onRevoke: () => void }
       </td>
       <td className="px-4 py-3">
         <button
-          onClick={handleRevoke}
+          onClick={() => setConfirmOpen(true)}
           disabled={revoking}
           className="rounded-lg p-1.5 text-rosely-rose hover:bg-rosely-rose/10 transition-colors disabled:opacity-50"
           aria-label={`Revoke token ${token.name}`}
         >
           <Trash2 className="size-4" />
         </button>
+
+        <AlertDialog
+          open={confirmOpen}
+          onOpenChange={(o) => {
+            if (!o) setConfirmOpen(false);
+          }}
+        >
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Revoke token</AlertDialogTitle>
+              <AlertDialogDescription>
+                Revoke token{" "}
+                <span className="font-semibold text-rosely-night">{token.name}</span>? Any
+                integration using it will immediately stop working. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={revoking}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleRevoke();
+                }}
+                disabled={revoking}
+              >
+                {revoking ? "Revoking..." : "Revoke Token"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </td>
     </tr>
   );
@@ -258,9 +336,11 @@ function TokenRow({ token, onRevoke }: { token: ApiToken; onRevoke: () => void }
 // ── Create Token Modal ──────────────────────────────────────────────────────
 
 function CreateTokenModal({
+  open,
   onClose,
   onCreated,
 }: {
+  open: boolean;
   onClose: () => void;
   onCreated: (token: string) => void;
 }) {
@@ -302,21 +382,30 @@ function CreateTokenModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-xl border border-rosely-blush bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-bold text-rosely-night">Create API Token</h3>
-        <p className="mt-1 text-sm text-rosely-mist">
-          Generate a new token for technical integrations
-        </p>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
+    >
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create API Token</DialogTitle>
+          <DialogDescription>Generate a new token for technical integrations</DialogDescription>
+        </DialogHeader>
 
         {error && (
-          <Alert variant="destructive" className="mt-4">
+          <Alert variant="destructive" id="token-error">
             <AlertCircle className="size-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <form onSubmit={handleCreate} className="mt-4 flex flex-col gap-4">
+        <form
+          onSubmit={handleCreate}
+          className="flex flex-col gap-4"
+          aria-describedby={error ? "token-error" : undefined}
+        >
           <div>
             <Label htmlFor="token-name">Token Name</Label>
             <Input
@@ -325,6 +414,8 @@ function CreateTokenModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              aria-required
+              aria-invalid={error ? true : undefined}
               placeholder="e.g. CI/CD Pipeline, Import Script"
               className="mt-1"
             />
@@ -347,7 +438,7 @@ function CreateTokenModal({
             </select>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <DialogFooter>
             <button
               type="button"
               onClick={onClose}
@@ -363,9 +454,9 @@ function CreateTokenModal({
               <Key className="size-4" />
               {creating ? "Creating..." : "Create Token"}
             </button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

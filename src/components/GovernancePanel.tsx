@@ -43,7 +43,7 @@ export function GovernancePanel({ factSheetName, children }: GovernancePanelProp
   const [activeTab, setActiveTab] = useState<TabId>("seal");
 
   return (
-    <div className="bg-white rounded-xl border border-rosely-blush overflow-hidden">
+    <div className="bg-card rounded-xl border border-rosely-blush overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-rosely-petal bg-rosely-cream/30">
         <h2 className="text-sm font-semibold text-rosely-night truncate">{factSheetName}</h2>

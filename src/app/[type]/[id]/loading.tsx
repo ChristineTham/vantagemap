@@ -23,7 +23,7 @@ export default function DetailLoading() {
 
       {/* Content skeleton */}
       <div className="flex flex-col gap-4">
-        <div className="rounded-xl border border-rosely-blush bg-white p-5 flex flex-col gap-4">
+        <div className="rounded-xl border border-rosely-blush bg-card p-5 flex flex-col gap-4">
           <div className="h-4 w-24 rounded bg-rosely-cream/50" />
           <div className="grid grid-cols-2 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (

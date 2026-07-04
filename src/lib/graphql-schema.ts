@@ -26,6 +26,7 @@ import { db } from "@/db";
 import {
   applications,
   businessCapabilities,
+  businessContexts,
   organizations,
   strategicObjectives,
   initiatives,
@@ -191,6 +192,17 @@ const OrganizationType = new GraphQLObjectType({
   }),
 });
 
+const BusinessContextType = new GraphQLObjectType({
+  name: "BusinessContext",
+  fields: () => ({
+    ...commonFields,
+    subtype: { type: GraphQLString },
+    level: { type: GraphQLInt },
+    parentId: { type: GraphQLString },
+    ...relationshipFields,
+  }),
+});
+
 const ObjectiveType = new GraphQLObjectType({
   name: "StrategicObjective",
   fields: () => ({
@@ -283,6 +295,10 @@ function createConnectionType(name: string, nodeType: GraphQLObjectType) {
 const ApplicationConnectionType = createConnectionType("Application", ApplicationType);
 const CapabilityConnectionType = createConnectionType("BusinessCapability", CapabilityType);
 const OrganizationConnectionType = createConnectionType("Organization", OrganizationType);
+const BusinessContextConnectionType = createConnectionType(
+  "BusinessContext",
+  BusinessContextType
+);
 const ObjectiveConnectionType = createConnectionType("StrategicObjective", ObjectiveType);
 const InitiativeConnectionType = createConnectionType("Initiative", InitiativeType);
 const ITComponentConnectionType = createConnectionType("ITComponent", ITComponentType);
@@ -375,6 +391,23 @@ const QueryType = new GraphQLObjectType({
       type: OrganizationConnectionType,
       args: paginationArgs,
       resolve: (_, args) => paginatedQuery(organizations, args, "Organization"),
+    },
+    businessContexts: {
+      type: BusinessContextConnectionType,
+      args: paginationArgs,
+      resolve: (_, args) => paginatedQuery(businessContexts, args, "BusinessContext"),
+    },
+    businessContext: {
+      type: BusinessContextType,
+      args: { id: { type: new GraphQLNonNull(GraphQLString) } },
+      resolve: async (_, { id }) => {
+        const [row] = await db
+          .select()
+          .from(businessContexts)
+          .where(eq(businessContexts.id, id))
+          .limit(1);
+        return row ? { ...row, _type: "BusinessContext" } : null;
+      },
     },
     objectives: {
       type: ObjectiveConnectionType,

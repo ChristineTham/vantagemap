@@ -82,7 +82,7 @@ export function TechRadarView({ components, categories: _categories }: TechRadar
         <select
           value={filterRing}
           onChange={(e) => setFilterRing(e.target.value)}
-          className="rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
+          className="rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
         >
           <option value="all">All Rings</option>
           {RINGS.map((r) => (
@@ -94,7 +94,7 @@ export function TechRadarView({ components, categories: _categories }: TechRadar
         <select
           value={filterQuadrant}
           onChange={(e) => setFilterQuadrant(e.target.value)}
-          className="rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
+          className="rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
         >
           <option value="all">All Quadrants</option>
           {QUADRANTS.map((q) => (
@@ -103,7 +103,7 @@ export function TechRadarView({ components, categories: _categories }: TechRadar
             </option>
           ))}
         </select>
-        <span className="text-xs text-rosely-mist ml-auto">
+        <span className="text-xs text-rosely-dusk ml-auto">
           {filtered.length} of {components.length} shown
         </span>
       </div>
@@ -113,7 +113,7 @@ export function TechRadarView({ components, categories: _categories }: TechRadar
         {RINGS.map((ring) => (
           <div key={ring.key} className="flex items-center gap-1.5">
             <StatusBadge status={ring.label} colorMap={techRingColour} />
-            <span className="text-xs text-rosely-mist">{ring.description}</span>
+            <span className="text-xs text-rosely-dusk">{ring.description}</span>
           </div>
         ))}
       </div>
@@ -145,14 +145,14 @@ function QuadrantCard({ label, items }: { label: string; items: ITComponent[] })
   if (noRing.length > 0) byRing.set("Unclassified", noRing);
 
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-4">
+    <div className="rounded-xl border border-rosely-blush bg-card p-4">
       <h3 className="text-sm font-semibold text-rosely-night mb-3">
         {label}
-        <span className="ml-2 text-xs font-normal text-rosely-mist">({items.length})</span>
+        <span className="ml-2 text-xs font-normal text-rosely-dusk">({items.length})</span>
       </h3>
 
       {items.length === 0 ? (
-        <p className="text-xs text-rosely-mist italic">No technologies in this quadrant.</p>
+        <p className="text-xs text-rosely-dusk italic">No technologies in this quadrant.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {RINGS.map((ring) => {
@@ -173,7 +173,7 @@ function QuadrantCard({ label, items }: { label: string; items: ITComponent[] })
                       <HealthIndicator health={item.health} />
                       {item.name}
                       {item.version && (
-                        <span className="text-rosely-mist ml-0.5">v{item.version}</span>
+                        <span className="text-rosely-dusk ml-0.5">v{item.version}</span>
                       )}
                     </span>
                   ))}
@@ -183,7 +183,7 @@ function QuadrantCard({ label, items }: { label: string; items: ITComponent[] })
           })}
           {byRing.has("Unclassified") && (
             <div>
-              <span className="text-xs font-medium text-rosely-mist mb-1.5 block">
+              <span className="text-xs font-medium text-rosely-dusk mb-1.5 block">
                 Unclassified
               </span>
               <div className="flex flex-wrap gap-2">

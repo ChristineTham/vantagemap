@@ -51,7 +51,7 @@ export default async function StrategyPage() {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-rosely-night">Strategy Map</h1>
-          <p className="text-sm text-rosely-mist mt-1">
+          <p className="text-sm text-rosely-dusk mt-1">
             Balanced Scorecard — strategic objectives by perspective.
           </p>
         </div>
@@ -78,7 +78,7 @@ export default async function StrategyPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-rosely-night">Strategy Map</h1>
-        <p className="text-sm text-rosely-mist mt-1">
+        <p className="text-sm text-rosely-dusk mt-1">
           {objectives.length} objectives across {PERSPECTIVES.length} perspectives •{" "}
           {initiatives.length} linked initiatives
         </p>
@@ -97,13 +97,13 @@ export default async function StrategyPage() {
                 <h2 className="text-sm font-semibold text-rosely-night uppercase tracking-wide">
                   {perspective.label}
                 </h2>
-                <span className="text-xs text-rosely-mist">
+                <span className="text-xs text-rosely-dusk">
                   {items.length} objective{items.length !== 1 ? "s" : ""}
                 </span>
               </div>
 
               {items.length === 0 ? (
-                <p className="text-xs text-rosely-mist italic">
+                <p className="text-xs text-rosely-dusk italic">
                   No objectives in this perspective.
                 </p>
               ) : (
@@ -129,13 +129,13 @@ function ObjectiveCard({
   initiativeCount: number;
 }) {
   return (
-    <div className="rounded-lg border border-white/60 bg-white p-3 shadow-sm">
+    <div className="rounded-lg border border-white/60 bg-card p-3 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-medium text-rosely-night">{objective.name}</h3>
         <HealthIndicator health={objective.health} />
       </div>
       {objective.description && (
-        <p className="mt-1 text-xs text-rosely-mist line-clamp-2">{objective.description}</p>
+        <p className="mt-1 text-xs text-rosely-dusk line-clamp-2">{objective.description}</p>
       )}
       <div className="mt-2 flex items-center gap-2">
         <LifecycleTag lifecycle={objective.lifecycle} />

@@ -38,6 +38,17 @@ vi.mock("@/lib/audit", () => ({
   computeDiff: vi.fn().mockReturnValue(undefined),
 }));
 
+vi.mock("@/lib/notifications", () => ({
+  notifySubscribers: vi.fn().mockResolvedValue(undefined),
+}));
+
+// `after()` schedules post-response work; outside a request scope it throws, so
+// stub it to a no-op (the audit/notification side effects are covered elsewhere).
+vi.mock("next/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/server")>();
+  return { ...actual, after: vi.fn() };
+});
+
 // ─── Module imports (after mocks) ──────────────────────────────────────────
 
 import { db } from "@/db";

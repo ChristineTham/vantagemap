@@ -185,7 +185,7 @@ export function RelationshipAddDialog({
       }}
     >
       <DialogContent className="max-w-lg max-h-[70vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="sticky top-0 z-10 border-b border-rosely-blush bg-white px-6 py-4 rounded-t-xl">
+        <DialogHeader className="sticky top-0 z-10 border-b border-rosely-blush bg-card px-6 py-4 rounded-t-xl">
           <DialogTitle className="text-lg font-semibold text-rosely-night">
             {step === "type" ? "Add Relationship" : `Select ${selectedTargetType}`}
           </DialogTitle>
@@ -212,9 +212,10 @@ export function RelationshipAddDialog({
                   type="text"
                   value={typeSearch}
                   onChange={(e) => setTypeSearch(e.target.value)}
+                  aria-label="Filter relationship types"
                   placeholder="Filter relationship types…"
                   className={cn(
-                    "w-full rounded-lg border border-rosely-blush bg-white py-2 pl-10 pr-4 text-sm text-rosely-night",
+                    "w-full rounded-lg border border-rosely-blush bg-card py-2 pl-10 pr-4 text-sm text-rosely-night",
                     "placeholder:text-rosely-mist",
                     "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                   )}
@@ -281,19 +282,23 @@ export function RelationshipAddDialog({
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  <label className="block text-xs font-medium text-rosely-dusk">
+                  <label
+                    htmlFor="rel-entity-search"
+                    className="block text-xs font-medium text-rosely-dusk"
+                  >
                     Search for a {selectedTargetType}
                   </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-rosely-mist" />
                     <input
+                      id="rel-entity-search"
                       type="text"
                       autoFocus
                       value={entitySearch}
                       onChange={(e) => setEntitySearch(e.target.value)}
                       placeholder={`Type a name to search…`}
                       className={cn(
-                        "w-full rounded-lg border border-rosely-blush bg-white py-2 pl-10 pr-4 text-sm text-rosely-night",
+                        "w-full rounded-lg border border-rosely-blush bg-card py-2 pl-10 pr-4 text-sm text-rosely-night",
                         "placeholder:text-rosely-mist",
                         "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                       )}
@@ -305,7 +310,7 @@ export function RelationshipAddDialog({
 
                   {/* Results */}
                   {entitySearch.trim() && (
-                    <div className="max-h-48 overflow-y-auto rounded-lg border border-rosely-blush bg-white shadow-sm">
+                    <div className="max-h-48 overflow-y-auto rounded-lg border border-rosely-blush bg-card shadow-sm">
                       {searching ? (
                         <p className="py-4 text-center text-sm text-rosely-mist">Searching…</p>
                       ) : searchResults.length === 0 ? (
@@ -334,16 +339,20 @@ export function RelationshipAddDialog({
               )}
 
               <div>
-                <label className="block text-xs font-medium text-rosely-dusk mb-1">
+                <label
+                  htmlFor="rel-description"
+                  className="block text-xs font-medium text-rosely-dusk mb-1"
+                >
                   Description (optional)
                 </label>
                 <input
+                  id="rel-description"
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of this relationship"
                   className={cn(
-                    "w-full rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night",
+                    "w-full rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night",
                     "placeholder:text-rosely-mist",
                     "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30"
                   )}

@@ -125,6 +125,12 @@ export function SearchBar() {
             }
           }}
           placeholder="Search…"
+          role="combobox"
+          aria-label="Search fact sheets"
+          aria-expanded={showDropdown}
+          aria-haspopup="listbox"
+          aria-controls="search-bar-results"
+          aria-autocomplete="list"
           className="min-w-0 flex-1 bg-transparent text-sm text-rosely-night placeholder:text-rosely-mist focus:outline-none"
         />
         {query && (
@@ -132,7 +138,6 @@ export function SearchBar() {
             onClick={handleClear}
             className="shrink-0 text-rosely-mist hover:text-rosely-night transition-colors"
             aria-label="Clear search"
-            tabIndex={-1}
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -142,7 +147,10 @@ export function SearchBar() {
       {/* Dropdown */}
       {showDropdown && (
         <div
-          className="absolute left-2 right-2 top-full z-50 mt-1 rounded-xl border border-rosely-blush bg-white shadow-xl overflow-hidden"
+          id="search-bar-results"
+          role="listbox"
+          aria-label="Search results"
+          className="absolute left-2 right-2 top-full z-50 mt-1 rounded-xl border border-rosely-blush bg-card shadow-xl overflow-hidden"
           style={{ minWidth: "16rem", maxHeight: "70vh", overflowY: "auto" }}
         >
           {results.length > 0 ? (

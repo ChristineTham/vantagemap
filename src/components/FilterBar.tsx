@@ -31,6 +31,7 @@ export function FilterBar({ filters, colorMap, onRemove, onClearAll, className }
         <button
           key={`${filter.field}-${filter.value}-${index}`}
           onClick={() => onRemove(filter)}
+          aria-label={`Remove filter: ${filter.label ?? filter.value}`}
           className="group inline-flex items-center gap-1"
         >
           <StatusBadge

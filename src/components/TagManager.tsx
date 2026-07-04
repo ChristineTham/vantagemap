@@ -102,10 +102,11 @@ export function TagManager({
 
       {/* Create new group form */}
       {showNewGroup && (
-        <div className="bg-white rounded-xl border border-rosely-blush p-4 flex flex-col gap-3">
+        <div className="bg-card rounded-xl border border-rosely-blush p-4 flex flex-col gap-3">
           <input
             type="text"
             placeholder="Group name"
+            aria-label="Group name"
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
             className="w-full px-3 py-2 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac"
@@ -113,6 +114,7 @@ export function TagManager({
           <input
             type="text"
             placeholder="Description (optional)"
+            aria-label="Group description"
             value={newGroupDesc}
             onChange={(e) => setNewGroupDesc(e.target.value)}
             className="w-full px-3 py-2 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac"
@@ -149,7 +151,7 @@ export function TagManager({
         {tagGroups.map((group) => (
           <div
             key={group.id}
-            className="bg-white rounded-xl border border-rosely-blush overflow-hidden"
+            className="bg-card rounded-xl border border-rosely-blush overflow-hidden"
           >
             {/* Group header */}
             <div className="flex items-center justify-between px-4 py-3 hover:bg-rosely-petal/30 transition-colors">
@@ -229,13 +231,15 @@ export function TagManager({
                     <input
                       type="text"
                       placeholder="Tag name"
+                      aria-label="Tag name"
                       value={newTagName}
                       onChange={(e) => setNewTagName(e.target.value)}
                       className="flex-1 px-2 py-1 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac"
                     />
                     <input
                       type="text"
-                      placeholder="Color (hex)"
+                      placeholder="Colour (hex)"
+                      aria-label="Tag colour (hex)"
                       value={newTagColor}
                       onChange={(e) => setNewTagColor(e.target.value)}
                       className="w-24 px-2 py-1 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac"

@@ -87,14 +87,14 @@ Implement the canonical data model from [MODEL.md](MODEL.md) as database tables 
 
 **Decisions summary:**
 
-- 22 tables across 9 schema files (`enums.ts`, `business.ts`, `applications.ts`, `strategy.ts`, `technology.ts`, `relationships.ts`, `tags.ts`, `audit.ts`, `users.ts`)
-- 28 PostgreSQL enums for all domain-specific value sets
+- 31 tables across 12 schema files (`enums.ts`, `business.ts`, `applications.ts`, `strategy.ts`, `technology.ts`, `relationships.ts`, `tags.ts`, `governance.ts`, `audit.ts`, `users.ts`, `api-tokens.ts`, `webhooks.ts`)
+- 27 PostgreSQL enums for all domain-specific value sets
 - All tables use `uuid` primary keys, `created_at`/`updated_at` timestamps, `quality_seal` and `custom_fields jsonb` for governance
 - Typed edge table (`relationships`) with 35-value `relationship_type` enum; indexed on source, target, and type
 - `audit_entries` is append-only (no `updated_at`); 5 indexes for p95 &lt;1 s retrieval requirement from [nfr.md](phase-0/nfr.md)
 - `subscriptions` and `tag_assignments` use unique constraints to prevent duplicates
 - User/workspace tables are separate from Better Auth session tables (Better Auth adds its own tables in Phase 10)
-- Seed script (`src/db/seed.ts`) is idempotent via `TRUNCATE … CASCADE`; populates all 22 tables
+- Seed script (`src/db/seed.ts`) is idempotent via `TRUNCATE … CASCADE`; populates all 31 tables
 - Migration file generated at `drizzle/0000_wakeful_iron_patriot.sql`; schema pushed to Neon free-tier database
 
 | Step | Title                                  | Scope                                                                                                                                                                                                                                                                                                    | Depends on |
@@ -428,7 +428,7 @@ Database schema scaffolded, migration generated, pushed to Neon, and seed data l
 
 | File                                    | Step    | Description                                                                                                                                     |
 | --------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/db/schema/enums.ts`                | 3.1–3.8 | 28 PostgreSQL enums shared across all bounded contexts                                                                                          |
+| `src/db/schema/enums.ts`                | 3.1–3.8 | 27 PostgreSQL enums shared across all bounded contexts                                                                                          |
 | `src/db/schema/business.ts`             | 3.1     | `business_capabilities` (hierarchical), `organizations`, `business_contexts`                                                                    |
 | `src/db/schema/applications.ts`         | 3.2     | `applications`, `data_objects`, `interfaces`                                                                                                    |
 | `src/db/schema/strategy.ts`             | 3.3     | `strategic_objectives`, `kpis`, `initiatives`, `platforms`                                                                                      |
@@ -439,7 +439,7 @@ Database schema scaffolded, migration generated, pushed to Neon, and seed data l
 | `src/db/schema/users.ts`                | 3.8     | `users`, `workspaces`, `user_workspace_roles` with FK cascade                                                                                   |
 | `src/db/schema/index.ts`                | 3.1–3.8 | Barrel re-exporting all schema modules                                                                                                          |
 | `src/db/seed.ts`                        | 3.9     | Idempotent seed: 2 users, 19 capabilities, 10 apps, 6 objectives, 8 KPIs, 6 initiatives, 12 IT components, 7 tags, relationships, audit entries |
-| `drizzle/0000_wakeful_iron_patriot.sql` | 3.1–3.8 | Generated SQL migration (22 tables, all enums, indexes, FKs)                                                                                    |
+| `drizzle/0000_wakeful_iron_patriot.sql` | 3.1–3.8 | Generated SQL migration (initial tables, all enums, indexes, FKs; the schema has since grown to 31 tables across later phases)                   |
 
 ### Pipeline Verification (all green)
 

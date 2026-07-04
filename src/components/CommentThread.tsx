@@ -73,6 +73,7 @@ function CommentItem({
           <div className="flex items-start gap-2 mt-2">
             <textarea
               placeholder="Write a reply..."
+              aria-label="Write a reply"
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               className="flex-1 px-3 py-2 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac resize-none"
@@ -135,6 +136,7 @@ export function CommentThread({ comments, currentUserId, onSubmitComment }: Comm
       <div className="flex items-start gap-2">
         <textarea
           placeholder="Add a comment..."
+          aria-label="Add a comment"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           className="flex-1 px-3 py-2 text-sm border border-rosely-blush rounded-md focus:outline-none focus:ring-1 focus:ring-rosely-lilac resize-none"

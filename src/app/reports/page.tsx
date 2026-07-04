@@ -11,7 +11,15 @@ import { ObsolescenceTable } from "@/components/ObsolescenceTable";
 import {
   ReportingChartsLazy as ReportingCharts,
   CapabilityCoverageChartLazy as CapabilityCoverageChart,
+  RoadmapImpactSectionLazy as RoadmapImpactSection,
+  DataQualitySectionLazy as DataQualitySection,
+  AdoptionSectionLazy as AdoptionSection,
 } from "@/components/LazyCharts";
+import {
+  getRoadmapImpact,
+  getDataQualityMetrics,
+  getAdoptionMetrics,
+} from "@/lib/reports-extended";
 
 export const metadata: Metadata = {
   title: "Reports – VantageMap",
@@ -19,15 +27,31 @@ export const metadata: Metadata = {
     "Enterprise architecture reporting and analytics: TIME, 6R, obsolescence risk, portfolio health.",
 };
 
+// Reports are authenticated and query live data (including direct DB
+// aggregations), so this page must be rendered on demand rather than
+// statically prerendered at build time.
+export const dynamic = "force-dynamic";
+
 export default async function ReportsPage() {
-  const [timeReport, sixRReport, obsolescenceReport, portfolioReport, coverageReport] =
-    await Promise.all([
-      getTimeDistribution(),
-      getSixRDistribution(),
-      getObsolescenceRisk(),
-      getPortfolioHealth(),
-      getCapabilityCoverage(),
-    ]);
+  const [
+    timeReport,
+    sixRReport,
+    obsolescenceReport,
+    portfolioReport,
+    coverageReport,
+    roadmapImpact,
+    dataQuality,
+    adoption,
+  ] = await Promise.all([
+    getTimeDistribution(),
+    getSixRDistribution(),
+    getObsolescenceRisk(),
+    getPortfolioHealth(),
+    getCapabilityCoverage(),
+    getRoadmapImpact(),
+    getDataQualityMetrics(),
+    getAdoptionMetrics(),
+  ]);
 
   return (
     <div className="p-6 flex flex-col gap-8 max-w-7xl mx-auto">
@@ -81,7 +105,7 @@ export default async function ReportsPage() {
 
       {/* TIME Recommendations */}
       {timeReport.recommendations.length > 0 && (
-        <div className="rounded-xl border border-rosely-blush bg-white p-5">
+        <div className="rounded-xl border border-rosely-blush bg-card p-5">
           <h3 className="text-sm font-semibold text-rosely-night mb-3">
             Suggested TIME Classifications
           </h3>
@@ -131,7 +155,7 @@ export default async function ReportsPage() {
       />
 
       {/* Portfolio Health Detail */}
-      <div className="rounded-xl border border-rosely-blush bg-white p-5">
+      <div className="rounded-xl border border-rosely-blush bg-card p-5">
         <h3 className="text-sm font-semibold text-rosely-night mb-4">Portfolio Health Breakdown</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <DimensionCard
@@ -154,6 +178,15 @@ export default async function ReportsPage() {
           />
         </div>
       </div>
+
+      {/* 13.5 — Roadmap Impact Analysis */}
+      <RoadmapImpactSection data={roadmapImpact} />
+
+      {/* 13.6 — Data Quality Metrics */}
+      <DataQualitySection data={dataQuality} />
+
+      {/* 13.7 — Adoption Metrics */}
+      <AdoptionSection data={adoption} />
     </div>
   );
 }
@@ -172,7 +205,7 @@ function StatCard({
   subtitle: string;
 }) {
   return (
-    <div className="rounded-xl border border-rosely-blush bg-white p-4">
+    <div className="rounded-xl border border-rosely-blush bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         {icon}
         <span className="text-xl font-bold text-rosely-night">{value}</span>

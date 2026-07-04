@@ -127,7 +127,7 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="rounded-lg border border-rosely-blush bg-white px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
+          className="rounded-lg border border-rosely-blush bg-card px-3 py-2 text-sm text-rosely-night focus:border-rosely-lilac focus:outline-none"
         >
           <option value="all">All Statuses</option>
           {STATUS_ORDER.map((s) => (
@@ -136,7 +136,7 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
             </option>
           ))}
         </select>
-        <span className="text-xs text-rosely-mist ml-auto">
+        <span className="text-xs text-rosely-dusk ml-auto">
           {filtered.length} of {initiatives.length} shown
         </span>
       </div>
@@ -149,11 +149,11 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
       </div>
 
       {/* Gantt Chart */}
-      <div className="rounded-xl border border-rosely-blush bg-white overflow-hidden">
+      <div className="rounded-xl border border-rosely-blush bg-card overflow-hidden">
         {/* Month Headers */}
         <div className="flex border-b border-rosely-blush bg-rosely-cream/30">
           <div className="w-56 shrink-0 border-r border-rosely-blush px-3 py-2">
-            <span className="text-xs font-medium text-rosely-mist">Initiative</span>
+            <span className="text-xs font-medium text-rosely-dusk">Initiative</span>
           </div>
           <div className="flex-1 flex overflow-x-auto">
             {months.map((m, idx) => (
@@ -161,9 +161,9 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
                 key={idx}
                 className="flex-1 min-w-[60px] border-r border-rosely-petal px-1 py-2 text-center"
               >
-                <span className="text-2xs text-rosely-mist block">{m.label}</span>
+                <span className="text-2xs text-rosely-dusk block">{m.label}</span>
                 {(idx === 0 || m.label === "Jan") && (
-                  <span className="text-3xs text-rosely-mist/60">{m.year}</span>
+                  <span className="text-3xs text-rosely-dusk/70">{m.year}</span>
                 )}
               </div>
             ))}
@@ -172,7 +172,7 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
 
         {/* Rows */}
         {filtered.length === 0 ? (
-          <div className="px-4 py-12 text-center text-sm text-rosely-mist">
+          <div className="px-4 py-12 text-center text-sm text-rosely-dusk">
             No initiatives match your filters.
           </div>
         ) : (
@@ -214,15 +214,15 @@ export function RoadmapView({ initiatives }: RoadmapViewProps) {
       </div>
 
       {/* Summary Table */}
-      <div className="rounded-xl border border-rosely-blush bg-white overflow-hidden">
+      <div className="rounded-xl border border-rosely-blush bg-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-rosely-blush text-left">
-              <th className="px-4 py-3 font-medium text-rosely-mist">Name</th>
-              <th className="px-4 py-3 font-medium text-rosely-mist">Status</th>
-              <th className="px-4 py-3 font-medium text-rosely-mist">Start</th>
-              <th className="px-4 py-3 font-medium text-rosely-mist">End</th>
-              <th className="px-4 py-3 font-medium text-rosely-mist">Health</th>
+              <th className="px-4 py-3 font-medium text-rosely-dusk">Name</th>
+              <th className="px-4 py-3 font-medium text-rosely-dusk">Status</th>
+              <th className="px-4 py-3 font-medium text-rosely-dusk">Start</th>
+              <th className="px-4 py-3 font-medium text-rosely-dusk">End</th>
+              <th className="px-4 py-3 font-medium text-rosely-dusk">Health</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-rosely-petal">

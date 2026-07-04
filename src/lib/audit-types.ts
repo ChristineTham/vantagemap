@@ -18,5 +18,22 @@ export type FactSheetType =
   | "ITComponent"
   | "Provider";
 
+/**
+ * Non-fact-sheet entities that are also audited (governance, integration, and
+ * administration surfaces). Stored in the same `audit_entries.target_type`
+ * column, which is a free-form varchar to accommodate these.
+ */
+export type AuditTargetType =
+  | FactSheetType
+  | "Relationship"
+  | "Webhook"
+  | "Survey"
+  | "SurveyResponse"
+  | "ApiToken"
+  | "User"
+  | "Todo"
+  | "Comment"
+  | "Import";
+
 /** Audit action types matching the audit_action PostgreSQL enum. */
 export type AuditAction = "create" | "update" | "delete";

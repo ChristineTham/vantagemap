@@ -111,9 +111,23 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     ...(options?.headers as Record<string, string> | undefined),
   };
 
-  // Dev-mode auth bypass
-  if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) {
-    headers["x-dev-user-id"] = process.env.DEV_USER_ID;
+  // Server-side: forward the incoming request's cookies so the API layer can
+  // authenticate the session. Without this, server-rendered pages would receive
+  // a 401 in production and render empty. `next/headers` is imported lazily so
+  // this module stays usable in Client Components.
+  if (typeof window === "undefined") {
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieHeader = (await cookies()).toString();
+      if (cookieHeader) headers["cookie"] = cookieHeader;
+    } catch {
+      // Not in a request scope (e.g. build-time prerender) — nothing to forward.
+    }
+
+    // Dev-mode auth bypass (development only).
+    if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) {
+      headers["x-dev-user-id"] = process.env.DEV_USER_ID;
+    }
   }
 
   const res = await fetch(url, {
@@ -209,6 +223,8 @@ export const initiativesApi = createEntityClient<Initiative>("/api/initiatives")
 export const itComponentsApi = createEntityClient<ITComponent>("/api/it-components");
 export const techCategoriesApi = createEntityClient<TechCategory>("/api/tech-categories");
 export const organizationsApi = createEntityClient<Organization>("/api/organizations");
+export const businessContextsApi =
+  createEntityClient<Record<string, unknown>>("/api/business-contexts");
 export const dataObjectsApi = createEntityClient<DataObject>("/api/data-objects");
 export const interfacesApi = createEntityClient<InterfaceEntity>("/api/interfaces");
 export const providersApi = createEntityClient<Provider>("/api/providers");
@@ -434,6 +450,22 @@ export async function createFactSheetTodo(
   });
 }
 
+/** Update a todo (e.g. toggle done). */
+export async function updateTodo(
+  todoId: string,
+  data: { title?: string; assigneeId?: string | null; done?: boolean; dueDate?: string | null }
+): Promise<ApiSuccessResponse<TodoItem>> {
+  return apiFetch<ApiSuccessResponse<TodoItem>>(`/api/todos/${todoId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+/** Delete a todo. */
+export async function deleteTodo(todoId: string): Promise<void> {
+  await apiFetch<void>(`/api/todos/${todoId}`, { method: "DELETE" });
+}
+
 /** Fetch subscriptions for a fact sheet. */
 export async function getFactSheetSubscriptions(
   type: string,
@@ -553,6 +585,122 @@ export async function createSurvey(data: {
 }): Promise<ApiSuccessResponse<Survey>> {
   return apiFetch<ApiSuccessResponse<Survey>>("/api/surveys", {
     method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// ── Saved Searches API ──────────────────────────────────────────────────────
+
+export interface SavedSearch {
+  id: string;
+  userId: string;
+  name: string;
+  query: string | null;
+  entityTypes: string[] | null;
+  filters: Record<string, string> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SavedSearchInput {
+  name: string;
+  query?: string | null;
+  entityTypes?: string[] | null;
+  filters?: Record<string, string> | null;
+}
+
+/** List the current user's saved searches. */
+export async function listSavedSearches(): Promise<ApiSuccessResponse<SavedSearch[]>> {
+  return apiFetch<ApiSuccessResponse<SavedSearch[]>>("/api/saved-searches");
+}
+
+/** Create a saved search for the current user. */
+export async function createSavedSearch(
+  data: SavedSearchInput
+): Promise<ApiSuccessResponse<SavedSearch>> {
+  return apiFetch<ApiSuccessResponse<SavedSearch>>("/api/saved-searches", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/** Update (e.g. rename) a saved search. */
+export async function updateSavedSearch(
+  id: string,
+  data: Partial<SavedSearchInput>
+): Promise<ApiSuccessResponse<SavedSearch>> {
+  return apiFetch<ApiSuccessResponse<SavedSearch>>(`/api/saved-searches/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+/** Delete a saved search. */
+export async function deleteSavedSearch(id: string): Promise<void> {
+  await apiFetch<void>(`/api/saved-searches/${id}`, { method: "DELETE" });
+}
+
+// ── Notifications API ───────────────────────────────────────────────────────
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string | null;
+  entityType: string | null;
+  entityId: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface NotificationPreferences {
+  emailNotifs: boolean;
+  emailOnSubscribedChange: boolean;
+  emailOnMention: boolean;
+  weeklyDigest: boolean;
+  inAppEnabled: boolean;
+}
+
+/** List the current user's notifications (newest first) with the unread count. */
+export async function listNotifications(): Promise<
+  ApiSuccessResponse<{ notifications: Notification[]; unreadCount: number }>
+> {
+  return apiFetch<ApiSuccessResponse<{ notifications: Notification[]; unreadCount: number }>>(
+    "/api/notifications"
+  );
+}
+
+/**
+ * Mark notifications read (or unread). Omit `ids` to mark all of the current
+ * user's notifications.
+ */
+export async function markNotificationsRead(options?: {
+  ids?: string[];
+  read?: boolean;
+}): Promise<ApiSuccessResponse<{ updated: number }>> {
+  return apiFetch<ApiSuccessResponse<{ updated: number }>>("/api/notifications", {
+    method: "PATCH",
+    body: JSON.stringify({
+      ...(options?.ids ? { ids: options.ids } : {}),
+      read: options?.read ?? true,
+    }),
+  });
+}
+
+/** Get the current user's notification preferences. */
+export async function getNotificationPreferences(): Promise<
+  ApiSuccessResponse<NotificationPreferences>
+> {
+  return apiFetch<ApiSuccessResponse<NotificationPreferences>>("/api/notifications/preferences");
+}
+
+/** Update (upsert) the current user's notification preferences. */
+export async function updateNotificationPreferences(
+  data: Partial<NotificationPreferences>
+): Promise<ApiSuccessResponse<NotificationPreferences>> {
+  return apiFetch<ApiSuccessResponse<NotificationPreferences>>("/api/notifications/preferences", {
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }

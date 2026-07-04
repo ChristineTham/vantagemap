@@ -8,19 +8,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // While checking auth, show content without sidebar (avoids layout flash)
   if (isPending) {
-    return <main className="flex-1 overflow-y-auto">{children}</main>;
+    return (
+      <main id="main" className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    );
   }
 
   // Unauthenticated: full-width content, no sidebar
   if (!user) {
-    return <main className="flex-1 overflow-y-auto">{children}</main>;
+    return (
+      <main id="main" className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    );
   }
 
   // Authenticated: sidebar + content
   return (
     <>
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main id="main" className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </>
   );
 }

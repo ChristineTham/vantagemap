@@ -8,6 +8,8 @@ interface SearchInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /** Accessible label for the search input (defaults to the placeholder). */
+  "aria-label"?: string;
 }
 
 /**
@@ -18,6 +20,7 @@ export function SearchInput({
   onChange,
   placeholder = "Search…",
   className,
+  "aria-label": ariaLabel,
 }: SearchInputProps) {
   return (
     <div className={cn("relative", className)}>
@@ -27,8 +30,9 @@ export function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        aria-label={ariaLabel ?? placeholder}
         className={cn(
-          "w-full rounded-lg border border-rosely-blush bg-white py-2 pl-10 pr-4 text-sm text-rosely-night",
+          "w-full rounded-lg border border-rosely-blush bg-card py-2 pl-10 pr-4 text-sm text-rosely-night",
           "placeholder:text-rosely-mist",
           "focus:border-rosely-lilac focus:outline-none focus:ring-2 focus:ring-rosely-lilac/30",
           "transition-colors"

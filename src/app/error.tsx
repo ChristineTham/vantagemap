@@ -44,7 +44,7 @@ export default function GlobalError({
         </button>
         <Link
           href="/"
-          className="rounded-lg border border-rosely-blush bg-white px-4 py-2 text-sm font-medium text-rosely-night hover:bg-rosely-petal transition-colors"
+          className="rounded-lg border border-rosely-blush bg-card px-4 py-2 text-sm font-medium text-rosely-night hover:bg-rosely-petal transition-colors"
         >
           Dashboard
         </Link>

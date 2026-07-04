@@ -29,12 +29,36 @@ import { requirePermission } from "@/lib/rbac";
 import { writeAuditLog, computeDiff } from "@/lib/audit";
 import type { FactSheetType } from "@/lib/audit-types";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { withRetry } from "@/lib/neon-retry";
+import { notifySubscribers } from "@/lib/notifications";
 import {
   parseListParams,
   buildOrderBy,
   buildWhereConditions,
   buildPaginationMeta,
 } from "@/lib/query";
+
+// ── Protected Fields ──────────────────────────────────────────────────────────
+
+/**
+ * Fields that must never be set via the generic create/update payload.
+ *
+ * `qualitySeal` is governed by the quality-seal state machine
+ * (`/api/fact-sheets/:type/:id/quality-seal`) and its audit trail — accepting it
+ * here would let any Member bypass the workflow. Timestamps and identity columns
+ * are managed by the database / audit layer. These are stripped defensively even
+ * if an entity's Zod schema happens to expose them.
+ */
+const PROTECTED_WRITE_FIELDS = ["qualitySeal", "createdAt", "updatedAt", "createdBy"] as const;
+
+/** Remove server-controlled fields from a client-supplied payload. */
+function stripProtectedFields<T extends Record<string, unknown>>(data: T): T {
+  const clone = { ...data };
+  for (const field of PROTECTED_WRITE_FIELDS) {
+    delete clone[field];
+  }
+  return clone;
+}
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -149,10 +173,14 @@ export function createCreateHandler(config: CrudConfig) {
     const parsed = await parseBody(request, config.createSchema);
     if ("error" in parsed) return parsed.error;
 
-    const [row] = await db
-      .insert(config.table)
-      .values(parsed.data as any)
-      .returning();
+    const values = stripProtectedFields(parsed.data as Record<string, unknown>);
+
+    const [row] = await withRetry(() =>
+      db
+        .insert(config.table)
+        .values(values as any)
+        .returning()
+    );
 
     if (isFeatureEnabled("FEATURE_AUDIT_LOGGING")) {
       const displayName =
@@ -207,17 +235,18 @@ export function createUpdateHandler(config: CrudConfig) {
       const parsed = await parseBody(request, config.updateSchema);
       if ("error" in parsed) return parsed.error;
 
-      const [updated] = await db
-        .update(config.table)
-        .set(parsed.data as any)
-        .where(eq((config.table as any).id, id))
-        .returning();
+      const values = stripProtectedFields(parsed.data as Record<string, unknown>);
+
+      const [updated] = await withRetry(() =>
+        db
+          .update(config.table)
+          .set(values as any)
+          .where(eq((config.table as any).id, id))
+          .returning()
+      );
 
       if (isFeatureEnabled("FEATURE_AUDIT_LOGGING")) {
-        const diff = computeDiff(
-          existing as Record<string, unknown>,
-          parsed.data as Record<string, unknown>
-        );
+        const diff = computeDiff(existing as Record<string, unknown>, values);
 
         after(async () => {
           await writeAuditLog({
@@ -231,6 +260,17 @@ export function createUpdateHandler(config: CrudConfig) {
           });
         });
       }
+
+      // Notify subscribers of the change (best-effort, non-blocking).
+      after(async () => {
+        await notifySubscribers({
+          entityType: config.entityType,
+          entityId: id,
+          action: "updated",
+          actorId: auth.auth.userId,
+          displayName: (updated as any).name ?? undefined,
+        });
+      });
 
       return ok(updated);
     }
@@ -264,7 +304,7 @@ export function createDeleteHandler(config: CrudConfig) {
         return notFound(`${config.entityType} not found`);
       }
 
-      await db.delete(config.table).where(eq((config.table as any).id, id));
+      await withRetry(() => db.delete(config.table).where(eq((config.table as any).id, id)));
 
       if (isFeatureEnabled("FEATURE_AUDIT_LOGGING")) {
         after(async () => {
@@ -278,6 +318,17 @@ export function createDeleteHandler(config: CrudConfig) {
           });
         });
       }
+
+      // Notify subscribers of the deletion (best-effort, non-blocking).
+      after(async () => {
+        await notifySubscribers({
+          entityType: config.entityType,
+          entityId: id,
+          action: "deleted",
+          actorId: auth.auth.userId,
+          displayName: (existing as any).name ?? undefined,
+        });
+      });
 
       return noContent();
     }

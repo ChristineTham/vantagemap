@@ -21,6 +21,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin } from "better-auth/plugins";
 import { db } from "@/db";
+import { sendAuthEmail } from "@/lib/email";
+import { provisionAppUser } from "@/lib/auth-provision";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -36,24 +38,39 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
     autoSignIn: true,
     sendResetPassword: async ({ user, url }) => {
-      // In production, replace with a transactional email service (Resend, Postmark, etc.)
-      console.log(`[Auth] Password reset requested for ${user.email}: ${url}`);
+      await sendAuthEmail({
+        to: user.email,
+        subject: "Reset your VantageMap password",
+        heading: "Password reset requested",
+        body: "Click the button below to choose a new password. If you didn't request this, you can safely ignore this email.",
+        ctaLabel: "Reset password",
+        ctaUrl: url,
+      });
     },
   },
 
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      // In production, replace with a transactional email service
-      console.log(`[Auth] Email verification for ${user.email}: ${url}`);
+      await sendAuthEmail({
+        to: user.email,
+        subject: "Verify your VantageMap email",
+        heading: "Confirm your email address",
+        body: "Click the button below to verify your email and activate your account.",
+        ctaLabel: "Verify email",
+        ctaUrl: url,
+      });
     },
     sendOnSignUp: true,
   },
 
+  // Persist rate-limit counters in the database so limits hold across serverless
+  // instances and cold starts (in-memory storage is per-instance and ineffective
+  // on Vercel/Azure).
   rateLimit: {
     enabled: true,
     window: 60, // 60-second window
     max: 10, // max 10 requests per window per IP
-    storage: "memory",
+    storage: "database",
   },
 
   session: {
@@ -70,6 +87,18 @@ export const auth = betterAuth({
       avatarUrl: {
         type: "string",
         required: false,
+      },
+    },
+  },
+
+  // Provision the matching application user + default workspace role whenever a
+  // Better Auth user is created (sign-up), keeping the two user models in sync.
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (createdUser) => {
+          await provisionAppUser({ email: createdUser.email, name: createdUser.name });
+        },
       },
     },
   },
