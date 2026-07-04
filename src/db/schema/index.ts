@@ -3,10 +3,8 @@
  *
  * Bounded contexts:
  *   enums.ts         — shared PostgreSQL enums
- *   business.ts      — BusinessCapability, Organization, BusinessContext
- *   applications.ts  — Application, DataObject, Interface
- *   strategy.ts      — StrategicObjective, KPI, Initiative, Platform
- *   technology.ts    — TechCategory, ITComponent, Provider
+ *   documents.ts     — unified document meta-model (replaces the 12 per-type tables)
+ *   strategy.ts      — KPIs + KPI history (sub-entities of documents)
  *   relationships.ts — generic edge table
  *   tags.ts          — TagGroup, Tag, TagAssignment, Subscription
  *   audit.ts         — AuditEntry
@@ -17,10 +15,7 @@
  */
 
 export * from "./enums";
-export * from "./business";
-export * from "./applications";
 export * from "./strategy";
-export * from "./technology";
 export * from "./relationships";
 export * from "./tags";
 export * from "./audit";

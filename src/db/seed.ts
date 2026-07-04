@@ -15,7 +15,6 @@ import * as schema from "./schema";
 import { auth } from "../lib/auth-server";
 import { buildEnterpriseArchitectureTypes } from "../lib/templates/enterprise-architecture";
 import { VALID_RELATIONSHIP_PAIRS } from "../lib/relationship-rules";
-import { BUILTIN_DOCUMENT_COLUMNS } from "../lib/document-schema";
 
 /** Password for the seeded demo accounts (development only). */
 const SEED_PASSWORD = "Password123!";
@@ -66,18 +65,6 @@ async function seed() {
       tag_groups,
       relationships,
       kpis,
-      interfaces,
-      data_objects,
-      applications,
-      it_components,
-      tech_categories,
-      providers,
-      platforms,
-      initiatives,
-      strategic_objectives,
-      business_contexts,
-      organizations,
-      business_capabilities,
       user_workspace_roles,
       workspaces,
       users
@@ -147,77 +134,83 @@ async function seed() {
     // Level 1
     {
       name: "Customer Management",
-      level: "1" as const,
+      level: 1,
       health: "Excellent" as const,
       description: "Manage customer relationships and interactions",
     },
     {
       name: "Product Development",
-      level: "1" as const,
+      level: 1,
       health: "Good" as const,
       description: "Design, develop, and deliver products",
     },
     {
       name: "Financial Management",
-      level: "1" as const,
+      level: 1,
       health: "Good" as const,
       description: "Financial planning, accounting, and reporting",
     },
     {
       name: "Human Resources",
-      level: "1" as const,
+      level: 1,
       health: "Fair" as const,
       description: "Workforce management and talent development",
     },
     {
       name: "Supply Chain",
-      level: "1" as const,
+      level: 1,
       health: "Good" as const,
       description: "End-to-end supply chain operations",
     },
     {
       name: "IT Management",
-      level: "1" as const,
+      level: 1,
       health: "Fair" as const,
       description: "Technology infrastructure and service delivery",
     },
     {
       name: "Marketing",
-      level: "1" as const,
+      level: 1,
       health: "Good" as const,
       description: "Marketing strategy and campaign management",
     },
     {
       name: "Sales",
-      level: "1" as const,
+      level: 1,
       health: "Excellent" as const,
       description: "Sales operations and revenue generation",
     },
   ];
 
-  const l1Caps = await db.insert(schema.businessCapabilities).values(capData).returning();
+  const l1Caps = await db
+    .insert(schema.documents)
+    .values(capData.map((c) => ({ ...c, typeKey: "BusinessCapability" as const })))
+    .returning();
 
   // Level 2 under Customer Management
   const l2CustMgmt = await db
-    .insert(schema.businessCapabilities)
+    .insert(schema.documents)
     .values([
       {
+        typeKey: "BusinessCapability" as const,
         name: "Customer Acquisition",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[0].id,
         health: "Good" as const,
         description: "Attract and onboard new customers",
       },
       {
+        typeKey: "BusinessCapability" as const,
         name: "Customer Retention",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[0].id,
         health: "Excellent" as const,
         description: "Retain and grow existing customer relationships",
       },
       {
+        typeKey: "BusinessCapability" as const,
         name: "Customer Analytics",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[0].id,
         health: "Fair" as const,
         description: "Analyse customer behaviour and preferences",
@@ -227,25 +220,28 @@ async function seed() {
 
   // Level 2 under Product Development
   const l2ProdDev = await db
-    .insert(schema.businessCapabilities)
+    .insert(schema.documents)
     .values([
       {
+        typeKey: "BusinessCapability" as const,
         name: "Product Design",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[1].id,
         health: "Good" as const,
         description: "Design new products and features",
       },
       {
+        typeKey: "BusinessCapability" as const,
         name: "Product Engineering",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[1].id,
         health: "Good" as const,
         description: "Build and test product implementations",
       },
       {
+        typeKey: "BusinessCapability" as const,
         name: "Product Launch",
-        level: "2" as const,
+        level: 2,
         parentId: l1Caps[1].id,
         health: "Fair" as const,
         description: "Go-to-market planning and execution",
@@ -254,24 +250,27 @@ async function seed() {
     .returning();
 
   // Level 2 under Financial Management
-  await db.insert(schema.businessCapabilities).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "BusinessCapability" as const,
       name: "Financial Planning & Analysis",
-      level: "2" as const,
+      level: 2,
       parentId: l1Caps[2].id,
       health: "Good" as const,
       description: "Budgeting, forecasting, and financial analysis",
     },
     {
+      typeKey: "BusinessCapability" as const,
       name: "Accounts Payable",
-      level: "2" as const,
+      level: 2,
       parentId: l1Caps[2].id,
       health: "Fair" as const,
       description: "Invoice processing and vendor payments",
     },
     {
+      typeKey: "BusinessCapability" as const,
       name: "Accounts Receivable",
-      level: "2" as const,
+      level: 2,
       parentId: l1Caps[2].id,
       health: "Good" as const,
       description: "Revenue collection and billing",
@@ -279,17 +278,19 @@ async function seed() {
   ]);
 
   // Level 3 under Customer Retention
-  await db.insert(schema.businessCapabilities).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "BusinessCapability" as const,
       name: "Loyalty Programme Management",
-      level: "3" as const,
+      level: 3,
       parentId: l2CustMgmt[1].id,
       health: "Good" as const,
       description: "Design and operate customer loyalty programs",
     },
     {
+      typeKey: "BusinessCapability" as const,
       name: "Churn Prevention",
-      level: "3" as const,
+      level: 3,
       parentId: l2CustMgmt[1].id,
       health: "Fair" as const,
       description: "Identify and mitigate customer attrition risk",
@@ -297,17 +298,19 @@ async function seed() {
   ]);
 
   // Level 3 under Product Design
-  await db.insert(schema.businessCapabilities).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "BusinessCapability" as const,
       name: "UX Research",
-      level: "3" as const,
+      level: 3,
       parentId: l2ProdDev[0].id,
       health: "Good" as const,
       description: "User experience research and usability testing",
     },
     {
+      typeKey: "BusinessCapability" as const,
       name: "UI Design",
-      level: "3" as const,
+      level: 3,
       parentId: l2ProdDev[0].id,
       health: "Excellent" as const,
       description: "Visual and interaction design",
@@ -319,8 +322,9 @@ async function seed() {
   console.log("  → Organizations");
 
   const [orgHQ] = await db
-    .insert(schema.organizations)
+    .insert(schema.documents)
     .values({
+      typeKey: "Organization",
       name: "Headquarters",
       subtype: "Business Unit",
       level: 1,
@@ -328,8 +332,9 @@ async function seed() {
     })
     .returning();
 
-  await db.insert(schema.organizations).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "Organization",
       name: "Engineering",
       subtype: "Business Unit",
       level: 2,
@@ -337,6 +342,7 @@ async function seed() {
       description: "Software engineering division",
     },
     {
+      typeKey: "Organization",
       name: "Marketing",
       subtype: "Business Unit",
       level: 2,
@@ -344,33 +350,50 @@ async function seed() {
       description: "Marketing and communications",
     },
     {
+      typeKey: "Organization",
       name: "Sales",
       subtype: "Business Unit",
       level: 2,
       parentId: orgHQ.id,
       description: "Sales and business development",
     },
-    { name: "Europe", subtype: "Region", level: 1, description: "European operations" },
     {
+      typeKey: "Organization",
+      name: "Europe",
+      subtype: "Region",
+      level: 1,
+      description: "European operations",
+    },
+    {
+      typeKey: "Organization",
       name: "North America",
       subtype: "Region",
       level: 1,
       description: "North American operations",
     },
-    { name: "Asia Pacific", subtype: "Region", level: 1, description: "APAC operations" },
     {
+      typeKey: "Organization",
+      name: "Asia Pacific",
+      subtype: "Region",
+      level: 1,
+      description: "APAC operations",
+    },
+    {
+      typeKey: "Organization",
       name: "Enterprise Customers",
       subtype: "Customer",
       level: 1,
       description: "Large enterprise customer segment",
     },
     {
+      typeKey: "Organization",
       name: "SMB Customers",
       subtype: "Customer",
       level: 1,
       description: "Small and medium business segment",
     },
     {
+      typeKey: "Organization",
       name: "Platform Team",
       subtype: "Team",
       level: 2,
@@ -383,38 +406,45 @@ async function seed() {
 
   console.log("  → Business Contexts");
 
-  await db.insert(schema.businessContexts).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "BusinessContext",
       name: "Online Purchase Journey",
       subtype: "Customer Journey",
       description: "End-to-end e-commerce customer experience",
     },
     {
+      typeKey: "BusinessContext",
       name: "Hire to Retire",
       subtype: "Value Stream",
       description: "Employee lifecycle from hiring to retirement",
     },
     {
+      typeKey: "BusinessContext",
       name: "Source to Pay",
       subtype: "Value Stream",
       description: "Procurement through payment processing",
     },
     {
+      typeKey: "BusinessContext",
       name: "Order Fulfilment",
       subtype: "Process",
       description: "Order processing and delivery workflow",
     },
     {
+      typeKey: "BusinessContext",
       name: "Mobile Banking App",
       subtype: "Business Product",
       description: "Consumer mobile banking application",
     },
     {
+      typeKey: "BusinessContext",
       name: "Life Insurance",
       subtype: "Business Product",
       description: "Life insurance product line",
     },
     {
+      typeKey: "BusinessContext",
       name: "Energy Efficiency Management",
       subtype: "ESG Capability",
       description: "Energy consumption tracking and optimization",
@@ -426,8 +456,9 @@ async function seed() {
   console.log("  → Applications");
 
   const appRows = await db
-    .insert(schema.applications)
-    .values([
+    .insert(schema.documents)
+    .values(
+      [
       {
         name: "SAP S/4HANA",
         description: "Enterprise resource planning suite",
@@ -538,24 +569,47 @@ async function seed() {
         businessCriticality: "Mission Critical",
         timeClassification: "Invest",
       },
-    ])
+      ].map((a) => ({ ...a, typeKey: "Application" as const }))
+    )
     .returning();
 
   // ── 6. Data Objects ───────────────────────────────────────────────────
 
   console.log("  → Data Objects");
 
-  await db.insert(schema.dataObjects).values([
-    { name: "Customer", description: "Customer master data", dataClassification: "Confidential" },
-    { name: "Order", description: "Purchase order data", dataClassification: "Internal" },
-    { name: "Invoice", description: "Billing invoice records", dataClassification: "Confidential" },
+  await db.insert(schema.documents).values([
     {
+      typeKey: "DataObject",
+      name: "Customer",
+      description: "Customer master data",
+      dataClassification: "Confidential",
+    },
+    {
+      typeKey: "DataObject",
+      name: "Order",
+      description: "Purchase order data",
+      dataClassification: "Internal",
+    },
+    {
+      typeKey: "DataObject",
+      name: "Invoice",
+      description: "Billing invoice records",
+      dataClassification: "Confidential",
+    },
+    {
+      typeKey: "DataObject",
       name: "Employee",
       description: "Employee personal and job data",
       dataClassification: "Restricted",
     },
-    { name: "Product", description: "Product catalog information", dataClassification: "Internal" },
     {
+      typeKey: "DataObject",
+      name: "Product",
+      description: "Product catalog information",
+      dataClassification: "Internal",
+    },
+    {
+      typeKey: "DataObject",
       name: "Contract",
       description: "Vendor and customer contracts",
       dataClassification: "Confidential",
@@ -566,29 +620,29 @@ async function seed() {
 
   console.log("  → Interfaces");
 
-  await db.insert(schema.interfaces).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "Interface",
       name: "SAP → Salesforce Sync",
       subtype: "Logical Interface",
       dataFlowDirection: "Outgoing",
       frequency: "Real-time",
-      providerApplicationId: appRows[0].id,
       description: "Customer data synchronisation from ERP to CRM",
     },
     {
+      typeKey: "Interface",
       name: "Order API",
       subtype: "API",
       dataFlowDirection: "Bi-Directional",
       frequency: "On-demand",
-      providerApplicationId: appRows[9].id,
       description: "REST API for order lifecycle management",
     },
     {
+      typeKey: "Interface",
       name: "Microsoft Graph FastMCP",
       subtype: "MCP Server",
       dataFlowDirection: "Bi-Directional",
       frequency: "On-demand",
-      providerApplicationId: appRows[8].id,
       description: "MCP server for AI assistant access to Microsoft Graph",
       endpointUrl: "https://graph.microsoft.com/mcp",
       authProtocol: "OAuth 2.0",
@@ -600,34 +654,40 @@ async function seed() {
   console.log("  → Strategic Objectives & KPIs");
 
   const objRows = await db
-    .insert(schema.strategicObjectives)
+    .insert(schema.documents)
     .values([
       {
+        typeKey: "StrategicObjective",
         name: "Increase Revenue",
         perspective: "Financial",
         description: "Grow top-line revenue through new channels",
       },
       {
+        typeKey: "StrategicObjective",
         name: "Reduce Operating Costs",
         perspective: "Financial",
         description: "Optimise operations to reduce cost base",
       },
       {
+        typeKey: "StrategicObjective",
         name: "Improve Customer Satisfaction",
         perspective: "Customer",
         description: "Increase NPS and reduce churn",
       },
       {
+        typeKey: "StrategicObjective",
         name: "Accelerate Time to Market",
         perspective: "Internal Process",
         description: "Reduce product delivery cycle time",
       },
       {
+        typeKey: "StrategicObjective",
         name: "Build Digital Capabilities",
         perspective: "Learning & Growth",
         description: "Develop cloud-native and AI skills across the org",
       },
       {
+        typeKey: "StrategicObjective",
         name: "Enhance Data-Driven Decision Making",
         perspective: "Internal Process",
         description: "Improve analytics and reporting capabilities",
@@ -700,8 +760,9 @@ async function seed() {
   console.log("  → Initiatives");
 
   const initRows = await db
-    .insert(schema.initiatives)
-    .values([
+    .insert(schema.documents)
+    .values(
+      [
       {
         name: "Cloud Transformation Program",
         subtype: "Program",
@@ -755,38 +816,49 @@ async function seed() {
         endDate: "2026-06-30",
         description: "Evaluate greenfield ERP implementation options",
       },
-    ])
+      ].map((i) => ({ ...i, typeKey: "Initiative" as const }))
+    )
     .returning();
 
   // ── 10. Providers ────────────────────────────────────────────────────
 
   console.log("  → Providers");
 
-  const providerRows = await db
-    .insert(schema.providers)
+  await db
+    .insert(schema.documents)
     .values([
       {
+        typeKey: "Provider",
         name: "Amazon Web Services",
         description: "Cloud infrastructure provider",
         location: "Seattle, WA",
       },
       {
+        typeKey: "Provider",
         name: "Microsoft Azure",
         description: "Cloud platform and services",
         location: "Redmond, WA",
       },
-      { name: "SAP", description: "Enterprise software vendor", location: "Walldorf, Germany" },
       {
+        typeKey: "Provider",
+        name: "SAP",
+        description: "Enterprise software vendor",
+        location: "Walldorf, Germany",
+      },
+      {
+        typeKey: "Provider",
         name: "Salesforce",
         description: "CRM and cloud platform vendor",
         location: "San Francisco, CA",
       },
       {
+        typeKey: "Provider",
         name: "Atlassian",
         description: "Collaboration and project management tools",
         location: "Sydney, Australia",
       },
       {
+        typeKey: "Provider",
         name: "OpenAI",
         description: "AI research and deployment company",
         location: "San Francisco, CA",
@@ -799,45 +871,59 @@ async function seed() {
   console.log("  → Tech Categories");
 
   const [catDB] = await db
-    .insert(schema.techCategories)
-    .values({ name: "Database", description: "Data storage and management systems", level: 1 })
+    .insert(schema.documents)
+    .values({
+      typeKey: "TechCategory",
+      name: "Database",
+      description: "Data storage and management systems",
+      level: 1,
+    })
     .returning();
 
   const [catHosting] = await db
-    .insert(schema.techCategories)
+    .insert(schema.documents)
     .values({
+      typeKey: "TechCategory",
       name: "Hosting / Operations",
       description: "Infrastructure and hosting services",
       level: 1,
     })
     .returning();
 
-  const [catLang] = await db
-    .insert(schema.techCategories)
+  await db
+    .insert(schema.documents)
     .values({
+      typeKey: "TechCategory",
       name: "Programming Language",
       description: "Software development languages",
       level: 1,
     })
     .returning();
 
-  const [catFramework] = await db
-    .insert(schema.techCategories)
-    .values({ name: "Framework", description: "Application development frameworks", level: 1 })
+  await db
+    .insert(schema.documents)
+    .values({
+      typeKey: "TechCategory",
+      name: "Framework",
+      description: "Application development frameworks",
+      level: 1,
+    })
     .returning();
 
-  const [catTool] = await db
-    .insert(schema.techCategories)
+  await db
+    .insert(schema.documents)
     .values({
+      typeKey: "TechCategory",
       name: "Development Tool",
       description: "Software development and CI/CD tools",
       level: 1,
     })
     .returning();
 
-  const [catAI] = await db
-    .insert(schema.techCategories)
+  await db
+    .insert(schema.documents)
     .values({
+      typeKey: "TechCategory",
       name: "AI / ML",
       description: "Artificial intelligence and machine learning",
       level: 1,
@@ -845,9 +931,10 @@ async function seed() {
     .returning();
 
   // Level 2 under Database
-  const [catRelDB] = await db
-    .insert(schema.techCategories)
+  await db
+    .insert(schema.documents)
     .values({
+      typeKey: "TechCategory",
       name: "Relational Database",
       description: "SQL-based relational databases",
       level: 2,
@@ -855,8 +942,9 @@ async function seed() {
     })
     .returning();
 
-  await db.insert(schema.techCategories).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "TechCategory",
       name: "NoSQL Database",
       description: "Non-relational databases",
       level: 2,
@@ -865,14 +953,16 @@ async function seed() {
   ]);
 
   // Level 2 under Hosting
-  await db.insert(schema.techCategories).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "TechCategory",
       name: "Public Cloud",
       description: "Public cloud platforms",
       level: 2,
       parentId: catHosting.id,
     },
     {
+      typeKey: "TechCategory",
       name: "Container Orchestration",
       description: "Container management platforms",
       level: 2,
@@ -884,123 +974,120 @@ async function seed() {
 
   console.log("  → IT Components");
 
-  await db.insert(schema.itComponents).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "ITComponent",
       name: "PostgreSQL 16",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Platforms",
-      techCategoryId: catRelDB.id,
       version: "16",
       description: "Open-source relational database",
     },
     {
+      typeKey: "ITComponent",
       name: "AWS EC2",
       subtype: "IaaS",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Platforms",
-      providerId: providerRows[0].id,
-      techCategoryId: catHosting.id,
       description: "Virtual compute instances",
     },
     {
+      typeKey: "ITComponent",
       name: "TypeScript",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Languages & Frameworks",
-      techCategoryId: catLang.id,
       version: "5.x",
       description: "Typed JavaScript superset",
     },
     {
+      typeKey: "ITComponent",
       name: "Next.js",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Languages & Frameworks",
-      techCategoryId: catFramework.id,
       version: "16",
       description: "React framework for production",
     },
     {
+      typeKey: "ITComponent",
       name: "React",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Languages & Frameworks",
-      techCategoryId: catFramework.id,
       version: "19",
       description: "UI component library",
     },
     {
+      typeKey: "ITComponent",
       name: "Tailwind CSS",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Tools",
-      techCategoryId: catTool.id,
       version: "4",
       description: "Utility-first CSS framework",
     },
     {
+      typeKey: "ITComponent",
       name: "Docker",
       subtype: "Software",
       lifecycle: "Active",
       ring: "Adopt",
       quadrant: "Platforms",
-      techCategoryId: catHosting.id,
       description: "Container runtime",
     },
     {
+      typeKey: "ITComponent",
       name: "Kubernetes",
       subtype: "PaaS",
       lifecycle: "Active",
       ring: "Trial",
       quadrant: "Platforms",
-      techCategoryId: catHosting.id,
       description: "Container orchestration platform",
     },
     {
+      typeKey: "ITComponent",
       name: "GPT-4o",
       subtype: "AI Model",
       lifecycle: "Active",
       ring: "Trial",
       quadrant: "Platforms",
-      providerId: providerRows[5].id,
-      techCategoryId: catAI.id,
       description: "Large language model",
     },
     {
+      typeKey: "ITComponent",
       name: "Azure Functions",
       subtype: "PaaS",
       lifecycle: "Active",
       ring: "Assess",
       quadrant: "Platforms",
-      providerId: providerRows[1].id,
-      techCategoryId: catHosting.id,
       description: "Serverless compute service",
     },
     {
+      typeKey: "ITComponent",
       name: "jQuery",
       subtype: "Software",
       lifecycle: "End of Life",
       ring: "Hold",
       quadrant: "Languages & Frameworks",
-      techCategoryId: catFramework.id,
       version: "3.7",
       endOfLife: "2025-12-31",
       description: "Legacy JavaScript library",
     },
     {
+      typeKey: "ITComponent",
       name: "AngularJS",
       subtype: "Software",
       lifecycle: "End of Life",
       ring: "Hold",
       quadrant: "Languages & Frameworks",
-      techCategoryId: catFramework.id,
       version: "1.8",
       endOfLife: "2021-12-31",
       description: "Legacy frontend framework (superseded by Angular)",
@@ -1011,18 +1098,21 @@ async function seed() {
 
   console.log("  → Platforms");
 
-  await db.insert(schema.platforms).values([
+  await db.insert(schema.documents).values([
     {
+      typeKey: "Platform",
       name: "E-Commerce Platform",
       description: "B2C e-commerce capabilities and applications",
       lifecycle: "Active",
     },
     {
+      typeKey: "Platform",
       name: "Data Analytics Platform",
       description: "Enterprise data lake, warehouse, and BI tools",
       lifecycle: "Phase In",
     },
     {
+      typeKey: "Platform",
       name: "Cloud Infrastructure",
       description: "Core cloud hosting and compute services",
       lifecycle: "Active",
@@ -1312,46 +1402,6 @@ async function seed() {
       }))
     )
     .onConflictDoNothing();
-
-  // ── Data cutover: mirror the seeded legacy rows into the unified `documents`
-  // table so the dynamic document pages are populated with the same data. Row
-  // ids are preserved so existing relationships (which reference them) line up.
-  console.log("  → Mirroring legacy rows into unified documents table");
-  const DOC_COLUMN_KEYS = new Set<string>([
-    ...BUILTIN_DOCUMENT_COLUMNS,
-    "id",
-    "createdAt",
-    "updatedAt",
-    "customFields",
-  ]);
-  const legacySources: { table: unknown; typeKey: string }[] = [
-    { table: schema.businessCapabilities, typeKey: "BusinessCapability" },
-    { table: schema.organizations, typeKey: "Organization" },
-    { table: schema.businessContexts, typeKey: "BusinessContext" },
-    { table: schema.applications, typeKey: "Application" },
-    { table: schema.dataObjects, typeKey: "DataObject" },
-    { table: schema.interfaces, typeKey: "Interface" },
-    { table: schema.strategicObjectives, typeKey: "StrategicObjective" },
-    { table: schema.initiatives, typeKey: "Initiative" },
-    { table: schema.platforms, typeKey: "Platform" },
-    { table: schema.techCategories, typeKey: "TechCategory" },
-    { table: schema.itComponents, typeKey: "ITComponent" },
-    { table: schema.providers, typeKey: "Provider" },
-  ];
-  for (const { table, typeKey } of legacySources) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rows = (await db.select().from(table as any)) as Record<string, unknown>[];
-    if (rows.length === 0) continue;
-    const values = rows.map((row) => {
-      const v: Record<string, unknown> = { typeKey };
-      for (const [k, val] of Object.entries(row)) {
-        if (DOC_COLUMN_KEYS.has(k)) v[k] = val;
-      }
-      return v;
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await db.insert(schema.documents).values(values as any);
-  }
 
   console.log("\n✅ Seed complete!");
   console.log("\n🔑 Demo sign-in credentials:");

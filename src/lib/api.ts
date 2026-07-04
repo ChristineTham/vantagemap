@@ -8,21 +8,6 @@
  * In production, the base URL comes from environment variables.
  */
 
-import type {
-  BusinessCapability,
-  Application,
-  StrategicObjective,
-  Initiative,
-  ITComponent,
-  TechCategory,
-  Organization,
-  DataObject,
-  InterfaceEntity,
-  Provider,
-  Platform,
-  Relationship,
-} from "@/lib/types";
-
 // ── Types ───────────────────────────────────────────────────────────────────
 
 interface ApiSuccessResponse<T> {
@@ -154,82 +139,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
   return body as T;
 }
-
-function buildListUrl(basePath: string, params?: ListParams): string {
-  const searchParams = new URLSearchParams();
-
-  if (params?.page) searchParams.set("page", String(params.page));
-  if (params?.pageSize) searchParams.set("pageSize", String(params.pageSize));
-  if (params?.sortBy) searchParams.set("sortBy", params.sortBy);
-  if (params?.sortDirection) searchParams.set("sortDirection", params.sortDirection);
-
-  if (params?.filters) {
-    for (const [key, value] of Object.entries(params.filters)) {
-      searchParams.set(`filter[${key}]`, value);
-    }
-  }
-
-  if (params?.search) {
-    for (const [key, value] of Object.entries(params.search)) {
-      searchParams.set(`search[${key}]`, value);
-    }
-  }
-
-  const qs = searchParams.toString();
-  return qs ? `${basePath}?${qs}` : basePath;
-}
-
-// ── Generic CRUD Client ─────────────────────────────────────────────────────
-
-function createEntityClient<T>(basePath: string) {
-  return {
-    async list(params?: ListParams): Promise<ApiListResponse<T>> {
-      const url = buildListUrl(basePath, params);
-      return apiFetch<ApiListResponse<T>>(url);
-    },
-
-    async getById(id: string): Promise<ApiSuccessResponse<T>> {
-      return apiFetch<ApiSuccessResponse<T>>(`${basePath}/${id}`);
-    },
-
-    async create(data: Partial<T>): Promise<ApiSuccessResponse<T>> {
-      return apiFetch<ApiSuccessResponse<T>>(basePath, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    },
-
-    async update(id: string, data: Partial<T>): Promise<ApiSuccessResponse<T>> {
-      return apiFetch<ApiSuccessResponse<T>>(`${basePath}/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
-    },
-
-    async remove(id: string): Promise<void> {
-      await apiFetch<void>(`${basePath}/${id}`, {
-        method: "DELETE",
-      });
-    },
-  };
-}
-
-// ── Entity Clients ──────────────────────────────────────────────────────────
-
-export const capabilitiesApi = createEntityClient<BusinessCapability>("/api/capabilities");
-export const applicationsApi = createEntityClient<Application>("/api/applications");
-export const objectivesApi = createEntityClient<StrategicObjective>("/api/objectives");
-export const initiativesApi = createEntityClient<Initiative>("/api/initiatives");
-export const itComponentsApi = createEntityClient<ITComponent>("/api/it-components");
-export const techCategoriesApi = createEntityClient<TechCategory>("/api/tech-categories");
-export const organizationsApi = createEntityClient<Organization>("/api/organizations");
-export const businessContextsApi =
-  createEntityClient<Record<string, unknown>>("/api/business-contexts");
-export const dataObjectsApi = createEntityClient<DataObject>("/api/data-objects");
-export const interfacesApi = createEntityClient<InterfaceEntity>("/api/interfaces");
-export const providersApi = createEntityClient<Provider>("/api/providers");
-export const platformsApi = createEntityClient<Platform>("/api/platforms");
-export const relationshipsApi = createEntityClient<Relationship>("/api/relationships");
 
 // ── Search API ──────────────────────────────────────────────────────────────
 

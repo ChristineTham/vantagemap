@@ -23,17 +23,21 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `next start -p ${PORT}`,
+    command: `npx next start -p ${PORT}`,
     url: BASE_URL,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
     env: {
       SKIP_ENV_VALIDATION: "true",
       NODE_ENV: "production",
-      BETTER_AUTH_SECRET: "e2e-secret-e2e-secret-e2e-secret-1234",
+      // Prefer real values (pass a seeded DB via `node --env-file=.env.local`),
+      // falling back to dummies so the public smoke suite runs without a DB.
+      BETTER_AUTH_SECRET:
+        process.env.BETTER_AUTH_SECRET || "e2e-secret-e2e-secret-e2e-secret-1234",
       BETTER_AUTH_URL: BASE_URL,
       NEXT_PUBLIC_APP_URL: BASE_URL,
-      DATABASE_URL: "postgresql://user:pass@localhost:5432/db?sslmode=require",
+      DATABASE_URL:
+        process.env.DATABASE_URL || "postgresql://user:pass@localhost:5432/db?sslmode=require",
     },
   },
 });

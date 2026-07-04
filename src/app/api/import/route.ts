@@ -21,21 +21,9 @@
 import { NextRequest } from "next/server";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  applications,
-  businessCapabilities,
-  organizations,
-  strategicObjectives,
-  initiatives,
-  itComponents,
-  techCategories,
-  providers,
-  platforms,
-  dataObjects,
-  interfaces as interfacesTable,
-} from "@/db/schema";
+import { documents } from "@/db/schema";
 import { withErrorHandler, ok, badRequest } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
 import { requirePermission } from "@/lib/rbac";
@@ -47,22 +35,25 @@ import { dispatchWebhookEvent } from "@/lib/webhook-engine";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_ROWS = 10_000;
 
-// ── Table Mapping ───────────────────────────────────────────────────────────
+// ── Document Types (PLANV3: unified `documents` table) ────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TABLE_MAP: Record<string, any> = {
-  Application: applications,
-  BusinessCapability: businessCapabilities,
-  Organization: organizations,
-  StrategicObjective: strategicObjectives,
-  Initiative: initiatives,
-  ITComponent: itComponents,
-  TechCategory: techCategories,
-  Provider: providers,
-  Platform: platforms,
-  DataObject: dataObjects,
-  Interface: interfacesTable,
-};
+// The document type keys that may be imported. `factSheetType` carries one of
+// these keys; every imported row is written to the unified `documents` table
+// with its `typeKey` set. Validated statically so an unknown type is rejected
+// without a DB round-trip.
+const VALID_TYPE_KEYS = new Set<string>([
+  "Application",
+  "BusinessCapability",
+  "Organization",
+  "StrategicObjective",
+  "Initiative",
+  "ITComponent",
+  "TechCategory",
+  "Provider",
+  "Platform",
+  "DataObject",
+  "Interface",
+]);
 
 // Column name normalization: common CSV headers → DB column names
 const COLUMN_ALIASES: Record<string, string> = {
@@ -149,7 +140,8 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 
   if (!file) return badRequest("File is required");
   if (!factSheetType) return badRequest("factSheetType is required");
-  if (!TABLE_MAP[factSheetType]) return badRequest(`Invalid factSheetType: ${factSheetType}`);
+  if (!VALID_TYPE_KEYS.has(factSheetType))
+    return badRequest(`Invalid factSheetType: ${factSheetType}`);
   if (!["preview", "execute"].includes(mode))
     return badRequest("mode must be 'preview' or 'execute'");
 
@@ -292,8 +284,8 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     });
   }
 
-  // Execute mode — upsert rows in batches for performance
-  const table = TABLE_MAP[factSheetType];
+  // Execute mode — upsert rows in batches for performance.
+  // All rows land in the unified `documents` table, discriminated by typeKey.
   let insertedCount = 0;
   let updatedCount = 0;
   const rowErrors: { row: number; message: string }[] = [];
@@ -306,28 +298,40 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
         const rowIndex = batchStart + idx;
         try {
           if (row.id) {
-            // Upsert: try update first
+            // Upsert: try update first (scoped to this type within `documents`)
             const [existing] = await db
-              .select({ id: table.id })
-              .from(table)
-              .where(eq(table.id, row.id as string))
+              .select({ id: documents.id })
+              .from(documents)
+              .where(
+                and(eq(documents.id, row.id as string), eq(documents.typeKey, factSheetType))
+              )
               .limit(1);
 
             if (existing) {
               await db
-                .update(table)
-                .set({ ...row, updatedAt: new Date() })
-                .where(eq(table.id, row.id as string));
+                .update(documents)
+                .set({ ...row, updatedAt: new Date() } as typeof documents.$inferInsert)
+                .where(
+                  and(eq(documents.id, row.id as string), eq(documents.typeKey, factSheetType))
+                );
               return { action: "updated" as const };
             } else {
-              await db
-                .insert(table)
-                .values({ ...row, createdAt: new Date(), updatedAt: new Date() });
+              await db.insert(documents).values({
+                ...row,
+                typeKey: factSheetType,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              } as typeof documents.$inferInsert);
               return { action: "inserted" as const };
             }
           } else {
             // Insert new
-            await db.insert(table).values({ ...row, createdAt: new Date(), updatedAt: new Date() });
+            await db.insert(documents).values({
+              ...row,
+              typeKey: factSheetType,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as typeof documents.$inferInsert);
             return { action: "inserted" as const };
           }
         } catch (err) {

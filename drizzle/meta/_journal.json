@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1783124819158,
+      "when": 1783145692673,
       "tag": "0000_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1783125562198,
-      "tag": "0001_features",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1783141413807,
-      "tag": "0002_planv3_documents",
       "breakpoints": true
     }
   ]

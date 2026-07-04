@@ -61,7 +61,7 @@ import {
   createDeleteHandler,
   type CrudConfig,
 } from "@/lib/crud-factory";
-import { businessCapabilities } from "@/db/schema";
+import { documents } from "@/db/schema";
 
 // ─── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -173,14 +173,14 @@ const createSchema = z.object({
 });
 
 const config: CrudConfig = {
-  table: businessCapabilities,
+  table: documents,
   entityType: "BusinessCapability",
   createSchema,
   updateSchema: createSchema.partial(),
   columnMap: {
-    name: businessCapabilities.name,
-    lifecycle: businessCapabilities.lifecycle,
-    createdAt: businessCapabilities.createdAt,
+    name: documents.name,
+    lifecycle: documents.lifecycle,
+    createdAt: documents.createdAt,
   },
 };
 

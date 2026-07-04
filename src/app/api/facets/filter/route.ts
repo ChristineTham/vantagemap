@@ -3,6 +3,9 @@
  *
  * GET /api/facets/filter — Filter fact sheets across types with faceted criteria.
  *
+ * PLANV3 cutover: filters over the unified `documents` table (by `type_key` and
+ * the pooled facet columns) instead of the 12 legacy per-type tables.
+ *
  * Query parameters:
  *   types          — comma-separated fact sheet types (required, at least one)
  *   lifecycle      — comma-separated lifecycle values to include
@@ -17,10 +20,15 @@
 
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+// documents is the unified table this route filters (via raw SQL against its
+// physical table name). Imported to anchor the PLANV3 schema contract.
+import { documents } from "@/db/schema";
 import { ok, badRequest, withErrorHandler } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
 import { requirePermission } from "@/lib/rbac";
 import { parsePagination, buildPaginationMeta } from "@/lib/query";
+
+void documents;
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -38,97 +46,25 @@ interface FilteredResult {
 
 // ── Configuration ───────────────────────────────────────────────────────────
 
-const FILTERABLE_TABLES: Record<
-  string,
-  { table: string; hasLifecycle: boolean; hasHealth: boolean; hasSeal: boolean; hasOwner: boolean }
-> = {
-  BusinessCapability: {
-    table: "business_capabilities",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Organization: {
-    table: "organizations",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  BusinessContext: {
-    table: "business_contexts",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Application: {
-    table: "applications",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  DataObject: {
-    table: "data_objects",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Interface: {
-    table: "interfaces",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  StrategicObjective: {
-    table: "strategic_objectives",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Initiative: {
-    table: "initiatives",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Platform: {
-    table: "platforms",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  TechCategory: {
-    table: "tech_categories",
-    hasLifecycle: false,
-    hasHealth: false,
-    hasSeal: false,
-    hasOwner: true,
-  },
-  ITComponent: {
-    table: "it_components",
-    hasLifecycle: true,
-    hasHealth: true,
-    hasSeal: true,
-    hasOwner: true,
-  },
-  Provider: {
-    table: "providers",
-    hasLifecycle: false,
-    hasHealth: false,
-    hasSeal: false,
-    hasOwner: true,
-  },
-};
+/**
+ * Valid entity type keys — these are the `type_key` values stored in the
+ * unified `documents` table.
+ */
+const VALID_TYPES = new Set<string>([
+  "BusinessCapability",
+  "Organization",
+  "BusinessContext",
+  "Application",
+  "DataObject",
+  "Interface",
+  "StrategicObjective",
+  "Initiative",
+  "Platform",
+  "TechCategory",
+  "ITComponent",
+  "Provider",
+]);
 
-const VALID_TYPES = new Set(Object.keys(FILTERABLE_TABLES));
 const VALID_SORT_FIELDS = new Set(["name", "updatedAt", "lifecycle", "health"]);
 
 // ── GET Handler ─────────────────────────────────────────────────────────────
@@ -187,82 +123,64 @@ export const GET = withErrorHandler(async (request: Request) => {
 
   const pagination = parsePagination(url.searchParams);
 
-  // Build per-type queries
-  const subQueries: string[] = [];
+  // Build WHERE conditions against the unified documents table
+  const conditions: string[] = [];
 
-  for (const typeName of requestedTypes) {
-    const config = FILTERABLE_TABLES[typeName];
-    if (!config) continue;
+  const escapeList = (vals: string[]) =>
+    vals.map((v) => `'${v.replace(/'/g, "''")}'`).join(",");
 
-    const conditions: string[] = [];
+  // type_key filter (required)
+  conditions.push(`type_key IN (${escapeList(requestedTypes)})`);
 
-    // Lifecycle filter
-    if (lifecycleFilter.length > 0 && config.hasLifecycle) {
-      const escaped = lifecycleFilter.map((v) => `'${v.replace(/'/g, "''")}'`).join(",");
-      conditions.push(`lifecycle IN (${escaped})`);
-    } else if (lifecycleFilter.length > 0 && !config.hasLifecycle) {
-      // This type doesn't have lifecycle — skip it entirely
-      continue;
-    }
-
-    // Health filter
-    if (healthFilter.length > 0 && config.hasHealth) {
-      const escaped = healthFilter.map((v) => `'${v.replace(/'/g, "''")}'`).join(",");
-      conditions.push(`health IN (${escaped})`);
-    } else if (healthFilter.length > 0 && !config.hasHealth) {
-      continue;
-    }
-
-    // Quality seal filter
-    if (qualitySealFilter.length > 0 && config.hasSeal) {
-      const escaped = qualitySealFilter.map((v) => `'${v.replace(/'/g, "''")}'`).join(",");
-      conditions.push(`quality_seal IN (${escaped})`);
-    } else if (qualitySealFilter.length > 0 && !config.hasSeal) {
-      continue;
-    }
-
-    // Owner filter (partial match)
-    if (ownerFilter && config.hasOwner) {
-      conditions.push(`owner ILIKE '%${ownerFilter.replace(/'/g, "''")}%'`);
-    }
-
-    // Tag filter — entity must have at least one of the specified tags
-    if (tagFilter.length > 0) {
-      const escaped = tagFilter.map((v) => `'${v.replace(/'/g, "''")}'`).join(",");
-      conditions.push(
-        `id IN (SELECT fact_sheet_id FROM tag_assignments WHERE fact_sheet_type = '${typeName}' AND tag_id IN (${escaped}))`
-      );
-    }
-
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-
-    subQueries.push(`
-      SELECT
-        id,
-        name,
-        description,
-        '${typeName}' AS entity_type,
-        ${config.hasLifecycle ? "lifecycle::text" : "NULL::text"} AS lifecycle,
-        ${config.hasHealth ? "health::text" : "NULL::text"} AS health,
-        ${config.hasSeal ? "quality_seal::text" : "NULL::text"} AS quality_seal,
-        ${config.hasOwner ? "owner" : "NULL::text"} AS owner,
-        updated_at::text AS updated_at
-      FROM ${config.table}
-      ${whereClause}
-    `);
+  // Lifecycle filter
+  if (lifecycleFilter.length > 0) {
+    conditions.push(`lifecycle IN (${escapeList(lifecycleFilter)})`);
   }
 
-  if (subQueries.length === 0) {
-    return ok({
-      results: [],
-      meta: { page: pagination.page, pageSize: pagination.pageSize, total: 0, totalPages: 0 },
-    });
+  // Health filter
+  if (healthFilter.length > 0) {
+    conditions.push(`health IN (${escapeList(healthFilter)})`);
   }
 
-  const unionQuery = subQueries.join("\nUNION ALL\n");
+  // Quality seal filter
+  if (qualitySealFilter.length > 0) {
+    conditions.push(`quality_seal IN (${escapeList(qualitySealFilter)})`);
+  }
+
+  // Owner filter (partial match)
+  if (ownerFilter) {
+    conditions.push(`owner ILIKE '%${ownerFilter.replace(/'/g, "''")}%'`);
+  }
+
+  // Tag filter — entity must have at least one of the specified tags.
+  // tag_assignments.fact_sheet_type stores the type_key; fact_sheet_id the document id.
+  if (tagFilter.length > 0) {
+    conditions.push(
+      `id IN (SELECT fact_sheet_id FROM tag_assignments WHERE fact_sheet_type IN (${escapeList(
+        requestedTypes
+      )}) AND tag_id IN (${escapeList(tagFilter)}))`
+    );
+  }
+
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
+
+  const baseSelect = `
+    SELECT
+      id,
+      name,
+      description,
+      type_key AS entity_type,
+      lifecycle::text AS lifecycle,
+      health::text AS health,
+      quality_seal::text AS quality_seal,
+      owner,
+      updated_at::text AS updated_at
+    FROM documents
+    ${whereClause}
+  `;
 
   // Count total
-  const countQuery = `SELECT COUNT(*)::int AS total FROM (${unionQuery}) AS filtered`;
+  const countQuery = `SELECT COUNT(*)::int AS total FROM (${baseSelect}) AS filtered`;
   const countResult = (await db.execute(sql.raw(countQuery))).rows as Array<{ total: number }>;
   const total = Number(countResult[0]?.total ?? 0);
 
@@ -272,7 +190,7 @@ export const GET = withErrorHandler(async (request: Request) => {
 
   // Fetch results
   const dataQuery = `
-    SELECT * FROM (${unionQuery}) AS filtered
+    SELECT * FROM (${baseSelect}) AS filtered
     ORDER BY ${outerSortCol} ${sortDirection} NULLS LAST, name ASC
     LIMIT ${pagination.pageSize}
     OFFSET ${pagination.offset}

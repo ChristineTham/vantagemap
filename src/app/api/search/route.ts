@@ -5,6 +5,9 @@
  * Returns results grouped by type with relevance ranking.
  * Uses PostgreSQL ts_rank + to_tsvector/to_tsquery for p95 <300 ms.
  *
+ * PLANV3 cutover: searches the unified `documents` table (filtered by
+ * `type_key`) instead of the 12 legacy per-type tables.
+ *
  * Query parameters:
  *   q        — search query string (required)
  *   types    — comma-separated list of entity types to search (optional, defaults to all)
@@ -14,10 +17,15 @@
 
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+// documents is the unified table this route queries (via raw SQL against its
+// physical table name). Imported to anchor the PLANV3 schema contract.
+import { documents } from "@/db/schema";
 import { ok, badRequest, withErrorHandler } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
 import { requirePermission } from "@/lib/rbac";
 import { parsePagination, buildPaginationMeta } from "@/lib/query";
+
+void documents;
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -40,33 +48,26 @@ interface GroupedResults {
 
 // ── Configuration ───────────────────────────────────────────────────────────
 
-/** Tables to search with their entity type labels and table names. */
-const SEARCHABLE_TABLES = [
-  {
-    type: "BusinessCapability",
-    table: "business_capabilities",
-    hasLifecycle: true,
-    hasHealth: true,
-  },
-  { type: "Organization", table: "organizations", hasLifecycle: true, hasHealth: true },
-  { type: "BusinessContext", table: "business_contexts", hasLifecycle: true, hasHealth: true },
-  { type: "Application", table: "applications", hasLifecycle: true, hasHealth: true },
-  { type: "DataObject", table: "data_objects", hasLifecycle: true, hasHealth: true },
-  { type: "Interface", table: "interfaces", hasLifecycle: true, hasHealth: true },
-  {
-    type: "StrategicObjective",
-    table: "strategic_objectives",
-    hasLifecycle: true,
-    hasHealth: true,
-  },
-  { type: "Initiative", table: "initiatives", hasLifecycle: true, hasHealth: true },
-  { type: "Platform", table: "platforms", hasLifecycle: true, hasHealth: true },
-  { type: "TechCategory", table: "tech_categories", hasLifecycle: false, hasHealth: false },
-  { type: "ITComponent", table: "it_components", hasLifecycle: true, hasHealth: true },
-  { type: "Provider", table: "providers", hasLifecycle: false, hasHealth: false },
+/**
+ * Valid entity type keys — these are the `type_key` values stored in the
+ * unified `documents` table (formerly the 12 per-type tables).
+ */
+const SEARCHABLE_TYPES = [
+  "BusinessCapability",
+  "Organization",
+  "BusinessContext",
+  "Application",
+  "DataObject",
+  "Interface",
+  "StrategicObjective",
+  "Initiative",
+  "Platform",
+  "TechCategory",
+  "ITComponent",
+  "Provider",
 ] as const;
 
-const VALID_TYPES = new Set(SEARCHABLE_TABLES.map((t) => t.type));
+const VALID_TYPES = new Set<string>(SEARCHABLE_TYPES);
 
 // ── GET Handler ─────────────────────────────────────────────────────────────
 
@@ -93,7 +94,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   let requestedTypes: string[] = [];
   if (typesParam) {
     requestedTypes = typesParam.split(",").map((t) => t.trim());
-    const invalidTypes = requestedTypes.filter((t) => !(VALID_TYPES as Set<string>).has(t));
+    const invalidTypes = requestedTypes.filter((t) => !VALID_TYPES.has(t));
     if (invalidTypes.length > 0) {
       return badRequest(`Invalid entity types: ${invalidTypes.join(", ")}`);
     }
@@ -101,11 +102,10 @@ export const GET = withErrorHandler(async (request: Request) => {
 
   const pagination = parsePagination(url.searchParams);
 
-  // Filter which tables to search
-  const tablesToSearch =
-    requestedTypes.length > 0
-      ? SEARCHABLE_TABLES.filter((t) => requestedTypes.includes(t.type))
-      : [...SEARCHABLE_TABLES];
+  // Restrict to the requested type_key values (or all searchable types)
+  const typesToSearch = requestedTypes.length > 0 ? requestedTypes : [...SEARCHABLE_TYPES];
+  const typeInList = typesToSearch.map((t) => sanitizeForSql(t)).join(", ");
+  const typeFilter = `type_key IN (${typeInList})`;
 
   // nameOnly mode: substring ILIKE match on name — used by relationship pickers
   // for partial-word search without FTS word-boundary constraints
@@ -113,62 +113,57 @@ export const GET = withErrorHandler(async (request: Request) => {
   const escapedLike = query.replace(/[%_\\]/g, (c) => `\\${c}`);
   const likePattern = sanitizeForSql(`%${escapedLike}%`);
 
-  const searchUnion = tablesToSearch
-    .map((tableConfig) => {
-      const lifecycleCol = tableConfig.hasLifecycle ? "lifecycle" : "NULL";
-      const healthCol = tableConfig.hasHealth ? "health" : "NULL";
-
-      if (nameOnly) {
-        return `
-        SELECT
-          id,
-          name,
-          description,
-          '${tableConfig.type}' AS entity_type,
-          ${lifecycleCol}::text AS lifecycle,
-          ${healthCol}::text AS health,
-          0::float AS rank,
-          name AS headline
-        FROM ${tableConfig.table}
-        WHERE name ILIKE ${likePattern}
+  const baseSelect = nameOnly
+    ? `
+      SELECT
+        id,
+        name,
+        description,
+        type_key AS entity_type,
+        lifecycle::text AS lifecycle,
+        health::text AS health,
+        0::float AS rank,
+        name AS headline
+      FROM documents
+      WHERE ${typeFilter}
+        AND (
+          name ILIKE ${likePattern}
           OR coalesce(description, '') ILIKE ${likePattern}
-      `;
-      }
-
-      return `
-        SELECT
-          id,
-          name,
-          description,
-          '${tableConfig.type}' AS entity_type,
-          ${lifecycleCol}::text AS lifecycle,
-          ${healthCol}::text AS health,
-          ts_rank(
-            to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, '')),
-            plainto_tsquery('english', ${sanitizeForSql(query)})
-          ) AS rank,
-          ts_headline(
-            'english',
-            coalesce(name, '') || ' — ' || coalesce(description, ''),
-            plainto_tsquery('english', ${sanitizeForSql(query)}),
-            'StartSel=<mark>, StopSel=</mark>, MaxWords=50, MinWords=20'
-          ) AS headline
-        FROM ${tableConfig.table}
-        WHERE to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, ''))
-              @@ plainto_tsquery('english', ${sanitizeForSql(query)})
-      `;
-    })
-    .join("\nUNION ALL\n");
+        )
+    `
+    : `
+      SELECT
+        id,
+        name,
+        description,
+        type_key AS entity_type,
+        lifecycle::text AS lifecycle,
+        health::text AS health,
+        ts_rank(
+          to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, '')),
+          plainto_tsquery('english', ${sanitizeForSql(query)})
+        ) AS rank,
+        ts_headline(
+          'english',
+          coalesce(name, '') || ' — ' || coalesce(description, ''),
+          plainto_tsquery('english', ${sanitizeForSql(query)}),
+          'StartSel=<mark>, StopSel=</mark>, MaxWords=50, MinWords=20'
+        ) AS headline
+      FROM documents
+      WHERE ${typeFilter}
+        AND to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, ''))
+            @@ plainto_tsquery('english', ${sanitizeForSql(query)})
+    `;
 
   // Count total results
-  const countQuery = `SELECT COUNT(*) AS total FROM (${searchUnion}) AS search_results`;
+  const countQuery = `SELECT COUNT(*) AS total FROM (${baseSelect}) AS search_results`;
   const countRows = (await db.execute(sql.raw(countQuery))).rows as Array<{ total: string }>;
   const total = Number(countRows[0]?.total ?? 0);
 
   // Fetch paginated results ordered by rank (or name for nameOnly mode)
   const orderBy = nameOnly ? "name ASC" : "rank DESC, name ASC";
   const dataQuery = `
-    SELECT * FROM (${searchUnion}) AS search_results
+    SELECT * FROM (${baseSelect}) AS search_results
     ORDER BY ${orderBy}
     LIMIT ${pagination.pageSize}
     OFFSET ${pagination.offset}
@@ -218,11 +213,8 @@ export const GET = withErrorHandler(async (request: Request) => {
 
 /**
  * Sanitize a user-provided string for inclusion in a SQL query.
- * Uses dollar-quoting to safely embed the string.
  */
 function sanitizeForSql(input: string): string {
-  // Use PostgreSQL dollar-quoting to avoid SQL injection.
-  // The dollar-quote tag is randomized to prevent injection via the tag itself.
   const escaped = input.replace(/'/g, "''");
   return `'${escaped}'`;
 }

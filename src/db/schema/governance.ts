@@ -16,7 +16,6 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { factSheetTypeEnum } from "./enums";
 import { users } from "./users";
 
 // ── Comments ────────────────────────────────────────────────────────────────
@@ -25,7 +24,7 @@ export const comments = pgTable(
   "comments",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    factSheetType: factSheetTypeEnum("fact_sheet_type").notNull(),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }).notNull(),
     factSheetId: uuid("fact_sheet_id").notNull(),
     authorId: uuid("author_id")
       .notNull()
@@ -62,7 +61,7 @@ export const todos = pgTable(
   "todos",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    factSheetType: factSheetTypeEnum("fact_sheet_type").notNull(),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }).notNull(),
     factSheetId: uuid("fact_sheet_id").notNull(),
     title: varchar("title", { length: 500 }).notNull(),
     description: text("description"),
@@ -110,7 +109,7 @@ export const surveys = pgTable(
     createdById: uuid("created_by_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    factSheetType: factSheetTypeEnum("fact_sheet_type"),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }),
     factSheetId: uuid("fact_sheet_id"),
     status: varchar("status", { length: 50 }).notNull().default("draft"), // draft, active, closed
     closesAt: timestamp("closes_at", { withTimezone: true }),
@@ -207,7 +206,7 @@ export const qualitySealTransitions = pgTable(
   "quality_seal_transitions",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    factSheetType: factSheetTypeEnum("fact_sheet_type").notNull(),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }).notNull(),
     factSheetId: uuid("fact_sheet_id").notNull(),
     fromState: varchar("from_state", { length: 50 }).notNull(),
     toState: varchar("to_state", { length: 50 }).notNull(),

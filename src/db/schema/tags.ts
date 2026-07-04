@@ -8,7 +8,7 @@
 
 import { pgTable, uuid, varchar, text, timestamp, index, unique } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { factSheetTypeEnum, tagModeEnum, subscriptionRoleEnum } from "./enums";
+import { tagModeEnum, subscriptionRoleEnum } from "./enums";
 
 // ── Tag Group ───────────────────────────────────────────────────────────────
 
@@ -61,7 +61,7 @@ export const tagAssignments = pgTable(
     tagId: uuid("tag_id")
       .notNull()
       .references(() => tags.id, { onDelete: "cascade" }),
-    factSheetType: factSheetTypeEnum("fact_sheet_type").notNull(),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }).notNull(),
     factSheetId: uuid("fact_sheet_id").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -85,7 +85,7 @@ export const subscriptions = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid("user_id").notNull(), // FK to users table
-    factSheetType: factSheetTypeEnum("fact_sheet_type").notNull(),
+    factSheetType: varchar("fact_sheet_type", { length: 100 }).notNull(),
     factSheetId: uuid("fact_sheet_id").notNull(),
     role: subscriptionRoleEnum("role").notNull().default("Observer"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

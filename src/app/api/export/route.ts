@@ -16,42 +16,31 @@
 import { NextRequest } from "next/server";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
-import { ilike } from "drizzle-orm";
+import { and, eq, ilike } from "drizzle-orm";
 import { db } from "@/db";
-import {
-  applications,
-  businessCapabilities,
-  organizations,
-  strategicObjectives,
-  initiatives,
-  itComponents,
-  techCategories,
-  providers,
-  platforms,
-  dataObjects,
-  interfaces as interfacesTable,
-} from "@/db/schema";
+import { documents } from "@/db/schema";
 import { withErrorHandler, badRequest } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { dispatchWebhookEvent } from "@/lib/webhook-engine";
 
-// ── Table Mapping ───────────────────────────────────────────────────────────
+// ── Document Types (PLANV3: unified `documents` table) ────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TABLE_MAP: Record<string, any> = {
-  Application: applications,
-  BusinessCapability: businessCapabilities,
-  Organization: organizations,
-  StrategicObjective: strategicObjectives,
-  Initiative: initiatives,
-  ITComponent: itComponents,
-  TechCategory: techCategories,
-  Provider: providers,
-  Platform: platforms,
-  DataObject: dataObjects,
-  Interface: interfacesTable,
-};
+// The document type keys that may be exported. `type` carries one of these
+// keys; rows are read from the unified `documents` table filtered by `typeKey`.
+const VALID_TYPE_KEYS = new Set<string>([
+  "Application",
+  "BusinessCapability",
+  "Organization",
+  "StrategicObjective",
+  "Initiative",
+  "ITComponent",
+  "TechCategory",
+  "Provider",
+  "Platform",
+  "DataObject",
+  "Interface",
+]);
 
 // ── GET /api/export ─────────────────────────────────────────────────────────
 
@@ -80,25 +69,25 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
   const fieldsParam = searchParams.get("fields");
 
   if (!type) return badRequest("type query parameter is required");
-  if (!TABLE_MAP[type]) return badRequest(`Invalid type: ${type}`);
+  if (!VALID_TYPE_KEYS.has(type)) return badRequest(`Invalid type: ${type}`);
   if (format !== "csv" && format !== "xlsx")
     return badRequest("format must be 'csv' or 'xlsx'");
 
-  const table = TABLE_MAP[type];
-
-  // Build query
-  const where = filter ? ilike(table.name, `%${filter}%`) : undefined;
+  // Read from the unified `documents` table, filtered by type_key.
+  const where = filter
+    ? and(eq(documents.typeKey, type), ilike(documents.name, `%${filter}%`))
+    : eq(documents.typeKey, type);
 
   // Fetch all matching rows (streaming not possible with Drizzle select)
   // Limit to 50,000 to prevent memory issues
-  const rows = await db.select().from(table).where(where).limit(50_000);
+  const rows = await db.select().from(documents).where(where).limit(50_000);
 
   if (rows.length === 0) {
     return badRequest("No data found for the given type and filter");
   }
 
   // Field filtering
-  let data = rows;
+  let data: Record<string, unknown>[] = rows;
   if (fieldsParam) {
     const fields = fieldsParam.split(",").map((f) => f.trim());
     data = rows.map((row: Record<string, unknown>) => {

@@ -6,10 +6,11 @@
  * Includes relationship type, direction, and metadata columns.
  */
 
-import { pgTable, uuid, text, timestamp, jsonb, index, unique } from "drizzle-orm/pg-core";
-import { factSheetTypeEnum, relationshipTypeEnum } from "./enums";
+import { pgTable, uuid, varchar, text, timestamp, jsonb, index, unique } from "drizzle-orm/pg-core";
 
 // ── Generic Relationship Edge Table ─────────────────────────────────────────
+// PLANV3: type columns are varchar (not the fixed fact_sheet_type enum) so that
+// documents of any configured/custom type can be related.
 
 export const relationships = pgTable(
   "relationships",
@@ -17,15 +18,15 @@ export const relationships = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
 
     // Source entity
-    sourceType: factSheetTypeEnum("source_type").notNull(),
+    sourceType: varchar("source_type", { length: 100 }).notNull(),
     sourceId: uuid("source_id").notNull(),
 
     // Target entity
-    targetType: factSheetTypeEnum("target_type").notNull(),
+    targetType: varchar("target_type", { length: 100 }).notNull(),
     targetId: uuid("target_id").notNull(),
 
     // Relationship semantics
-    relationshipType: relationshipTypeEnum("relationship_type").notNull(),
+    relationshipType: varchar("relationship_type", { length: 100 }).notNull(),
     description: text("description"),
 
     // Relation-level attributes (e.g. annual cost, CRUD usage, usage type)

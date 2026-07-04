@@ -25,127 +25,11 @@ CREATE TYPE "public"."tech_ring" AS ENUM('Adopt', 'Trial', 'Assess', 'Hold');-->
 CREATE TYPE "public"."technical_standard" AS ENUM('Approved', 'Approved with constraints', 'Deprecated');--> statement-breakpoint
 CREATE TYPE "public"."time_classification" AS ENUM('Tolerate', 'Invest', 'Migrate', 'Eliminate');--> statement-breakpoint
 CREATE TYPE "public"."user_status" AS ENUM('Active', 'Invited', 'Requested', 'Not Invited', 'Archived');--> statement-breakpoint
-CREATE TABLE "business_capabilities" (
+CREATE TABLE "kpi_history" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"level" "capability_level" DEFAULT '1' NOT NULL,
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"maturity" integer,
-	"strategic_importance" integer,
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "business_contexts" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "business_context_subtype" DEFAULT 'Process' NOT NULL,
-	"level" integer DEFAULT 1,
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "organizations" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "organization_subtype" DEFAULT 'Business Unit' NOT NULL,
-	"level" integer DEFAULT 1,
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "applications" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "application_subtype",
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"technical_fit" "fit_score",
-	"functional_fit" "fit_score",
-	"business_criticality" "business_criticality",
-	"time_classification" time_classification,
-	"six_r_classification" "six_r_classification",
-	"version" varchar(100),
-	"parent_id" uuid,
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "data_objects" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"data_classification" varchar(100),
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "interfaces" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "interface_subtype" DEFAULT 'Logical Interface',
-	"data_flow_direction" "data_flow_direction",
-	"frequency" varchar(100),
-	"provider_application_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"endpoint_url" varchar(2048),
-	"auth_protocol" varchar(100),
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "initiatives" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "initiative_subtype" DEFAULT 'Project',
-	"status" "initiative_status" DEFAULT 'Not Started',
-	"start_date" date,
-	"end_date" date,
-	"budget" numeric,
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"kpi_id" uuid NOT NULL,
+	"value" numeric NOT NULL,
+	"recorded_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "kpis" (
@@ -160,91 +44,13 @@ CREATE TABLE "kpis" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "platforms" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "strategic_objectives" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"perspective" "strategic_perspective" NOT NULL,
-	"parent_id" uuid,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "it_components" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"subtype" "it_component_subtype",
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"version" varchar(100),
-	"technical_standard" "technical_standard",
-	"ring" "tech_ring",
-	"quadrant" "tech_quadrant",
-	"end_of_life" date,
-	"end_of_support" date,
-	"tech_category_id" uuid,
-	"provider_id" uuid,
-	"parent_id" uuid,
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "providers" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"lifecycle" "lifecycle_phase" DEFAULT 'Active',
-	"health" "health_status" DEFAULT 'Good',
-	"quality_seal" "quality_seal" DEFAULT 'Draft',
-	"location" varchar(255),
-	"contact_info" text,
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "tech_categories" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"description" text,
-	"level" integer DEFAULT 1,
-	"parent_id" uuid,
-	"owner" varchar(255),
-	"custom_fields" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "relationships" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"source_type" "fact_sheet_type" NOT NULL,
+	"source_type" varchar(100) NOT NULL,
 	"source_id" uuid NOT NULL,
-	"target_type" "fact_sheet_type" NOT NULL,
+	"target_type" varchar(100) NOT NULL,
 	"target_id" uuid NOT NULL,
-	"relationship_type" "relationship_type" NOT NULL,
+	"relationship_type" varchar(100) NOT NULL,
 	"description" text,
 	"metadata" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -255,7 +61,7 @@ CREATE TABLE "relationships" (
 CREATE TABLE "subscriptions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
-	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_type" varchar(100) NOT NULL,
 	"fact_sheet_id" uuid NOT NULL,
 	"role" "subscription_role" DEFAULT 'Observer' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -266,7 +72,7 @@ CREATE TABLE "subscriptions" (
 CREATE TABLE "tag_assignments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tag_id" uuid NOT NULL,
-	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_type" varchar(100) NOT NULL,
 	"fact_sheet_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "uq_tag_assignment" UNIQUE("tag_id","fact_sheet_type","fact_sheet_id")
@@ -414,7 +220,7 @@ CREATE TABLE "api_tokens" (
 --> statement-breakpoint
 CREATE TABLE "comments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_type" varchar(100) NOT NULL,
 	"fact_sheet_id" uuid NOT NULL,
 	"author_id" uuid NOT NULL,
 	"parent_id" uuid,
@@ -426,7 +232,7 @@ CREATE TABLE "comments" (
 --> statement-breakpoint
 CREATE TABLE "quality_seal_transitions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_type" varchar(100) NOT NULL,
 	"fact_sheet_id" uuid NOT NULL,
 	"from_state" varchar(50) NOT NULL,
 	"to_state" varchar(50) NOT NULL,
@@ -462,7 +268,7 @@ CREATE TABLE "surveys" (
 	"title" varchar(255) NOT NULL,
 	"description" text,
 	"created_by_id" uuid NOT NULL,
-	"fact_sheet_type" "fact_sheet_type",
+	"fact_sheet_type" varchar(100),
 	"fact_sheet_id" uuid,
 	"status" varchar(50) DEFAULT 'draft' NOT NULL,
 	"closes_at" timestamp with time zone,
@@ -472,7 +278,7 @@ CREATE TABLE "surveys" (
 --> statement-breakpoint
 CREATE TABLE "todos" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"fact_sheet_type" "fact_sheet_type" NOT NULL,
+	"fact_sheet_type" varchar(100) NOT NULL,
 	"fact_sheet_id" uuid NOT NULL,
 	"title" varchar(500) NOT NULL,
 	"description" text,
@@ -515,7 +321,263 @@ CREATE TABLE "webhooks" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "kpis" ADD CONSTRAINT "kpis_objective_id_strategic_objectives_id_fk" FOREIGN KEY ("objective_id") REFERENCES "public"."strategic_objectives"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE TABLE "saved_searches" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"query" text,
+	"entity_types" jsonb,
+	"filters" jsonb,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "notification_preferences" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"email_notifs" boolean DEFAULT true NOT NULL,
+	"email_on_subscribed_change" boolean DEFAULT true NOT NULL,
+	"email_on_mention" boolean DEFAULT true NOT NULL,
+	"weekly_digest" boolean DEFAULT false NOT NULL,
+	"in_app_enabled" boolean DEFAULT true NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "notification_preferences_user_id_unique" UNIQUE("user_id")
+);
+--> statement-breakpoint
+CREATE TABLE "notifications" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"type" varchar(50) NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"body" text,
+	"entity_type" varchar(50),
+	"entity_id" varchar(64),
+	"read" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "document_field_configs" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type_config_id" uuid NOT NULL,
+	"field_key" varchar(100) NOT NULL,
+	"field_source" varchar(20) DEFAULT 'builtin' NOT NULL,
+	"label" varchar(255) NOT NULL,
+	"data_type" varchar(30) DEFAULT 'text' NOT NULL,
+	"field_type" varchar(50) DEFAULT 'text' NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"required" boolean DEFAULT false NOT NULL,
+	"options" jsonb,
+	"validation" jsonb,
+	"default_value" jsonb,
+	"searchable" boolean DEFAULT false NOT NULL,
+	"filterable" boolean DEFAULT true NOT NULL,
+	"show_in_list" boolean DEFAULT false NOT NULL,
+	"placeholder" varchar(255),
+	"help_text" text,
+	"group" varchar(100),
+	"width" varchar(20) DEFAULT 'full' NOT NULL,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "uq_field_configs_type_key" UNIQUE("type_config_id","field_key")
+);
+--> statement-breakpoint
+CREATE TABLE "document_page_components" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type_config_id" uuid NOT NULL,
+	"component_key" varchar(100) NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"config" jsonb,
+	"width" varchar(20) DEFAULT 'full' NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "uq_page_components_type_key" UNIQUE("type_config_id","component_key")
+);
+--> statement-breakpoint
+CREATE TABLE "document_type_configs" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type_key" varchar(100) NOT NULL,
+	"slug" varchar(100) NOT NULL,
+	"display_name" varchar(255) NOT NULL,
+	"plural_name" varchar(255) NOT NULL,
+	"icon" varchar(100) DEFAULT 'FileText' NOT NULL,
+	"color" varchar(50),
+	"is_hierarchical" boolean DEFAULT false NOT NULL,
+	"milestones_enabled" boolean DEFAULT false NOT NULL,
+	"description" text,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "document_type_configs_type_key_unique" UNIQUE("type_key"),
+	CONSTRAINT "document_type_configs_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+CREATE TABLE "documents" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type_key" varchar(100) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"lifecycle" varchar(50) DEFAULT 'Active',
+	"health" varchar(50) DEFAULT 'Good',
+	"quality_seal" varchar(50) DEFAULT 'Draft',
+	"owner" varchar(255),
+	"parent_id" uuid,
+	"level" integer,
+	"subtype" varchar(100),
+	"version" varchar(100),
+	"status" varchar(50),
+	"perspective" varchar(100),
+	"technical_fit" varchar(50),
+	"functional_fit" varchar(50),
+	"business_criticality" varchar(100),
+	"time_classification" varchar(50),
+	"six_r_classification" varchar(50),
+	"technical_standard" varchar(50),
+	"ring" varchar(50),
+	"quadrant" varchar(100),
+	"maturity" integer,
+	"strategic_importance" integer,
+	"data_classification" varchar(100),
+	"data_flow_direction" varchar(50),
+	"frequency" varchar(100),
+	"endpoint_url" varchar(2048),
+	"auth_protocol" varchar(100),
+	"location" varchar(255),
+	"contact_info" text,
+	"start_date" date,
+	"end_date" date,
+	"end_of_life" date,
+	"end_of_support" date,
+	"budget" numeric,
+	"decision_status" varchar(50),
+	"decision_date" date,
+	"context" text,
+	"decision_outcome" text,
+	"consequences" text,
+	"superseded_by_id" uuid,
+	"custom_fields" jsonb,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "relationship_rules" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"source_type_key" varchar(100) NOT NULL,
+	"target_type_key" varchar(100) NOT NULL,
+	"relationship_type" varchar(100) NOT NULL,
+	"reverse_label" varchar(100),
+	"description" text,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "uq_relationship_rule" UNIQUE("source_type_key","target_type_key","relationship_type")
+);
+--> statement-breakpoint
+CREATE TABLE "report_components" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"report_id" uuid NOT NULL,
+	"component_key" varchar(100) NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"config" jsonb,
+	"width" varchar(20) DEFAULT 'full' NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "uq_report_components_key" UNIQUE("report_id","component_key")
+);
+--> statement-breakpoint
+CREATE TABLE "reports" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"slug" varchar(100) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"owner_id" uuid,
+	"is_system" boolean DEFAULT false NOT NULL,
+	"is_shared" boolean DEFAULT true NOT NULL,
+	"category" varchar(100),
+	"data_source" jsonb NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "reports_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+CREATE TABLE "dashboard_components" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"dashboard_id" uuid NOT NULL,
+	"component_key" varchar(100) NOT NULL,
+	"title" varchar(255),
+	"data_source" jsonb NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"config" jsonb,
+	"width" varchar(20) DEFAULT 'half' NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "dashboards" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"slug" varchar(100) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"owner_id" uuid,
+	"is_system" boolean DEFAULT false NOT NULL,
+	"is_shared" boolean DEFAULT true NOT NULL,
+	"is_default" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "dashboards_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+CREATE TABLE "metamodel_templates" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"key" varchar(100) NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"version" varchar(50) DEFAULT '1.0.0' NOT NULL,
+	"schema_version" integer DEFAULT 1 NOT NULL,
+	"is_builtin" boolean DEFAULT false NOT NULL,
+	"is_active" boolean DEFAULT false NOT NULL,
+	"definition" jsonb NOT NULL,
+	"applied_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "metamodel_templates_key_unique" UNIQUE("key")
+);
+--> statement-breakpoint
+CREATE TABLE "decision_links" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"decision_id" uuid NOT NULL,
+	"document_id" uuid NOT NULL,
+	"impact" varchar(50) NOT NULL,
+	"note" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "decision_transitions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"decision_id" uuid NOT NULL,
+	"from_state" varchar(50),
+	"to_state" varchar(50) NOT NULL,
+	"actor_id" uuid,
+	"reason" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "milestones" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"document_id" uuid NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"date" date NOT NULL,
+	"status" varchar(50) DEFAULT 'Planned' NOT NULL,
+	"milestone_type" varchar(50),
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "kpi_history" ADD CONSTRAINT "kpi_history_kpi_id_kpis_id_fk" FOREIGN KEY ("kpi_id") REFERENCES "public"."kpis"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "kpis" ADD CONSTRAINT "kpis_objective_id_documents_id_fk" FOREIGN KEY ("objective_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tag_assignments" ADD CONSTRAINT "tag_assignments_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tags" ADD CONSTRAINT "tags_tag_group_id_tag_groups_id_fk" FOREIGN KEY ("tag_group_id") REFERENCES "public"."tag_groups"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_workspace_roles" ADD CONSTRAINT "user_workspace_roles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -533,6 +595,20 @@ ALTER TABLE "surveys" ADD CONSTRAINT "surveys_created_by_id_users_id_fk" FOREIGN
 ALTER TABLE "todos" ADD CONSTRAINT "todos_assignee_id_users_id_fk" FOREIGN KEY ("assignee_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "todos" ADD CONSTRAINT "todos_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_deliveries" ADD CONSTRAINT "webhook_deliveries_webhook_id_webhooks_id_fk" FOREIGN KEY ("webhook_id") REFERENCES "public"."webhooks"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "saved_searches" ADD CONSTRAINT "saved_searches_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification_preferences" ADD CONSTRAINT "notification_preferences_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_field_configs" ADD CONSTRAINT "document_field_configs_type_config_id_document_type_configs_id_fk" FOREIGN KEY ("type_config_id") REFERENCES "public"."document_type_configs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "document_page_components" ADD CONSTRAINT "document_page_components_type_config_id_document_type_configs_id_fk" FOREIGN KEY ("type_config_id") REFERENCES "public"."document_type_configs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "report_components" ADD CONSTRAINT "report_components_report_id_reports_id_fk" FOREIGN KEY ("report_id") REFERENCES "public"."reports"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "reports" ADD CONSTRAINT "reports_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "dashboard_components" ADD CONSTRAINT "dashboard_components_dashboard_id_dashboards_id_fk" FOREIGN KEY ("dashboard_id") REFERENCES "public"."dashboards"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "dashboards" ADD CONSTRAINT "dashboards_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision_links" ADD CONSTRAINT "decision_links_decision_id_documents_id_fk" FOREIGN KEY ("decision_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision_links" ADD CONSTRAINT "decision_links_document_id_documents_id_fk" FOREIGN KEY ("document_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision_transitions" ADD CONSTRAINT "decision_transitions_decision_id_documents_id_fk" FOREIGN KEY ("decision_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision_transitions" ADD CONSTRAINT "decision_transitions_actor_id_users_id_fk" FOREIGN KEY ("actor_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "milestones" ADD CONSTRAINT "milestones_document_id_documents_id_fk" FOREIGN KEY ("document_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_relationships_source" ON "relationships" USING btree ("source_type","source_id");--> statement-breakpoint
 CREATE INDEX "idx_relationships_target" ON "relationships" USING btree ("target_type","target_id");--> statement-breakpoint
 CREATE INDEX "idx_relationships_type" ON "relationships" USING btree ("relationship_type");--> statement-breakpoint
@@ -568,4 +644,21 @@ CREATE INDEX "deliveries_webhook_id_idx" ON "webhook_deliveries" USING btree ("w
 CREATE INDEX "deliveries_status_idx" ON "webhook_deliveries" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "deliveries_next_retry_idx" ON "webhook_deliveries" USING btree ("next_retry_at");--> statement-breakpoint
 CREATE INDEX "webhooks_active_idx" ON "webhooks" USING btree ("active");--> statement-breakpoint
-CREATE INDEX "webhooks_created_by_idx" ON "webhooks" USING btree ("created_by");
+CREATE INDEX "webhooks_created_by_idx" ON "webhooks" USING btree ("created_by");--> statement-breakpoint
+CREATE INDEX "idx_saved_searches_user" ON "saved_searches" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_notifications_user_read" ON "notifications" USING btree ("user_id","read");--> statement-breakpoint
+CREATE INDEX "idx_field_configs_type" ON "document_field_configs" USING btree ("type_config_id");--> statement-breakpoint
+CREATE INDEX "idx_page_components_type" ON "document_page_components" USING btree ("type_config_id");--> statement-breakpoint
+CREATE INDEX "idx_documents_type_key" ON "documents" USING btree ("type_key");--> statement-breakpoint
+CREATE INDEX "idx_documents_parent_id" ON "documents" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX "idx_documents_type_name" ON "documents" USING btree ("type_key","name");--> statement-breakpoint
+CREATE INDEX "idx_documents_type_lifecycle" ON "documents" USING btree ("type_key","lifecycle");--> statement-breakpoint
+CREATE INDEX "idx_documents_type_health" ON "documents" USING btree ("type_key","health");--> statement-breakpoint
+CREATE INDEX "idx_documents_custom_fields" ON "documents" USING gin ("custom_fields");--> statement-breakpoint
+CREATE INDEX "idx_report_components_report" ON "report_components" USING btree ("report_id");--> statement-breakpoint
+CREATE INDEX "idx_dashboard_components_dashboard" ON "dashboard_components" USING btree ("dashboard_id");--> statement-breakpoint
+CREATE INDEX "idx_decision_links_decision" ON "decision_links" USING btree ("decision_id");--> statement-breakpoint
+CREATE INDEX "idx_decision_links_document" ON "decision_links" USING btree ("document_id");--> statement-breakpoint
+CREATE INDEX "idx_decision_transitions_decision" ON "decision_transitions" USING btree ("decision_id");--> statement-breakpoint
+CREATE INDEX "idx_milestones_document" ON "milestones" USING btree ("document_id");--> statement-breakpoint
+CREATE INDEX "idx_milestones_date" ON "milestones" USING btree ("date");

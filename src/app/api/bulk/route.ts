@@ -1,11 +1,13 @@
 /**
- * Step 6.4 — Bulk Operations API
+ * Step 6.4 — Bulk Operations API (PLANV3: unified `documents` table)
  *
  * POST /api/bulk/update — Bulk update tags, lifecycle, fields for selected fact sheets.
  * POST /api/bulk/delete — Bulk delete selected fact sheets.
  * POST /api/bulk/upsert — Idempotent upsert for import workflows.
  *
- * All operations audit log each affected entity individually.
+ * All entities live in the unified `documents` table, discriminated by
+ * `type_key`. The API's `type` field is the document type key (e.g.
+ * "Application"). All operations audit log each affected entity individually.
  * Max 100 entities per request (guard against abuse).
  */
 
@@ -21,28 +23,34 @@ import { isFeatureEnabled } from "@/lib/feature-flags";
 
 // ── Types & Configuration ───────────────────────────────────────────────────
 
-const VALID_ENTITY_TYPES: Record<string, string> = {
-  BusinessCapability: "business_capabilities",
-  Organization: "organizations",
-  BusinessContext: "business_contexts",
-  Application: "applications",
-  DataObject: "data_objects",
-  Interface: "interfaces",
-  StrategicObjective: "strategic_objectives",
-  Initiative: "initiatives",
-  Platform: "platforms",
-  TechCategory: "tech_categories",
-  ITComponent: "it_components",
-  Provider: "providers",
-};
+// The document type keys that may be targeted by bulk operations. The API's
+// `type` field carries one of these keys; every row lives in the unified
+// `documents` table discriminated by `type_key`. Validated statically so the
+// request never needs a DB round-trip just to reject an unknown type.
+const VALID_TYPE_KEYS = [
+  "BusinessCapability",
+  "Organization",
+  "BusinessContext",
+  "Application",
+  "DataObject",
+  "Interface",
+  "StrategicObjective",
+  "Initiative",
+  "Platform",
+  "TechCategory",
+  "ITComponent",
+  "Provider",
+] as const;
 
-const VALID_TYPE_KEYS = Object.keys(VALID_ENTITY_TYPES);
+// Types that do not carry lifecycle/health columns on create (mirrors the
+// legacy per-table behaviour, now expressed against the pooled columns).
+const TYPES_WITHOUT_LIFECYCLE = new Set<string>(["TechCategory", "Provider"]);
 
 // ── Schemas ─────────────────────────────────────────────────────────────────
 
 const entityRefSchema = z.object({
   id: z.string().uuid(),
-  type: z.enum(VALID_TYPE_KEYS as [string, ...string[]]),
+  type: z.enum(VALID_TYPE_KEYS as unknown as [string, ...string[]]),
 });
 
 const bulkUpdateSchema = z.object({
@@ -64,7 +72,7 @@ const bulkDeleteSchema = z.object({
 });
 
 const upsertItemSchema = z.object({
-  type: z.enum(VALID_TYPE_KEYS as [string, ...string[]]),
+  type: z.enum(VALID_TYPE_KEYS as unknown as [string, ...string[]]),
   externalId: z.string().max(255).optional(),
   name: z.string().min(1).max(255),
   description: z.string().nullish(),
@@ -123,9 +131,6 @@ async function handleBulkUpdate(
   // Bulk field updates (per type)
   if (fields && Object.keys(fields).length > 0) {
     for (const [entityType, ids] of Object.entries(byType)) {
-      const table = VALID_ENTITY_TYPES[entityType];
-      if (!table) continue;
-
       // Build SET clause
       const setClauses: string[] = [];
       if (fields.lifecycle) {
@@ -144,7 +149,8 @@ async function handleBulkUpdate(
 
       if (setClauses.length > 1) {
         const idList = ids.map((id) => `'${id}'`).join(",");
-        const query = `UPDATE ${table} SET ${setClauses.join(", ")} WHERE id IN (${idList}) RETURNING id`;
+        const typeKey = entityType.replace(/'/g, "''");
+        const query = `UPDATE documents SET ${setClauses.join(", ")} WHERE type_key = '${typeKey}' AND id IN (${idList}) RETURNING id`;
         const updated = (await db.execute(sql.raw(query))).rows as Array<{ id: string }>;
 
         for (const row of updated) {
@@ -227,31 +233,33 @@ async function handleBulkDelete(
   }
 
   for (const [entityType, ids] of Object.entries(byType)) {
-    const table = VALID_ENTITY_TYPES[entityType];
-    if (!table) continue;
-
     const idList = ids.map((id) => `'${id}'`).join(",");
+    const typeKey = entityType.replace(/'/g, "''");
 
     // First, clean up related data (tag assignments, subscriptions, relationships)
     await db.execute(
       sql.raw(
-        `DELETE FROM tag_assignments WHERE fact_sheet_type = '${entityType}' AND fact_sheet_id IN (${idList})`
+        `DELETE FROM tag_assignments WHERE fact_sheet_type = '${typeKey}' AND fact_sheet_id IN (${idList})`
       )
     );
     await db.execute(
       sql.raw(
-        `DELETE FROM subscriptions WHERE fact_sheet_type = '${entityType}' AND fact_sheet_id IN (${idList})`
+        `DELETE FROM subscriptions WHERE fact_sheet_type = '${typeKey}' AND fact_sheet_id IN (${idList})`
       )
     );
     await db.execute(
       sql.raw(
-        `DELETE FROM relationships WHERE (source_type = '${entityType}' AND source_id IN (${idList})) OR (target_type = '${entityType}' AND target_id IN (${idList}))`
+        `DELETE FROM relationships WHERE (source_type = '${typeKey}' AND source_id IN (${idList})) OR (target_type = '${typeKey}' AND target_id IN (${idList}))`
       )
     );
 
-    // Delete the entities
+    // Delete the entities (scoped to this type_key within the unified table)
     const deleted = (
-      await db.execute(sql.raw(`DELETE FROM ${table} WHERE id IN (${idList}) RETURNING id`))
+      await db.execute(
+        sql.raw(
+          `DELETE FROM documents WHERE type_key = '${typeKey}' AND id IN (${idList}) RETURNING id`
+        )
+      )
     ).rows as Array<{ id: string }>;
 
     for (const row of deleted) {
@@ -295,9 +303,7 @@ async function handleBulkUpsert(
   const results: { name: string; type: string; action: "created" | "updated"; id: string }[] = [];
 
   for (const item of items) {
-    const table = VALID_ENTITY_TYPES[item.type];
-    if (!table) continue;
-
+    const typeKey = item.type.replace(/'/g, "''");
     const name = item.name.replace(/'/g, "''");
     const description = item.description ? item.description.replace(/'/g, "''") : null;
     const lifecycle = item.lifecycle ?? "Active";
@@ -306,7 +312,11 @@ async function handleBulkUpsert(
 
     // Try to find existing by name + type (idempotent upsert)
     const existing = (
-      await db.execute(sql.raw(`SELECT id FROM ${table} WHERE name = '${name}' LIMIT 1`))
+      await db.execute(
+        sql.raw(
+          `SELECT id FROM documents WHERE type_key = '${typeKey}' AND name = '${name}' LIMIT 1`
+        )
+      )
     ).rows as Array<{ id: string }>;
 
     if (existing.length > 0) {
@@ -318,7 +328,9 @@ async function handleBulkUpsert(
       if (owner !== null) setClauses.push(`owner = '${owner}'`);
 
       await db.execute(
-        sql.raw(`UPDATE ${table} SET ${setClauses.join(", ")} WHERE id = '${existing[0].id}'`)
+        sql.raw(
+          `UPDATE documents SET ${setClauses.join(", ")} WHERE id = '${existing[0].id}'`
+        )
       );
 
       results.push({ name: item.name, type: item.type, action: "updated", id: existing[0].id });
@@ -334,17 +346,17 @@ async function handleBulkUpsert(
         });
       }
     } else {
-      // Create new
-      const cols = ["name"];
-      const vals = [`'${name}'`];
+      // Create new — type_key is mandatory on the unified table
+      const cols = ["type_key", "name"];
+      const vals = [`'${typeKey}'`, `'${name}'`];
 
       if (description !== null) {
         cols.push("description");
         vals.push(`'${description}'`);
       }
 
-      // Only add lifecycle/health columns for types that have them
-      if (item.type !== "TechCategory" && item.type !== "Provider") {
+      // Only add lifecycle/health for types that have them
+      if (!TYPES_WITHOUT_LIFECYCLE.has(item.type)) {
         cols.push("lifecycle");
         vals.push(`'${lifecycle}'`);
         cols.push("health");
@@ -359,7 +371,7 @@ async function handleBulkUpsert(
       const insertResult = (
         await db.execute(
           sql.raw(
-            `INSERT INTO ${table} (${cols.join(", ")}) VALUES (${vals.join(", ")}) RETURNING id`
+            `INSERT INTO documents (${cols.join(", ")}) VALUES (${vals.join(", ")}) RETURNING id`
           )
         )
       ).rows as Array<{ id: string }>;
