@@ -14,9 +14,12 @@ import {
   Search,
   ShieldCheck,
   BarChart3,
+  FileText,
+  LayoutGrid,
+  Settings2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn, clientAuthHeaders } from "@/lib/utils";
 import { SearchModal } from "@/components/SearchModal";
 import { SearchBar } from "@/components/SearchBar";
 import { UserMenu } from "@/components/UserMenu";
@@ -35,12 +38,44 @@ const navItems = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
+// PLANV3 dynamic-document navigation hubs.
+const documentHubs = [
+  { href: "/dashboards", label: "Dashboards", icon: LayoutGrid },
+  { href: "/saved-reports", label: "Saved Reports", icon: BarChart3 },
+  { href: "/admin/document-types", label: "Meta-Model", icon: Settings2 },
+];
+
+interface DocTypeNav {
+  slug: string;
+  displayName: string;
+  pluralName: string;
+}
+
 // ── Sidebar Component ───────────────────────────────────────────────────────
 
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [docTypes, setDocTypes] = useState<DocTypeNav[]>([]);
+
+  // Load the configured document types for the dynamic "Documents" nav section.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/types", { headers: { ...clientAuthHeaders() } });
+        if (!res.ok) return;
+        const body = await res.json();
+        if (!cancelled) setDocTypes(body.data ?? []);
+      } catch {
+        /* nav degrades gracefully to the static items */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Global Cmd/Ctrl+K shortcut
   useEffect(() => {
@@ -98,6 +133,52 @@ export function Sidebar() {
               </Link>
             );
           })}
+
+          {/* PLANV3 dynamic documents & hubs */}
+          {!collapsed && (
+            <div className="mt-3 px-3 pb-1 text-2xs font-semibold uppercase tracking-wide text-rosely-mist">
+              Documents
+            </div>
+          )}
+          {documentHubs.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={collapsed ? item.label : undefined}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-rosely-petal text-rosely-plum"
+                    : "text-rosely-dusk hover:bg-rosely-petal/50 hover:text-rosely-night"
+                )}
+              >
+                <item.icon className="size-5 shrink-0" />
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
+          {!collapsed &&
+            docTypes.map((t) => {
+              const href = `/documents/${t.slug}`;
+              const isActive = pathname.startsWith(href);
+              return (
+                <Link
+                  key={t.slug}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors",
+                    isActive
+                      ? "bg-rosely-petal text-rosely-plum"
+                      : "text-rosely-dusk hover:bg-rosely-petal/50 hover:text-rosely-night"
+                  )}
+                >
+                  <FileText className="size-4 shrink-0 opacity-70" />
+                  <span className="truncate">{t.pluralName}</span>
+                </Link>
+              );
+            })}
 
           {/* Search — inline input (expanded) or icon button (collapsed) */}
           {collapsed ? (
