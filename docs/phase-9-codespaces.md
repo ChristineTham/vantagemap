@@ -8,24 +8,24 @@ Phase 9 code has been scaffolded locally. This document covers what was implemen
 
 ## What Was Implemented
 
-### Step 9.1 — Fact Sheet Detail View
+### Step 9.1 — Document Detail View
 
-- **Route:** `src/app/[type]/[id]/page.tsx` — Universal dynamic route for any fact sheet type
-- **Component:** `src/components/FactSheetDetail.tsx` — Client Component with tabbed view (Details / Relationships / Audit History)
+- **Route:** `src/app/[type]/[id]/page.tsx` — Universal dynamic route for any document type
+- **Component:** `src/components/DocumentDetail.tsx` — Client Component with tabbed view (Details / Relationships / Audit History)
 - **Loading:** `src/app/[type]/[id]/loading.tsx` — Skeleton loading state
 - **Data layer:** `src/lib/data.ts` — Added `getEntityByTypeAndId()`, `getRelationshipsForEntity()`, and `searchAllEntities()` functions
-- **Config registry:** `src/lib/fact-sheet-config.ts` — Central metadata for all 12 fact sheet types (fields, slugs, API paths, form schemas)
+- **Config registry:** `src/lib/document-config.ts` — Central metadata for all 12 document types (fields, slugs, API paths, form schemas)
 
-### Step 9.2 — Create Fact Sheet Form
+### Step 9.2 — Create Document Form
 
-- **Route:** `src/app/[type]/new/page.tsx` — Create page for any fact sheet type
-- **Component:** `src/components/FactSheetCreateForm.tsx` — Client Component with grouped fields, validation, and API submission
+- **Route:** `src/app/[type]/new/page.tsx` — Create page for any document type
+- **Component:** `src/components/DocumentCreateForm.tsx` — Client Component with grouped fields, validation, and API submission
 - **Loading:** `src/app/[type]/new/loading.tsx` — Skeleton loading state
 - **Helper:** `src/components/CreateButton.tsx` — Reusable "Create New" button component
 
-### Step 9.3 — Edit Fact Sheet Form
+### Step 9.3 — Edit Document Form
 
-- **Component:** `src/components/FactSheetEditDialog.tsx` — Modal dialog for editing, with diff detection (only sends changed fields)
+- **Component:** `src/components/DocumentEditDialog.tsx` — Modal dialog for editing, with diff detection (only sends changed fields)
 - Triggered from the detail view's "Edit" button
 
 ### Step 9.4 — Relationship Editor
@@ -54,7 +54,7 @@ Phase 9 code has been scaffolded locally. This document covers what was implemen
 
 ## How the Routing Works
 
-The `[type]` dynamic segment maps to fact sheet slugs defined in `src/lib/fact-sheet-config.ts`:
+The `[type]` dynamic segment maps to document slugs defined in `src/lib/document-config.ts`:
 
 | Slug                | Type               | Detail URL                | Create URL               |
 | ------------------- | ------------------ | ------------------------- | ------------------------ |
@@ -90,7 +90,7 @@ npx tsc --noEmit
 Fix any TypeScript errors. Common issues to watch for:
 
 - Unused import warnings from `eslint` (not blocking)
-- Possible type narrowing needed for the `FactSheetType` union usage in `data.ts`
+- Possible type narrowing needed for the `DocumentType` union usage in `data.ts`
 
 ### 3. Lint
 
@@ -136,7 +136,7 @@ npm run test
 
 3. **Audit History tab** — Currently renders a placeholder with skeleton loaders. Needs an API endpoint (`GET /api/audit?targetType=X&targetId=Y`) and a client-side fetch to display real audit entries.
 
-4. **Route conflicts** — The `[type]` catch-all may conflict with existing static routes (`/capabilities`, `/applications`, etc.). If this causes 404s, add a route group or move the dynamic route to a prefix like `/(factsheets)/[type]/[id]`. Alternatively, if Next.js resolves static routes before dynamic ones (which it should), this should work without changes.
+4. **Route conflicts** — The `[type]` catch-all may conflict with existing static routes (`/capabilities`, `/applications`, etc.). If this causes 404s, add a route group or move the dynamic route to a prefix like `/(documents)/[type]/[id]`. Alternatively, if Next.js resolves static routes before dynamic ones (which it should), this should work without changes.
 
 5. **Form validation** — Currently relies on HTML5 `required` attribute and server-side validation. Consider adding client-side Zod validation for richer error messages before submission.
 
@@ -149,15 +149,15 @@ npm run test
 New files created:
 
 ```text
-src/lib/fact-sheet-config.ts
+src/lib/document-config.ts
 src/app/[type]/[id]/page.tsx
 src/app/[type]/[id]/loading.tsx
 src/app/[type]/new/page.tsx
 src/app/[type]/new/loading.tsx
 src/app/search/page.tsx
-src/components/FactSheetDetail.tsx
-src/components/FactSheetCreateForm.tsx
-src/components/FactSheetEditDialog.tsx
+src/components/DocumentDetail.tsx
+src/components/DocumentCreateForm.tsx
+src/components/DocumentEditDialog.tsx
 src/components/DeleteConfirmDialog.tsx
 src/components/RelationshipList.tsx
 src/components/RelationshipAddDialog.tsx

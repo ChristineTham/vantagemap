@@ -13,7 +13,7 @@ Scenario format:
 Example
 
 Given a user with Member role and access to Applications inventory
-When the user creates a new Application fact sheet with required fields
+When the user creates a new Application document with required fields
 Then the new entity appears in the inventory list with persisted values
 And the user can open the detail view and see matching values
 And an audit event is stored with actor, timestamp, and target entity ID
@@ -28,8 +28,8 @@ Scenario format:
 
 Example
 
-Given a technical user token with create permissions for fact sheets
-When a POST request is sent to the fact sheet endpoint with valid payload
+Given a technical user token with create permissions for documents
+When a POST request is sent to the document endpoint with valid payload
 Then response status is 201
 And response includes stable identifier and timestamps
 And stored record matches request payload constraints
@@ -45,8 +45,8 @@ Scenario format:
 
 Example
 
-Given an active webhook subscription for fact sheet updates
-When a fact sheet is updated
+Given an active webhook subscription for document updates
+When a document is updated
 Then an event is queued and delivered to the endpoint
 And if endpoint fails, retries follow configured policy
 And after max retries, event is persisted to dead-letter storage with reason

@@ -201,6 +201,6 @@ src/app/roadmap/page.tsx (Server)
 Phase 8 provides all read-only views. Phase 9 adds:
 
 - 9.1: Universal detail page (`/[type]/[id]`) showing all fields, relationships, audit history
-- 9.2: Create fact sheet form (modal or page-based)
-- 9.3: Edit fact sheet form (inline or page-based)
+- 9.2: Create document form (modal or page-based)
+- 9.3: Edit document form (inline or page-based)
 - 9.4: Relationship editor

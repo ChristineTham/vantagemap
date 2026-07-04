@@ -129,7 +129,7 @@ Why not microservices first:
 Why PostgreSQL full-text search before a dedicated search engine:
 
 - Zero additional infrastructure cost for MVP
-- Sufficient for early entity volumes (< 10K fact sheets)
+- Sufficient for early entity volumes (< 10K documents)
 - Upgrade path to Meilisearch or managed search when metrics justify it
 
 ## 6. Target Logical Architecture
@@ -143,7 +143,7 @@ Client layer:
 Application/API layer:
 
 - Route handlers for CRUD, search, governance operations, admin, and integrations
-- Domain services for fact sheets, relationships, reporting, automation, and UAM
+- Domain services for documents, relationships, reporting, automation, and UAM
 - Policy enforcement service for RBAC and workspace isolation checks
 
 Data and state layer:
@@ -170,7 +170,7 @@ Primary bounded contexts:
 
 - Identity and Access Management
 - Meta Model and Schema Configuration
-- Fact Sheets and Relationships
+- Documents and Relationships
 - Reporting and Analytics
 - Integrations and Connector Runtime
 - Automation and Eventing
@@ -183,7 +183,7 @@ These boundaries align with business ownership, deployment evolution, and risk c
 
 MVP model objectives:
 
-- Support core LeanIX-like fact sheet entities and typed relationships
+- Support core LeanIX-like document entities and typed relationships
 - Preserve referential integrity and lifecycle states
 - Store ownership, subscriptions, tagging, and quality signals
 - Capture immutable audit history for change tracking
@@ -244,7 +244,7 @@ LeanIX-class enterprise usage depends on trust, traceability, and policy enforce
 Target profile:
 
 - MVP: 50 to 500 concurrent users
-- Data scale path: 100K to 1M fact sheets (with post-MVP expansion beyond)
+- Data scale path: 100K to 1M documents (with post-MVP expansion beyond)
 
 Performance strategy:
 
@@ -423,7 +423,7 @@ Supporting stores are introduced only when measurable needs emerge (search index
    The platform must safely handle role enforcement, lifecycle transitions, audit capture, and integration sync. These are transactional workloads where ACID guarantees materially reduce data integrity risk.
 
 2. Governance-heavy domain model  
-   Fact sheets, typed relationships, ownership, quality states, and policy checks benefit from relational constraints and referential integrity.
+   Documents, typed relationships, ownership, quality states, and policy checks benefit from relational constraints and referential integrity.
 
 3. Reporting and analytics fit  
    LeanIX-style value depends on cross-domain queries and aggregations. SQL is the most direct and maintainable foundation for these workloads in MVP and early scale.

@@ -5,9 +5,9 @@
 | Operation                         | Viewer | Member            | Admin | Custom Role  |
 | --------------------------------- | ------ | ----------------- | ----- | ------------ |
 | View inventory and details        | Yes    | Yes               | Yes   | Configurable |
-| Create fact sheets                | No     | Yes               | Yes   | Configurable |
-| Edit fact sheets                  | No     | Limited by policy | Yes   | Configurable |
-| Delete fact sheets                | No     | No                | Yes   | Restricted   |
+| Create documents                | No     | Yes               | Yes   | Configurable |
+| Edit documents                  | No     | Limited by policy | Yes   | Configurable |
+| Delete documents                | No     | No                | Yes   | Restricted   |
 | Manage users and roles            | No     | No                | Yes   | Restricted   |
 | Configure workspace governance    | No     | No                | Yes   | Configurable |
 | Manage technical users and tokens | No     | No                | Yes   | Configurable |

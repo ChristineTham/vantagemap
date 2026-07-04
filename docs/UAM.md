@@ -59,9 +59,9 @@ VantageMap V1 defines **three standard roles** (`standardRoleEnum`): **Viewer**,
 | Operation                        | Viewer | Member | Admin |
 | -------------------------------- | ------ | ------ | ----- |
 | View inventory and details       | ✅     | ✅     | ✅    |
-| Create fact sheets               | ❌     | ✅     | ✅    |
-| Edit fact sheets                 | ❌     | ✅     | ✅    |
-| Delete fact sheets               | ❌     | ❌     | ✅    |
+| Create documents               | ❌     | ✅     | ✅    |
+| Edit documents                 | ❌     | ✅     | ✅    |
+| Delete documents               | ❌     | ❌     | ✅    |
 | Manage users and roles           | ❌     | ❌     | ✅    |
 | Configure workspace governance   | ❌     | ❌     | ✅    |
 | Access audit logs                | ❌     | ❌     | ✅    |

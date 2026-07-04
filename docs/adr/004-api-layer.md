@@ -8,7 +8,7 @@
 
 VantageMap needs an API layer that supports:
 
-- CRUD operations for 12+ fact sheet entity types
+- CRUD operations for 12+ document entity types
 - Typed request/response contracts
 - OpenAPI specification generation for external integrations
 - Pagination, filtering, sorting as standard patterns

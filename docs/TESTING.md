@@ -20,14 +20,14 @@ npm run dev
 
 ### Audit History
 
-1. Navigate to any fact sheet detail (e.g. `/applications/<id>`)
+1. Navigate to any document detail (e.g. `/applications/<id>`)
 2. Click the **Audit History** tab
 3. Verify entries display with action badges, actor names, timestamps, and diff summaries
 4. If no mutations have occurred for that entity, expect "No audit entries found"
 
 ### Governance Tab
 
-1. Same fact sheet detail page
+1. Same document detail page
 2. Click the **Governance** tab
 3. Verify five sub-sections render: Quality Seal, Tags, Subscriptions, Comments, To-Dos
 4. Each section should load data from the API (or show an empty state)
@@ -36,7 +36,7 @@ npm run dev
 
 1. Navigate to `/governance/quality-seal`
 2. Verify summary cards show counts per seal state (Approved, Check Needed, Broken, Not Assessed)
-3. "Pending Review" queue lists fact sheets in Check Needed state with links to their detail pages
+3. "Pending Review" queue lists documents in Check Needed state with links to their detail pages
 
 ### Surveys Page
 
@@ -73,16 +73,16 @@ Verify these return valid JSON with correct pagination:
 | Method | Endpoint                          | Query Params                                                      |
 | ------ | --------------------------------- | ----------------------------------------------------------------- |
 | GET    | `/api/audit`                      | `targetType`, `targetId`, `actorId`, `action`, `page`, `pageSize` |
-| GET    | `/api/governance/comments`        | `factSheetId`                                                     |
-| POST   | `/api/governance/comments`        | body: `{ factSheetId, content }`                                  |
-| GET    | `/api/governance/todos`           | `factSheetId`                                                     |
-| POST   | `/api/governance/todos`           | body: `{ factSheetId, title }`                                    |
-| GET    | `/api/governance/subscriptions`   | `factSheetId`                                                     |
-| POST   | `/api/governance/subscriptions`   | body: `{ factSheetId }`                                           |
-| DELETE | `/api/governance/subscriptions`   | body: `{ factSheetId }`                                           |
-| GET    | `/api/governance/tags`            | `factSheetId`                                                     |
-| GET    | `/api/governance/quality-seal`    | `factSheetId`                                                     |
-| POST   | `/api/governance/quality-seal`    | body: `{ factSheetId, transition }`                               |
+| GET    | `/api/governance/comments`        | `documentId`                                                     |
+| POST   | `/api/governance/comments`        | body: `{ documentId, content }`                                  |
+| GET    | `/api/governance/todos`           | `documentId`                                                     |
+| POST   | `/api/governance/todos`           | body: `{ documentId, title }`                                    |
+| GET    | `/api/governance/subscriptions`   | `documentId`                                                     |
+| POST   | `/api/governance/subscriptions`   | body: `{ documentId }`                                           |
+| DELETE | `/api/governance/subscriptions`   | body: `{ documentId }`                                           |
+| GET    | `/api/governance/tags`            | `documentId`                                                     |
+| GET    | `/api/governance/quality-seal`    | `documentId`                                                     |
+| POST   | `/api/governance/quality-seal`    | body: `{ documentId, transition }`                               |
 | GET    | `/api/governance/tag-groups`      | —                                                                 |
 | POST   | `/api/governance/tag-groups`      | body: `{ name }`                                                  |
 | DELETE | `/api/governance/tag-groups`      | body: `{ id }`                                                    |
@@ -194,7 +194,7 @@ Charts (Recharts) are loaded via `next/dynamic` with `ssr: false`. Verify:
 
 CRUD operations (create/update/delete) use `after()` from `next/server` to write audit logs after the response is sent. Verify:
 
-1. Create or update any fact sheet (e.g. POST `/api/applications`)
+1. Create or update any document (e.g. POST `/api/applications`)
 2. The response should return immediately (~50-100ms faster than before)
 3. Audit log entry should appear in the database within 1-2 seconds
 

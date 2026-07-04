@@ -29,7 +29,7 @@ Translate product and platform requirements from the documentation corpus into:
 
 | Template                                                                           | Purpose                           |
 | ---------------------------------------------------------------------------------- | --------------------------------- |
-| [../openapi-templates/facts-crud.yaml](../openapi-templates/facts-crud.yaml)       | Fact sheet CRUD API skeleton      |
+| [../openapi-templates/facts-crud.yaml](../openapi-templates/facts-crud.yaml)       | Document CRUD API skeleton      |
 | [../openapi-templates/search.yaml](../openapi-templates/search.yaml)               | Search API skeleton               |
 | [../openapi-templates/relationships.yaml](../openapi-templates/relationships.yaml) | Relationship API skeleton         |
 | [../openapi-templates/auth.yaml](../openapi-templates/auth.yaml)                   | Auth token API skeleton           |

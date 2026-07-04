@@ -118,7 +118,7 @@ export const metadata: Metadata = {
 1. **`BulkEditDialog.tsx`** — Sequential update calls could use `Promise.all()` when processing multiple entities
 2. **`RelationshipAddDialog.tsx`** — Search + create are sequential (acceptable since create depends on search result)
 
-The `FactSheetDetail.tsx` governance tab already uses `Promise.all()` correctly — this is the right pattern.
+The `DocumentDetail.tsx` governance tab already uses `Promise.all()` correctly — this is the right pattern.
 
 ---
 

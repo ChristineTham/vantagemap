@@ -103,19 +103,19 @@ This catalog defines implementation epics grouped by bounded context, cross-refe
 - Target milestone: M4 Enterprise Expansion
 - Readiness notes: pull into MVP only if pilot requires federated identity. Prefer open-source identity providers (Keycloak, Authentik) over commercial SSO SaaS. SAML library should be open-source.
 
-## Meta Model and Fact Sheets
+## Meta Model and Documents
 
 ### EP-MODEL-001 Database Schema and Domain Models
 
 - Scope: MVP
 - Plan steps: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8
-- Outcome: all fact sheet tables (business architecture, application/data, strategy/planning, technology), relationship edge tables, tags/subscriptions, audit log, and user/role tables implemented as database schema with typed ORM models
+- Outcome: all document tables (business architecture, application/data, strategy/planning, technology), relationship edge tables, tags/subscriptions, audit log, and user/role tables implemented as database schema with typed ORM models
 - Dependencies: EP-PLATFORM-001
 - Acceptance criteria IDs: AC-MODEL-001, AC-MODEL-002, AC-MODEL-003, AC-MODEL-004, AC-MODEL-005, AC-MODEL-006, AC-MODEL-007, AC-MODEL-008, AC-MODEL-009, AC-MODEL-010, AC-MODEL-011, AC-MODEL-012, AC-MODEL-013, AC-MODEL-014, AC-MODEL-015, AC-MODEL-016, AC-MODEL-017, AC-MODEL-018, AC-MODEL-030, AC-MODEL-031
 - Owner: Architecture
 - Target milestone: M1 Foundation
 - Accountable owner: Christine Tham (interim)
-- Readiness notes: align strictly with MODEL.md; all 12+1 fact sheet types covered
+- Readiness notes: align strictly with MODEL.md; all 12+1 document types covered
 
 ### EP-MODEL-002 Custom Field Extension Governance
 
@@ -194,7 +194,7 @@ This catalog defines implementation epics grouped by bounded context, cross-refe
 
 - Scope: MVP
 - Plan steps: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6
-- Outcome: fact sheet detail view, create/edit forms, relationship editor, bulk edit UI, search/filter UI
+- Outcome: document detail view, create/edit forms, relationship editor, bulk edit UI, search/filter UI
 - Dependencies: EP-FRONTEND-002, EP-FACT-001, EP-FACT-002
 - Acceptance criteria IDs: AC-FRONT-020, AC-FRONT-021, AC-FRONT-022
 - Owner: Product
@@ -208,7 +208,7 @@ This catalog defines implementation epics grouped by bounded context, cross-refe
 
 - Scope: MVP
 - Plan steps: 11.1, 11.2
-- Outcome: tagging system with configurable modes, subscription/ownership model per fact sheet
+- Outcome: tagging system with configurable modes, subscription/ownership model per document
 - Dependencies: EP-ID-001, EP-FACT-001
 - Acceptance criteria IDs: AC-ADMIN-001, AC-ADMIN-002, AC-ADMIN-003, AC-ADMIN-004, AC-ADMIN-005, AC-ADMIN-006
 - Owner: Operations
@@ -397,7 +397,7 @@ This catalog defines implementation epics grouped by bounded context, cross-refe
 
 - Scope: Post-MVP
 - Plan steps: 15.5
-- Outcome: read-only portal view of selected fact sheets and reports with configurable visibility
+- Outcome: read-only portal view of selected documents and reports with configurable visibility
 - Dependencies: EP-FRONTEND-002
 - Acceptance criteria IDs: AC-PORTAL-001, AC-PORTAL-002
 - Owner: Product

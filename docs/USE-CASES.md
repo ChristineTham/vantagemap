@@ -27,7 +27,7 @@ The use cases are ordered from establishing a baseline to running governed chang
   lifecycle, business criticality, and technical/functional **fit scores**.
 - Read the **TIME recommendations** in Reports — the engine (`src/lib/reports.ts`)
   suggests a TIME classification from the fit scores and explains the reason.
-- Confirm or override the classification on each application's fact sheet.
+- Confirm or override the classification on each application's document.
 
 ## 3. Plan modernisation with 6R
 
@@ -76,12 +76,12 @@ The use cases are ordered from establishing a baseline to running governed chang
 
 ## 8. Govern data quality (Quality Seal)
 
-**Goal:** Ensure fact sheets are trustworthy before they inform decisions.
+**Goal:** Ensure documents are trustworthy before they inform decisions.
 
 - Run the **Quality Seal** workflow (`/governance/quality-seal`): a Member submits a
   Draft for review; an Admin approves or rejects; a rejected sheet is revised back to
   Draft; an Approved sheet can be sent for re-review.
-- Track how many fact sheets are Draft, Check Needed, Approved, or Rejected.
+- Track how many documents are Draft, Check Needed, Approved, or Rejected.
 
 ## 9. Run data-quality surveys
 
@@ -96,7 +96,7 @@ The use cases are ordered from establishing a baseline to running governed chang
 
 - Manage tag groups and tags (`/governance/tags`), choosing an on-the-fly, hybrid, or
   predefined-only mode per group.
-- Apply tags to fact sheets and use them as facets in search and filtering.
+- Apply tags to documents and use them as facets in search and filtering.
 
 ## 11. Find anything, fast (Search)
 

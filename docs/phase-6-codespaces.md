@@ -2,7 +2,7 @@
 
 ## What was done (locally)
 
-Phase 6 implements cross-entity operations that span multiple fact sheet types: relationship management, full-text search, faceted filtering, and bulk operations.
+Phase 6 implements cross-entity operations that span multiple document types: relationship management, full-text search, faceted filtering, and bulk operations.
 
 ### New files created
 
@@ -278,7 +278,7 @@ Or create a manual SQL migration in `drizzle/` adding GIN indexes.
 
 1. **SQL injection protection**: The search and facet APIs use string interpolation for UNION ALL queries (Drizzle doesn't support dynamic table UNION). Values are escaped via `replace(/'/g, "''")` and `plainto_tsquery` (which safely handles user input). For production, consider parameterised queries or prepared statements.
 
-2. **Audit logging for relationships**: Relationships don't have their own `FactSheetType` in the audit system. They're logged under `"BusinessCapability"` as a placeholder. Consider adding `"Relationship"` to the `FactSheetType` union if you want cleaner audit trails.
+2. **Audit logging for relationships**: Relationships don't have their own `DocumentType` in the audit system. They're logged under `"BusinessCapability"` as a placeholder. Consider adding `"Relationship"` to the `DocumentType` union if you want cleaner audit trails.
 
 3. **Bulk operation limits**: All bulk endpoints enforce max 100 entities per request. This prevents timeout and memory issues on serverless.
 

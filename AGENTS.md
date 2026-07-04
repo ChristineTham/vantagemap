@@ -29,8 +29,8 @@ VantageMap is an enterprise architecture and business strategy platform. It give
 | `/governance`   | Governance Hub                    | Quality seal, tags, surveys, data stewardship                    |
 | `/admin/*`      | Administration                    | User management, roles, API tokens, technical users              |
 | `/profile`      | User Profile                      | Account settings, password change, notifications                 |
-| `/[type]/[id]`  | Fact Sheet Detail                 | Universal detail view for any entity                             |
-| `/[type]/new`   | Create Fact Sheet                 | Entity creation form                                             |
+| `/[type]/[id]`  | Document Detail                 | Universal detail view for any entity                             |
+| `/[type]/new`   | Create Document                 | Entity creation form                                             |
 
 ## Tech Stack
 
@@ -89,7 +89,7 @@ src/
     profile/                  # User profile settings
     reports/                  # Reporting and analytics
     search/                   # Cross-entity search
-    [type]/                   # Universal fact sheet detail/create
+    [type]/                   # Universal document detail/create
     api/                      # 29 API route groups (REST + GraphQL)
     capabilities/page.tsx     # Business Capability Map
     applications/page.tsx     # Application Portfolio

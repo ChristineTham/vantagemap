@@ -80,8 +80,8 @@ if (addTags.length > 0) {
   const values = entities.flatMap((entity) =>
     addTags.map((tagId) => ({
       tagId,
-      factSheetType: entity.type,
-      factSheetId: entity.id,
+      documentType: entity.type,
+      documentId: entity.id,
     }))
   );
   await db.insert(tagAssignments).values(values).onConflictDoNothing();
@@ -219,7 +219,7 @@ Multiple client components (`SearchBar`, `SearchPageView`, `SearchModal`, admin 
 | -------------------------------------- | ----------------------------------------------------------------------- |
 | **Promise.all() for parallel fetches** | Dashboard (5 parallel queries), Strategy, Radar, Reports, Detail pages  |
 | **useMemo for derived state**          | ApplicationsView (filter → sort → paginate), TechRadarView, RoadmapView |
-| **useCallback for stable references**  | FactSheetDetail, FactSheetEditDialog, FactSheetCreateForm, admin pages  |
+| **useCallback for stable references**  | DocumentDetail, DocumentEditDialog, DocumentCreateForm, admin pages  |
 | **No barrel re-exports**               | Components imported individually, no `src/components/index.ts`          |
 | **Minimal RSC props**                  | Pages pass only needed fields to client components                      |
 | **No module-level mutable state**      | All `let` variables correctly scoped inside async functions             |

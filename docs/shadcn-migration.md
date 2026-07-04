@@ -36,7 +36,7 @@ This creates `src/components/ui/` with all the primitives needed for the migrati
 | ------------------------------------------ | ---------------------------------------------------------- |
 | `src/components/BulkEditDialog.tsx`        | Has tabbed content + form                                  |
 | `src/components/DeleteConfirmDialog.tsx`   | Confirmation pattern → use `AlertDialog`                   |
-| `src/components/FactSheetEditDialog.tsx`   | Large form, scrollable                                     |
+| `src/components/DocumentEditDialog.tsx`   | Large form, scrollable                                     |
 | `src/components/RelationshipAddDialog.tsx` | Multi-step wizard                                          |
 | `src/components/SearchModal.tsx`           | Already has good a11y; could use `Command` inside `Dialog` |
 
@@ -108,8 +108,8 @@ All auth pages and admin forms:
 - `src/app/profile/page.tsx`
 - `src/app/admin/users/page.tsx`
 - `src/app/admin/technical-users/page.tsx`
-- `src/components/FactSheetCreateForm.tsx`
-- `src/components/FactSheetEditDialog.tsx`
+- `src/components/DocumentCreateForm.tsx`
+- `src/components/DocumentEditDialog.tsx`
 - `src/components/SurveyListView.tsx`
 
 ### Migration Pattern
@@ -148,8 +148,8 @@ import { Label } from "@/components/ui/label";
 src/components/BulkEditDialog.tsx
 src/components/DeleteConfirmDialog.tsx
 src/components/RelationshipAddDialog.tsx
-src/components/FactSheetCreateForm.tsx
-src/components/FactSheetEditDialog.tsx
+src/components/DocumentCreateForm.tsx
+src/components/DocumentEditDialog.tsx
 src/components/SurveyListView.tsx
 src/app/profile/page.tsx (×2)
 src/app/(auth)/login/page.tsx
@@ -336,7 +336,7 @@ src/app/admin/roles/page.tsx
 src/app/admin/users/page.tsx
 src/app/admin/technical-users/page.tsx
 src/components/UserMenu.tsx
-src/components/FactSheetDetail.tsx
+src/components/DocumentDetail.tsx
 ```
 
 ### Migration Pattern
@@ -361,8 +361,8 @@ src/app/(auth)/login/page.tsx
 src/app/(auth)/register/page.tsx
 src/app/(auth)/forgot-password/page.tsx
 src/app/(auth)/reset-password/page.tsx
-src/components/FactSheetEditDialog.tsx
-src/components/FactSheetCreateForm.tsx
+src/components/DocumentEditDialog.tsx
+src/components/DocumentCreateForm.tsx
 src/components/DeleteConfirmDialog.tsx
 src/components/BulkEditDialog.tsx
 src/components/RelationshipAddDialog.tsx

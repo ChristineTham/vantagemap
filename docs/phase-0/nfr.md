@@ -5,7 +5,7 @@ This document defines measurable quality targets required before Phase 1 impleme
 ## 1) Performance
 
 - API read latency: p95 under 250 ms, p99 under 600 ms for standard inventory reads
-- API write latency: p95 under 400 ms for core fact sheet mutations
+- API write latency: p95 under 400 ms for core document mutations
 - Search latency: p95 under 300 ms for indexed filters at baseline dataset size
 - Report latency: p95 under 5 s for standard dashboard/report workloads
 - Webhook dispatch: median under 3 s from event commit to first delivery attempt
@@ -33,7 +33,7 @@ Validation
 ## 3) Scalability
 
 - Concurrent users: baseline support for 1,000 active users
-- Entity volume: baseline support for 100,000 fact sheets and 500,000 relations
+- Entity volume: baseline support for 100,000 documents and 500,000 relations
 - Audit volume: support 1,000,000 audit entries without query timeout in admin views
 - Pagination policy: required for all list endpoints over 200 records
 

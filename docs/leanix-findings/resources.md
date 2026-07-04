@@ -1,0 +1,36 @@
+# Additional Resources — LeanIX vs VantageMap
+
+**Scope note (17 pages).** This "Additional Resources" document is almost entirely non-product / legal-operational content generated from the SAP Help Portal. It contains: (1) the SAP LeanIX Workspace **Data Privacy Statement** (GDPR controller/processor model, data types, hosting regions, retention, user rights — pp. 2–5); (2) the **Cookies and Local Storage Policy**, including a table of specific cookies/local-storage keys used by the platform (pp. 5–8); (3) **Applications Terms & Conditions for the Microsoft Teams integration** ("LeanIX Notifications") (pp. 8–9); (4) an internal **Data Quality Control Mechanisms** overview describing SAP's *own* Gainsight/Snowflake monitoring of *their* telemetry data (pp. 9–10); (5) a **documentation-portal quick-start** for the new SAP Help Portal (multilingual search, PDF download, feedback thumbs) (pp. 10–13); and (6) the **SAP LeanIX Academy → SAP Learning training migration** notice (pp. 13–17). There are very few actual product features here; most items are corporate policy, terms, or SAP-internal operations that are out of scope for an EA tool and have no meaningful VantageMap equivalent.
+
+| # | LeanIX feature | Doc pages | VantageMap status | Evidence / gap note | Gap effort |
+|---|----------------|-----------|-------------------|---------------------|-----------|
+| 1 | Data Privacy Statement (GDPR controller/processor framing, data types processed, legal basis) | 2–4 | MISSING | Corporate/legal artifact, not a product feature. VantageMap is self-hosted MVP with no published privacy statement or controller/processor framing. Low product relevance. | S |
+| 2 | User data-subject rights: access, rectification, erasure, restriction, **data portability (machine-readable export)**, object, complaint | 4 | PARTIAL | Portability partly met by generic CSV/Excel export of fact sheets (`src/lib/*` import/export per baseline); but no per-user personal-data access/erasure workflow. No `gdpr`/`erasure` code found (grep empty). Maps to PLANV4 17.4 for the formal GDPR export/residency piece. | M |
+| 3 | Choice of **hosting region / data residency** (11 regions: DE, NL+IE, UK, CH, AU, US, CA, UAE, SG, BR, JP) | 3 | DEFERRED (PLANV4 17.4) | Data residency / GDPR export is explicitly deferred. VantageMap MVP is single-region (Neon Free); no region-selection UI. | — |
+| 4 | Subprocessor list & 30-day post-termination data deletion | 3 | MISSING | Operational/legal SaaS commitment. Not applicable to self-hosted VantageMap MVP; no automated retention-deletion policy in code. | S |
+| 5 | Cookies & Local Storage Policy + categorised cookie inventory (Essential/Functionality/Analytics/Marketing) | 5–8 | MISSING | No cookie-consent banner or documented cookie inventory in VantageMap. Better Auth uses session cookies but there is no consent/category management. Low EA-parity relevance. | S |
+| 6 | **Auto-logout / session inactivity** (`lxLastActivity` local-storage key drives auto-logout) | 7 | PARTIAL | Better Auth manages sessions (`src/lib/auth.ts`, `auth-server.ts`) with session expiry; no explicit client-side idle auto-logout timer found (grep for idle/inactivity only hits auth.ts config). | S |
+| 7 | Current-dashboard persistence (`lxCurrentDashboard` local-storage) | 7 | PARTIAL | VantageMap has a single Dashboard (`src/app/page.tsx`), not multiple selectable/persisted dashboards, so there is nothing to persist. Multi-dashboard/KPI dashboards are a known gap. | M |
+| 8 | JWT auth token storage (`lxAccessToken`) / IdP session cookies | 6–7 | EQUIVALENT | VantageMap uses Better Auth sessions + API bearer tokens (`src/lib/auth-server.ts`, `auth-client.ts`, admin API tokens). Equivalent auth-token mechanism. | — |
+| 9 | Intercom in-app chat support integration | 6 | MISSING | No embedded support-chat widget in VantageMap. Vendor support tooling, low EA relevance. | S |
+| 10 | **Microsoft Teams integration ("LeanIX Notifications")** — push notifications to Teams | 8–9 | PARTIAL | VantageMap notifications are in-app + email only (`src/lib/notifications.ts`) plus outbound HMAC webhooks (`src/lib/webhook-engine.ts`) that could feed Teams. No first-party Teams connector. Connector catalog / integrations are PLANV4 15.6. | M |
+| 11 | Data Quality Control Mechanisms — row-count deviation / % change alerts / weekend exception (Gainsight+Snowflake) | 9–10 | MISSING | This describes SAP's *internal* telemetry monitoring, NOT a customer-facing feature. VantageMap has data-quality *completeness* reporting and a Quality Seal (`src/lib/quality-seal.ts`, `reports.ts`) but no anomaly/deviation alerting pipeline. Not core EA-tool parity. | L |
+| 12 | Automated alert webhook backup (Snowpipe failover) | 10 | MISSING | SAP-internal ops. VantageMap has an outbound webhook engine but no ingestion-failure alerting. Out of scope. | — |
+| 13 | Documentation portal: multilingual (39-language) machine translation & search | 10–11 | DEFERRED (PLANV4 16.7) | i18n deferred. Applies to SAP's help portal, not the product; VantageMap docs are English markdown. | — |
+| 14 | Documentation portal: PDF download, ToC browse, thumbs-up/down feedback | 11–13 | MISSING | Help-portal features, not product features. VantageMap ships docs as repo markdown/PDF; no in-app docs portal or feedback widget. Out of scope. | — |
+| 15 | SAP LeanIX Academy / SAP Learning — training courses, certifications, learning journeys | 13–17 | MISSING | Vendor training & certification program. No equivalent (nor expected) in VantageMap. Entirely out of product scope. | — |
+
+## Key gaps
+
+Nearly everything in this document is legal, operational, or vendor-program content rather than EA-tool functionality, so there is little core parity to measure. The few product-adjacent items worth noting:
+
+- **Microsoft Teams notification integration (#10)** — VantageMap has in-app + email notifications and a generic outbound webhook engine, but no first-party Teams connector. This is a PARTIAL/M and belongs to the broader connector-catalog deferral (PLANV4 15.6).
+- **GDPR data-subject workflows & data portability (#2)** — generic CSV/Excel export covers fact-sheet data, but there is no per-user personal-data access/erasure/portability flow; the formal piece is deferred (PLANV4 17.4).
+- **Auto-logout on inactivity (#6)** — Better Auth handles session expiry, but no explicit client-side idle timeout; a small hardening gap (S).
+- **Data residency / region selection (#3)** — single-region MVP; deferred (PLANV4 17.4).
+
+None of these are core EA-modelling gaps.
+
+## Equivalence summary
+
+This document is an outlier: it is a bundle of privacy/cookie policies, Microsoft Teams T&Cs, SAP-internal data-quality monitoring, help-portal usage, and training-program migration — not a description of EA product capabilities. Consequently there is almost no core EA functionality to compare, and VantageMap is neither expected to nor does replicate the legal, hosting, support-tooling, and training-program artifacts described here. Where the doc does touch the product (auth/session handling, notifications, data export), VantageMap is broadly EQUIVALENT or PARTIAL, with the residual GDPR/residency and connector items already deferred to PLANV4.

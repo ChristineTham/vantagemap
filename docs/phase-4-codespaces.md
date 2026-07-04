@@ -10,7 +10,7 @@ Phase 4 utility modules have been created locally. Since package installation an
 | `src/lib/auth.ts`             | 4.2  | Authentication middleware — session cookie, bearer token, dev-mode bypass             |
 | `src/lib/rbac.ts`             | 4.3  | RBAC permission checks — role matrix mapping operations to Viewer/Member/Admin        |
 | `src/lib/audit.ts`            | 4.4  | Audit logging — `writeAuditLog()`, `writeFailedAuthLog()`, diff computation           |
-| `src/lib/audit-types.ts`      | 4.4  | Shared type aliases (FactSheetType, AuditAction) to avoid circular imports            |
+| `src/lib/audit-types.ts`      | 4.4  | Shared type aliases (DocumentType, AuditAction) to avoid circular imports            |
 | `src/lib/query.ts`            | 4.5  | Pagination, sorting, filtering utilities with Drizzle query builders                  |
 | `src/lib/feature-flags.ts`    | 4.6  | Environment-variable-backed feature flag system                                       |
 | `src/app/api/health/route.ts` | —    | Health check endpoint (`GET /api/health`)                                             |

@@ -12,9 +12,9 @@ VantageMap requires a database that supports:
 - ACID transactions for entity lifecycle management, audit logging, and RBAC enforcement
 - JSONB columns for custom fields and tenant-specific schema extensions
 - Hierarchical queries for business capability trees and organization structures
-- Relationship traversal across 12+ fact sheet types with typed edges
+- Relationship traversal across 12+ document types with typed edges
 - Full-text search as a baseline (ADR-006 covers dedicated search)
-- Target scale: 100K fact sheets, 500K relations, 1M audit entries (from [nfr.md](../phase-0/nfr.md))
+- Target scale: 100K documents, 500K relations, 1M audit entries (from [nfr.md](../phase-0/nfr.md))
 - Zero-cost free tier for MVP deployment
 - Azure managed service path for production
 
@@ -76,7 +76,7 @@ VantageMap requires a database that supports:
 | Referential integrity | **No foreign keys** — relationships must be enforced in application code |
 | AI agent familiarity  | High, but worse fit for relational domain models                         |
 
-**Why MongoDB is disqualified:** VantageMap's domain is fundamentally relational — typed relationships between fact sheets, referential integrity for audit trails, and RBAC enforcement all benefit from relational constraints. MongoDB's lack of foreign keys would require extensive application-level validation that increases bug surface and vibe-coding complexity.
+**Why MongoDB is disqualified:** VantageMap's domain is fundamentally relational — typed relationships between documents, referential integrity for audit trails, and RBAC enforcement all benefit from relational constraints. MongoDB's lack of foreign keys would require extensive application-level validation that increases bug surface and vibe-coding complexity.
 
 ### 5. Neo4j (Graph Database)
 
@@ -118,12 +118,12 @@ VantageMap requires a database that supports:
 
 ## Graph Database Evaluation
 
-VantageMap's domain is relationship-heavy: 12 fact sheet types connected by 40+ explicitly typed relations (see [MODEL.md](../MODEL.md) §4). The question is whether this relationship density warrants a graph database over PostgreSQL's relational model.
+VantageMap's domain is relationship-heavy: 12 document types connected by 40+ explicitly typed relations (see [MODEL.md](../MODEL.md) §4). The question is whether this relationship density warrants a graph database over PostgreSQL's relational model.
 
 ### Domain Analysis
 
 ```
-                    Fact Sheet Relationship Topology
+                    Document Relationship Topology
 
     Objective ──improves──▶ Business Capability
         │                         ▲
@@ -147,7 +147,7 @@ VantageMap's domain is relationship-heavy: 12 fact sheet types connected by 40+ 
 
 3. **Hierarchy depth: 2–3 levels.** Business capabilities (L1→L2→L3), organizations, and tech categories use shallow parent-child hierarchies, well-served by recursive CTEs and the `ltree` extension.
 
-4. **Scale is modest.** 100K fact sheets + 500K relations is trivially small for PostgreSQL JOINs with proper indexing. Graph databases show advantage at millions of entities with 5+ hop traversals.
+4. **Scale is modest.** 100K documents + 500K relations is trivially small for PostgreSQL JOINs with proper indexing. Graph databases show advantage at millions of entities with 5+ hop traversals.
 
 ### PostgreSQL Handles VantageMap's Queries
 
@@ -246,7 +246,7 @@ None of these conditions are present in VantageMap's requirements or roadmap (th
 
 ### Key factors:
 
-1. **Relational domain fit** — fact sheets, typed relationships, referential integrity, and RBAC are inherently relational workloads
+1. **Relational domain fit** — documents, typed relationships, referential integrity, and RBAC are inherently relational workloads
 2. **JSONB for extensibility** — custom fields without per-tenant schema migrations; GIN indexes for efficient queries
 3. **Built-in full-text search** — tsvector/tsquery provides zero-infrastructure search for MVP (see ADR-006)
 4. **Best free tier ecosystem** — Neon and Supabase both offer generous PostgreSQL free tiers with serverless adapters

@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-The SAP LeanIX Enterprise Architecture (EA) meta model provides a best-practice blueprint that has been validated across more than 1,000 enterprise customers. It defines the fundamental building blocks (called **fact sheets**), their attributes, subtypes, and the typed relationships between them.
+The SAP LeanIX Enterprise Architecture (EA) meta model provides a best-practice blueprint that has been validated across more than 1,000 enterprise customers. It defines the fundamental building blocks (called **documents**), their attributes, subtypes, and the typed relationships between them.
 
 The meta model is **prescriptive**: using it as-is maximises consistency and long-term analytical value. Customisation is possible but may restrict future reporting and use-case scenarios.
 
@@ -15,7 +15,7 @@ The meta model is **prescriptive**: using it as-is maximises consistency and lon
 
 | Version | Status                      | Notes                                                                       |
 | ------- | --------------------------- | --------------------------------------------------------------------------- |
-| v4      | Current (new workspaces)    | Adds Platform fact sheet, renames several types, adds richer subtypes       |
+| v4      | Current (new workspaces)    | Adds Platform document, renames several types, adds richer subtypes       |
 | v3      | Legacy (existing customers) | Project → Initiative, User Group → Organization, Process → Business Context |
 
 VantageMap is modelled on **v4**.
@@ -24,7 +24,7 @@ VantageMap is modelled on **v4**.
 
 ## 2. Architecture Layers
 
-The meta model organises all fact sheet types into four conceptual layers. These layers are for human comprehension only — they impose no technical separation in the product.
+The meta model organises all document types into four conceptual layers. These layers are for human comprehension only — they impose no technical separation in the product.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -42,20 +42,20 @@ The meta model organises all fact sheet types into four conceptual layers. These
 └──────────────────────────────────────────────────────────┘
 ```
 
-| Layer                           | Fact Sheet Types                                    | Purpose                                                        |
+| Layer                           | Document Types                                    | Purpose                                                        |
 | ------------------------------- | --------------------------------------------------- | -------------------------------------------------------------- |
 | Strategy & Transformation       | Objective, Platform, Initiative                     | Goals, groupings, and planned changes — spans all other layers |
 | Business Architecture           | Organization, Business Capability, Business Context | What the business does and who does it                         |
 | Application & Data Architecture | Data Object, Application, Interface                 | Software systems, the data they handle, and how they connect   |
 | Technical Architecture          | Provider, IT Component, Tech Category, System\*     | The technology that applications depend on                     |
 
-\*System is an optional fact sheet type — activate if needed.
+\*System is an optional document type — activate if needed.
 
 ---
 
-## 3. Fact Sheet Types
+## 3. Document Types
 
-There are **12 default fact sheet types** plus 1 optional. Each is described in detail below.
+There are **12 default document types** plus 1 optional. Each is described in detail below.
 
 ---
 
@@ -400,7 +400,7 @@ Examples: SAP S/4HANA, Salesforce, Workday, Confluence, Zoom, custom-built ERP.
 - Use **parent/child** for suites (e.g., Adobe Creative Cloud → Adobe Photoshop)
 - Track cost on the Application → IT Component relation, not directly on the application
 - To link to a provider, you must model an IT component first (no direct app → provider relation)
-- Model **external applications** critical to your architecture as individual fact sheets; use a single composite "External Application" for minor external integrations
+- Model **external applications** critical to your architecture as individual documents; use a single composite "External Application" for minor external integrations
 
 #### Common Antipatterns
 
@@ -450,7 +450,7 @@ Examples: SAP S/4HANA, Salesforce, Workday, Confluence, Zoom, custom-built ERP.
 
 #### Modeling Middleware (e.g., MuleSoft, Dell Boomi)
 
-Model the integration platform as an IT Component fact sheet, then link it to the interface. The interface remains between the applications (not between apps and middleware).
+Model the integration platform as an IT Component document, then link it to the interface. The interface remains between the applications (not between apps and middleware).
 
 ---
 
@@ -498,7 +498,7 @@ IT components are **building blocks** that run, maintain, and change application
 | **Software** | Commercial or open-source software products applications rely on   | Microsoft .NET Framework 4.8, Chrome, Windows Server 2022                                  |
 | **AI Model** | AI/ML software components (LLMs, image generation, etc.)           | OpenAI GPT-4o, Google Gemini, Microsoft Phi                                                |
 
-_Note: SaaS as an IT Component subtype represents the **hosting aspect** of a SaaS service (not the application itself, which is modelled as an Application fact sheet)._
+_Note: SaaS as an IT Component subtype represents the **hosting aspect** of a SaaS service (not the application itself, which is modelled as an Application document)._
 
 #### Key Attributes
 
@@ -524,7 +524,7 @@ _Note: SaaS as an IT Component subtype represents the **hosting aspect** of a Sa
 #### Best Practices
 
 - You don't need IT components for initial application portfolio work; add them when you need cost/risk/hosting analysis
-- Use the **reference catalog** for SaaS apps to auto-create IT component and provider fact sheets
+- Use the **reference catalog** for SaaS apps to auto-create IT component and provider documents
 - Model IT components at a **strategic level** — not patch-level detail
 - Normalise IT component names before importing (standardise versions/naming)
 - Group IT components into tech categories for contextual reporting
@@ -534,7 +534,7 @@ _Note: SaaS as an IT Component subtype represents the **hosting aspect** of a Sa
 
 - Importing too many IT components (maintenance overhead)
 - Tracking patch-level software versions
-- Confusing SaaS (IT Component subtype for hosting) with SaaS applications (Application fact sheet)
+- Confusing SaaS (IT Component subtype for hosting) with SaaS applications (Application document)
 - Importing all CMDB instances without filtering
 
 ---
@@ -586,9 +586,9 @@ Level 1: Hosting / Operations
 **Layer:** Technical Architecture  
 **Purpose:** Represent the technical environment underlying applications — for example, a server or virtual machine with its operating system, database, and runtime configurations.
 
-Systems are supported by IT components. This fact sheet type is relevant when you need to model the specific runtime instances of your applications (e.g., when integrating with ServiceNow CMDB data about application services).
+Systems are supported by IT components. This document type is relevant when you need to model the specific runtime instances of your applications (e.g., when integrating with ServiceNow CMDB data about application services).
 
-Activate this fact sheet type only when needed for your use case.
+Activate this document type only when needed for your use case.
 
 ---
 
@@ -598,8 +598,8 @@ Activate this fact sheet type only when needed for your use case.
 
 | Type                       | Description                                                        | Use Case                                                                                |
 | -------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| **Explicit (typed)**       | Named, directed relationships between two fact sheet types         | Most relationships in the meta model (e.g., "Application supports Business Capability") |
-| **Parent / Child**         | Hierarchical structures within a single fact sheet type            | Business Capability hierarchy, Organisation hierarchy, Initiative hierarchy             |
+| **Explicit (typed)**       | Named, directed relationships between two document types         | Most relationships in the meta model (e.g., "Application supports Business Capability") |
+| **Parent / Child**         | Hierarchical structures within a single document type            | Business Capability hierarchy, Organisation hierarchy, Initiative hierarchy             |
 | **Requires / Required By** | Logical or technical dependencies                                  | IT Component → Server requires OS; Data Object → Application dependencies               |
 | **Transitive**             | Inferred indirect connections via chains of existing relationships | Level-2 capability inherits relations of Level-1 parent for filtering and reporting     |
 
@@ -640,9 +640,9 @@ The diagram below shows all key relationships in the meta model v4:
                                         APPLICATION  IT COMPONENT
 ```
 
-### 4.4 Relation Summary by Fact Sheet
+### 4.4 Relation Summary by Document
 
-| Fact Sheet          | Relates TO          | Via relation                         |
+| Document          | Relates TO          | Via relation                         |
 | ------------------- | ------------------- | ------------------------------------ |
 | Application         | Business Capability | supports                             |
 | Application         | Organization        | used by                              |
@@ -703,9 +703,9 @@ The diagram below shows all key relationships in the meta model v4:
 
 ---
 
-## 5. Fact Sheet Subtypes — Complete Reference
+## 5. Document Subtypes — Complete Reference
 
-| Fact Sheet Type  | Subtype              | Default/Optional                        |
+| Document Type  | Subtype              | Default/Optional                        |
 | ---------------- | -------------------- | --------------------------------------- |
 | Application      | Business Application | Optional                                |
 | Application      | Microservice         | Optional                                |
@@ -734,7 +734,7 @@ The diagram below shows all key relationships in the meta model v4:
 | Organization     | Region               | Default                                 |
 | Organization     | Legal Entity         | Default                                 |
 | Organization     | Team                 | Default                                 |
-| System           | —                    | Optional fact sheet type                |
+| System           | —                    | Optional document type                |
 
 ---
 
@@ -748,37 +748,37 @@ Link Applications to Business Capabilities and Organizations, then use lifecycle
 - End-of-life applications still in use
 - Applications with poor fit scores as candidates for rationalization
 
-Key fact sheets: Application, Business Capability, Organization, IT Component
+Key documents: Application, Business Capability, Organization, IT Component
 
 ### 6.2 Technology Risk (Obsolescence)
 
 Model IT Components with lifecycle data and link them to providers via the tech category grouping. Flag EOL/EOS dates to surface infrastructure risk.
 
-Key fact sheets: IT Component, Provider, Tech Category, Application
+Key documents: IT Component, Provider, Tech Category, Application
 
 ### 6.3 Strategic Portfolio Planning
 
 Link Initiatives to Objectives, Business Capabilities, and Applications. Use the roadmap report to show transformation timelines.
 
-Key fact sheets: Initiative, Objective, Application, Business Capability, Platform
+Key documents: Initiative, Objective, Application, Business Capability, Platform
 
 ### 6.4 Integration Architecture
 
 Model Interfaces between Applications, capturing the data objects exchanged and the IT components (middleware) that implement each interface.
 
-Key fact sheets: Interface, Application, Data Object, IT Component
+Key documents: Interface, Application, Data Object, IT Component
 
 ### 6.5 Organisation Application Mapping
 
 Link Organizations to Applications (used by relation). Use the matrix report to show which applications are used across regions or business units — identifies rationalization potential.
 
-Key fact sheets: Organization, Application, Business Capability
+Key documents: Organization, Application, Business Capability
 
 ---
 
 ## 7. Meta Model v4 vs v3: Key Changes
 
-| v3 Fact Sheet       | v4 Fact Sheet       | Change                                                                                                             |
+| v3 Document       | v4 Document       | Change                                                                                                             |
 | ------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | (not present)       | Platform            | **New**                                                                                                            |
 | Project             | Initiative          | Renamed; subtypes added (Idea, Program, Project, Epic)                                                             |
@@ -795,18 +795,18 @@ Key fact sheets: Organization, Application, Business Capability
 
 VantageMap is modelled on a simplified subset of the LeanIX EA meta model, focused on the views most relevant to Chief Strategy Officers, Business Architects, and Product Leaders.
 
-| VantageMap View                   | LeanIX Equivalent Fact Sheets                     |
+| VantageMap View                   | LeanIX Equivalent Documents                     |
 | --------------------------------- | ------------------------------------------------- |
-| Dashboard                         | Summary across all fact sheet types               |
+| Dashboard                         | Summary across all document types               |
 | Business Capability Map           | Business Capability                               |
 | Application Portfolio             | Application, Organization, IT Component (partial) |
 | Strategy Map (Balanced Scorecard) | Objective, Initiative, Business Capability        |
 | Technology Radar                  | IT Component, Tech Category, Provider             |
 | Strategic Roadmap                 | Initiative, Application, Business Capability      |
 
-The VantageMap data model (`src/lib/data.ts`) maps to LeanIX fact sheets as follows:
+The VantageMap data model (`src/lib/data.ts`) maps to LeanIX documents as follows:
 
-| VantageMap Type              | LeanIX Fact Sheet            | Implemented     |
+| VantageMap Type              | LeanIX Document            | Implemented     |
 | ---------------------------- | ---------------------------- | --------------- |
 | `BusinessCapability`         | Business Capability          | ✅              |
 | `Application`                | Application                  | ✅ (simplified) |
@@ -827,7 +827,7 @@ implemented: each has a Drizzle table in `src/db/schema/`, a REST route group un
 (the Interface type is named `InterfaceFS` to avoid clashing with the GraphQL reserved
 word).
 
-`BusinessContext` is defined in `factSheetTypeEnum` and has a database table
+`BusinessContext` is defined in `documentTypeEnum` and has a database table
 (`business_contexts`), and it appears in seed data, but it does **not** yet have a
 dedicated REST route or GraphQL type. It remains schema-only for V1 — see
 [docs/PLANV4.md](PLANV4.md) for the post-MVP roadmap.
@@ -837,7 +837,7 @@ dedicated REST route or GraphQL type. It remains schema-only for V1 — see
 ## 9. References
 
 - [SAP LeanIX Meta Model (v4)](https://help.sap.com/docs/leanix/ea/meta-model)
-- [Fact Sheets Overview](https://help.sap.com/docs/leanix/ea/fact-sheets)
+- [Documents Overview](https://help.sap.com/docs/leanix/ea/documents)
 - [Delta to Meta Model v3](https://help.sap.com/docs/leanix/ea/delta-to-meta-model-v3)
 - [Using Relations](https://help.sap.com/docs/leanix/ea/relations)
 - [General Modeling Guidelines](https://help.sap.com/docs/leanix/ea/general-modeling-guidelines)

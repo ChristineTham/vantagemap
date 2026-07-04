@@ -45,7 +45,7 @@ This creates two new tables:
 | `src/lib/openapi.ts`                        | OpenAPI 3.1 specification (declarative)      |
 | `src/app/api/docs/openapi.json/route.ts`    | Serves the spec as JSON                      |
 | `src/app/api/docs/page.tsx`                 | Interactive API explorer (Scalar UI via CDN) |
-| `src/lib/graphql-schema.ts`                 | GraphQL schema with all 12 fact sheet types  |
+| `src/lib/graphql-schema.ts`                 | GraphQL schema with all 12 document types  |
 | `src/app/api/graphql/route.ts`              | GraphQL POST/GET endpoint                    |
 | `src/db/schema/webhooks.ts`                 | Webhook + delivery DB schema                 |
 | `src/lib/webhook-engine.ts`                 | Event catalog, HMAC signing, delivery engine |
@@ -146,14 +146,14 @@ curl http://localhost:3000/api/webhooks/<id> \
 curl -X POST http://localhost:3000/api/import \
   -H "Authorization: Bearer <token>" \
   -F "file=@applications.csv" \
-  -F "factSheetType=Application" \
+  -F "documentType=Application" \
   -F "mode=preview"
 
 # Execute mode (persists data)
 curl -X POST http://localhost:3000/api/import \
   -H "Authorization: Bearer <token>" \
   -F "file=@applications.csv" \
-  -F "factSheetType=Application" \
+  -F "documentType=Application" \
   -F "mode=execute"
 ```
 

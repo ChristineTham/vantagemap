@@ -8,11 +8,11 @@
 
 VantageMap requires cross-entity search that supports:
 
-- Full-text search across all 12+ fact sheet types
+- Full-text search across all 12+ document types
 - Faceted filtering by type, lifecycle phase, health status, tags, and custom fields
 - Results grouped by entity type with relevance ranking
 - p95 latency <300ms at baseline dataset size (from [nfr.md](../phase-0/nfr.md))
-- Target scale: 100K fact sheets
+- Target scale: 100K documents
 - Zero-cost MVP deployment
 
 ## Options Evaluated
@@ -149,7 +149,7 @@ Move to Meilisearch when any of these are true:
 
 ## Consequences
 
-- Phase 3 schema includes `tsvector` columns on all fact sheet tables
+- Phase 3 schema includes `tsvector` columns on all document tables
 - Phase 6.2 search API uses SQL queries with `@@` operator and `ts_rank`
 - Phase 6.3 faceted filtering uses SQL GROUP BY and COUNT
 - No additional infrastructure to deploy or maintain for MVP

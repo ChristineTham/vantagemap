@@ -138,9 +138,9 @@ Requires both frontend shell and entity APIs.
 
 | Step | Title                  | Depends on         |
 | ---- | ---------------------- | ------------------ |
-| 9.1  | Fact sheet detail view | Phase 8 (any view) |
-| 9.2  | Create fact sheet form | 9.1                |
-| 9.3  | Edit fact sheet form   | 9.1                |
+| 9.1  | Document detail view | Phase 8 (any view) |
+| 9.2  | Create document form | 9.1                |
+| 9.3  | Edit document form   | 9.1                |
 | 9.4  | Relationship editor    | 9.1, 6.1           |
 | 9.5  | Bulk edit UI           | Phase 8, 6.4       |
 | 9.6  | Search and filter UI   | 6.2, 6.3           |

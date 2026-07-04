@@ -8,7 +8,7 @@ Phase 11 implements governance controls for data quality management:
 - **11.2** Subscription/ownership model (Responsible, Accountable, Observer)
 - **11.3** Quality seal workflow (state machine: Draft → Check Needed → Approved/Rejected)
 - **11.4** Comments with threaded replies
-- **11.5** To-do tracking (per fact sheet, assignable)
+- **11.5** To-do tracking (per document, assignable)
 - **11.6** Survey framework (questions, responses, analytics)
 
 ## Files Created
@@ -28,11 +28,11 @@ Phase 11 implements governance controls for data quality management:
 | `/api/tag-groups`                          | `src/app/api/tag-groups/route.ts`                            | GET, POST          |
 | `/api/tag-groups/:id`                      | `src/app/api/tag-groups/[id]/route.ts`                       | GET, PATCH, DELETE |
 | `/api/tag-groups/:id/tags`                 | `src/app/api/tag-groups/[id]/tags/route.ts`                  | GET, POST          |
-| `/api/fact-sheets/:type/:id/tags`          | `src/app/api/fact-sheets/[type]/[id]/tags/route.ts`          | GET, POST, DELETE  |
-| `/api/fact-sheets/:type/:id/subscriptions` | `src/app/api/fact-sheets/[type]/[id]/subscriptions/route.ts` | GET, POST, DELETE  |
-| `/api/fact-sheets/:type/:id/quality-seal`  | `src/app/api/fact-sheets/[type]/[id]/quality-seal/route.ts`  | GET, POST          |
-| `/api/fact-sheets/:type/:id/comments`      | `src/app/api/fact-sheets/[type]/[id]/comments/route.ts`      | GET, POST          |
-| `/api/fact-sheets/:type/:id/todos`         | `src/app/api/fact-sheets/[type]/[id]/todos/route.ts`         | GET, POST          |
+| `/api/documents/:type/:id/tags`          | `src/app/api/documents/[type]/[id]/tags/route.ts`          | GET, POST, DELETE  |
+| `/api/documents/:type/:id/subscriptions` | `src/app/api/documents/[type]/[id]/subscriptions/route.ts` | GET, POST, DELETE  |
+| `/api/documents/:type/:id/quality-seal`  | `src/app/api/documents/[type]/[id]/quality-seal/route.ts`  | GET, POST          |
+| `/api/documents/:type/:id/comments`      | `src/app/api/documents/[type]/[id]/comments/route.ts`      | GET, POST          |
+| `/api/documents/:type/:id/todos`         | `src/app/api/documents/[type]/[id]/todos/route.ts`         | GET, POST          |
 | `/api/todos/:id`                           | `src/app/api/todos/[id]/route.ts`                            | PATCH, DELETE      |
 | `/api/surveys`                             | `src/app/api/surveys/route.ts`                               | GET, POST          |
 | `/api/surveys/:id`                         | `src/app/api/surveys/[id]/route.ts`                          | GET, PATCH, DELETE |
@@ -42,7 +42,7 @@ Phase 11 implements governance controls for data quality management:
 
 | Component           | File                                   | Purpose                                      |
 | ------------------- | -------------------------------------- | -------------------------------------------- |
-| `TagPicker`         | `src/components/TagPicker.tsx`         | Assign/remove tags on fact sheet detail      |
+| `TagPicker`         | `src/components/TagPicker.tsx`         | Assign/remove tags on document detail      |
 | `TagManager`        | `src/components/TagManager.tsx`        | Admin CRUD for tag groups and tags           |
 | `SubscriptionPanel` | `src/components/SubscriptionPanel.tsx` | Subscribe/unsubscribe with roles             |
 | `QualitySealBadge`  | `src/components/QualitySealBadge.tsx`  | Quality seal state + transitions             |
@@ -128,7 +128,7 @@ curl http://localhost:3000/api/tag-groups
 Test subscriptions:
 
 ```bash
-curl -X POST http://localhost:3000/api/fact-sheets/Application/<uuid>/subscriptions \
+curl -X POST http://localhost:3000/api/documents/Application/<uuid>/subscriptions \
   -H "Content-Type: application/json" \
   -d '{"role": "Responsible"}'
 ```
@@ -136,9 +136,9 @@ curl -X POST http://localhost:3000/api/fact-sheets/Application/<uuid>/subscripti
 Test quality seal:
 
 ```bash
-curl http://localhost:3000/api/fact-sheets/Application/<uuid>/quality-seal
+curl http://localhost:3000/api/documents/Application/<uuid>/quality-seal
 
-curl -X POST http://localhost:3000/api/fact-sheets/Application/<uuid>/quality-seal \
+curl -X POST http://localhost:3000/api/documents/Application/<uuid>/quality-seal \
   -H "Content-Type: application/json" \
   -d '{"toState": "Check Needed", "reason": "Ready for review"}'
 ```
@@ -169,7 +169,7 @@ Draft ──→ Check Needed ──→ Approved
 - **Rejected → Draft**: Member or Admin
 - **Approved → Check Needed**: Admin only (re-review)
 
-State is tracked via the `quality_seal_transitions` table. The current state is the `to_state` of the most recent transition for that fact sheet.
+State is tracked via the `quality_seal_transitions` table. The current state is the `to_state` of the most recent transition for that document.
 
 ### Tag Modes
 
@@ -189,7 +189,7 @@ State is tracked via the `quality_seal_transitions` table. The current state is 
 ## Known Limitations / Future Work
 
 1. **Notifications**: Subscriptions don't yet trigger notifications (deferred to Phase 12 webhooks)
-2. **Survey field merge**: `targetField` on survey questions is stored but not yet auto-merged into fact sheet fields
+2. **Survey field merge**: `targetField` on survey questions is stored but not yet auto-merged into document fields
 3. **Comment editing/deletion**: Only creation is implemented; edit/delete endpoints can be added
 4. **Tag mode enforcement**: The tag mode (predefined-only) is stored but not yet enforced at the API level — enforce in a follow-up
 5. **Governance page data hydration**: The governance pages are server components with placeholder data; wire up client-side fetching

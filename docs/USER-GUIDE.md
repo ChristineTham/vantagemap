@@ -43,7 +43,7 @@ A hierarchical map of what the business does, across three levels — Domain (L1
   domain; level-3 capabilities appear as inline chips.
 - **Health indicators and lifecycle tags** are shown at each level, with a colour-coded
   legend.
-- A **New Capability** button opens the fact-sheet creation form.
+- A **New Capability** button opens the document creation form.
 - An empty state is shown when no capabilities exist.
 
 ## Application Portfolio (`/applications`)
@@ -104,7 +104,7 @@ Cross-entity full-text search (rendered by `SearchPageView`):
 
 - Accepts a query (`q`), optional entity-type filters (`types`), and pagination
   (`page`) via the URL.
-- Backed by PostgreSQL full-text search across fact sheets, with faceted filtering by
+- Backed by PostgreSQL full-text search across documents, with faceted filtering by
   type.
 
 ## Governance (`/governance`)
@@ -114,7 +114,7 @@ count, needs-review count, active surveys, tag groups):
 
 ### Quality Seal (`/governance/quality-seal`)
 
-- Summary cards count fact sheets in each seal state: **Draft**, **Check Needed**,
+- Summary cards count documents in each seal state: **Draft**, **Check Needed**,
   **Approved**, **Rejected**.
 - A **Pending Review** section lists items in Check Needed with links to their detail
   pages; further sections group Draft, Approved, and Rejected items.
@@ -134,15 +134,15 @@ count, needs-review count, active surveys, tag groups):
 - Tag groups support three modes: **on-the-fly**, **hybrid**, and **predefined-only**,
   explained inline on the page.
 
-## Fact Sheet detail and creation (`/[type]/[id]`, `/[type]/new`)
+## Document detail and creation (`/[type]/[id]`, `/[type]/new`)
 
 Every entity type shares a universal detail and create experience:
 
-- **`/[type]/[id]`** renders the `FactSheetDetail` component for any entity
+- **`/[type]/[id]`** renders the `DocumentDetail` component for any entity
   (capability, application, objective, initiative, organisation, interface, data
   object, provider, platform, IT component, tech category). It shows the entity's
   fields plus its relationships, and returns a 404 for unknown types or ids.
-- **`/[type]/new`** renders `FactSheetCreateForm` to create a new entity of that type.
+- **`/[type]/new`** renders `DocumentCreateForm` to create a new entity of that type.
 
 Detail pages also expose collaboration features backed by the API: comments, to-dos,
 tags, subscriptions, and quality-seal transitions.

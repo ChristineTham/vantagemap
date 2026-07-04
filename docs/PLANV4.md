@@ -27,7 +27,7 @@ Enterprise SSO and provisioning from [UAM.md](UAM.md). Deferred from MVP unless 
 | 14.1 | SAML 2.0 SSO               | SP-initiated SAML flow. IdP metadata configuration UI. JIT user provisioning on first login. Attribute mapping (firstname, lastname, email, uid, role).      | 10.1, 4.2  |
 | 14.2 | SCIM provisioning          | SCIM 2.0 endpoint for user lifecycle sync (create, update, deactivate). Attribute mapping for role, department, ACE. Workspace-specific configuration.       | 14.1       |
 | 14.3 | IdP-managed custom roles   | Receive custom role claims from IdP. Map to permission sets. Standard role precedence rules. Multiple role aggregation.                                      | 14.1, 4.3  |
-| 14.4 | Virtual workspaces and ACL | Access Control Entities (ACE) for fact sheet scoping. Virtual workspace views with filtered fact sheet visibility. ACL defaults for new vs existing records. | 14.3, 10.5 |
+| 14.4 | Virtual workspaces and ACL | Access Control Entities (ACE) for document scoping. Virtual workspace views with filtered document visibility. ACL defaults for new vs existing records. | 14.3, 10.5 |
 
 ---
 
@@ -37,13 +37,13 @@ Advanced capabilities from [ADMIN.md](ADMIN.md), [USE-CASES.md](USE-CASES.md), a
 
 | Step | Title                         | Scope                                                                                                                                                                      | Depends on       |
 | ---- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| 15.1 | Automation framework          | No-code event-condition-action workflows. Trigger on fact sheet changes. Actions: update fields, send notifications, create tasks. Admin UI for rule builder.              | Phase 5, 12.3    |
+| 15.1 | Automation framework          | No-code event-condition-action workflows. Trigger on document changes. Actions: update fields, send notifications, create tasks. Admin UI for rule builder.              | Phase 5, 12.3    |
 | 15.2 | Transformation scenarios      | Scenario modeling with baseline and target states. Predefined templates (cloud migration, org restructure). Side-by-side comparison view. Rollback support.                | Phase 5, Phase 8 |
-| 15.3 | MCP server for AI integration | MCP-compatible endpoint exposing fact sheet tools for AI clients. Permission-scoped tool visibility. Query limits (max 10 values). Reference [DEVELOPER.md](DEVELOPER.md). | Phase 5, 4.3     |
-| 15.4 | AI-powered recommendations    | AI-assisted description generation for fact sheets. Relationship suggestions based on existing patterns. Natural language search/filtering.                                | 6.2, 9.1         |
-| 15.5 | Portal for external audiences | Read-only portal view of selected fact sheets and reports. Configurable visibility scope. Branding and theming. No authentication required for portal consumers.           | Phase 8, 4.6     |
+| 15.3 | MCP server for AI integration | MCP-compatible endpoint exposing document tools for AI clients. Permission-scoped tool visibility. Query limits (max 10 values). Reference [DEVELOPER.md](DEVELOPER.md). | Phase 5, 4.3     |
+| 15.4 | AI-powered recommendations    | AI-assisted description generation for documents. Relationship suggestions based on existing patterns. Natural language search/filtering.                                | 6.2, 9.1         |
+| 15.5 | Portal for external audiences | Read-only portal view of selected documents and reports. Configurable visibility scope. Branding and theming. No authentication required for portal consumers.           | Phase 8, 4.6     |
 | 15.6 | Connector catalog             | Pre-built integration connectors for common data sources (ServiceNow, Jira, Azure AD, AWS). Connector configuration UI. Scheduled sync with conflict resolution.           | 12.3, 12.4       |
-| 15.7 | AI governance use case        | AI policy and ethics tracking. AI Agent fact sheet subtype management. Risk and compliance scoring for AI initiatives. Reference [USE-CASES.md](USE-CASES.md).             | 5.2, 13.4        |
+| 15.7 | AI governance use case        | AI policy and ethics tracking. AI Agent document subtype management. Risk and compliance scoring for AI initiatives. Reference [USE-CASES.md](USE-CASES.md).             | 5.2, 13.4        |
 
 ---
 

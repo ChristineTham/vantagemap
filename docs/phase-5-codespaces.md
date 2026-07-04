@@ -198,7 +198,7 @@ SELECT * FROM audit_entries ORDER BY created_at DESC LIMIT 10;
 
 Phase 6 builds on Phase 5 with:
 
-- 6.1 Relationship CRUD API (create/manage edges between fact sheets)
+- 6.1 Relationship CRUD API (create/manage edges between documents)
 - 6.2 Cross-entity search API (full-text search across all types)
 - 6.3 Faceted filter API (combined multi-field filtering)
 - 6.4 Bulk operations API (batch updates/deletes)

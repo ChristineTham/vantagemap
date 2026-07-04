@@ -135,7 +135,7 @@ Constraints:
 1. **Serverless-native** — Inngest functions are HTTP handlers, perfectly compatible with Vercel's serverless model. No persistent workers needed.
 2. **Zero infrastructure for MVP** — Inngest Cloud free tier (50K runs/month) requires no Redis, no worker processes, no queue management.
 3. **Built-in step functions** — Multi-step workflows (e.g., import CSV → validate → upsert → report) with automatic state management between steps.
-4. **Event-driven model** — Functions are triggered by events, which maps naturally to VantageMap's domain events (fact sheet created, relationship changed, etc.).
+4. **Event-driven model** — Functions are triggered by events, which maps naturally to VantageMap's domain events (document created, relationship changed, etc.).
 5. **Production self-hosting** — Inngest server can be self-hosted for production, removing cloud dependency.
 
 ### Architecture:
@@ -183,7 +183,7 @@ export const webhookDelivery = inngest.createFunction(
     retries: 5,
     backoff: { type: "exponential", delay: "1s" },
   },
-  { event: "factsheet/updated" },
+  { event: "document/updated" },
   async ({ event, step }) => {
     const subscribers = await step.run("get-subscribers", async () => {
       // Fetch webhook subscriptions for this event type
