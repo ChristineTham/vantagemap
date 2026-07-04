@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5/14 — Meta-model config apply + counting helpers.
+ * PLANV2 Phase 4/5/14 — Meta-model config apply + counting helpers.
  *
  * The pure helpers (slug generation, reserved-key validation) are extracted so
  * they can be unit-tested without a database. The DB-backed counting helpers

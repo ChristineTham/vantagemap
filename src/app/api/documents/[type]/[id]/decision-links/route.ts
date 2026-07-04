@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 15 — Decision impact links for a document.
+ * PLANV2 Phase 15 — Decision impact links for a document.
  *
  * GET    /api/documents/[type]/[id]/decision-links
  *   Returns links where this document is the decision OR the affected document.

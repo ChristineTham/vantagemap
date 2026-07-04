@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 8 — Dashboard builder.
+ * PLANV2 Phase 8 — Dashboard builder.
  *
  * A dashboard is a set of widgets, each with its own component key, title,
  * width, and data source (reusing the report builder's `DataSourceForm`).

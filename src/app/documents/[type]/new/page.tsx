@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Dynamic document create page.
+ * PLANV2 — Dynamic document create page.
  *
  * Resolves the document type by slug and renders a create form built from the
  * type's enabled field configuration.

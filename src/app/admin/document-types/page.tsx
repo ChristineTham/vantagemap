@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 4 — Document type configuration: list.
+ * PLANV2 Phase 4 — Document type configuration: list.
  *
  * Admin-only. Lists every configured document type (including inactive ones)
  * with its display name, machine key, field count, and active status. Provides

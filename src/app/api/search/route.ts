@@ -5,7 +5,7 @@
  * Returns results grouped by type with relevance ranking.
  * Uses PostgreSQL ts_rank + to_tsvector/to_tsquery for p95 <300 ms.
  *
- * PLANV3 cutover: searches the unified `documents` table (filtered by
+ * PLANV2 cutover: searches the unified `documents` table (filtered by
  * `type_key`) instead of the 12 legacy per-type tables.
  *
  * Query parameters:
@@ -18,7 +18,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
 // documents is the unified table this route queries (via raw SQL against its
-// physical table name). Imported to anchor the PLANV3 schema contract.
+// physical table name). Imported to anchor the PLANV2 schema contract.
 import { documents } from "@/db/schema";
 import { ok, badRequest, withErrorHandler } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";

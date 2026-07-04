@@ -1,7 +1,7 @@
 /**
  * KPIs and their history.
  *
- * PLANV3: the legacy StrategicObjective / Initiative / Platform entity tables
+ * PLANV2: the legacy StrategicObjective / Initiative / Platform entity tables
  * were dropped in favour of the unified `documents` table. KPIs remain a
  * first-class sub-entity — a KPI belongs to a document (typically an Objective)
  * and carries a numeric target/current value plus a time series.

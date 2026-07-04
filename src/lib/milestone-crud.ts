@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Milestone CRUD handlers (documents' dated checkpoints).
+ * PLANV2 — Milestone CRUD handlers (documents' dated checkpoints).
  */
 
 import { z } from "zod";

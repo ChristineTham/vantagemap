@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Single field configuration.
+ * PLANV2 Phase 4/5 — Single field configuration.
  *
  * PATCH  /api/admin/document-types/[id]/fields/[fieldId] — update a field.
  * DELETE /api/admin/document-types/[id]/fields/[fieldId] — remove a field.

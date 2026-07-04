@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Built-in "Enterprise Architecture" meta-model template.
+ * PLANV2 — Built-in "Enterprise Architecture" meta-model template.
  *
  * Derives document type + field configuration from the legacy FACT_SHEET_CONFIGS
  * so the LeanIX-style model is reproduced in the dynamic system, and adds a

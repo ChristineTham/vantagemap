@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Dynamic relationship validation rules.
+ * PLANV2 — Dynamic relationship validation rules.
  *
  * Replaces the hardcoded VALID_RELATIONSHIP_PAIRS array. Admins configure which
  * relationship types are allowed between which document types. The relationship

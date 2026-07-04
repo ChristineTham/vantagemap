@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 7 — Report builder (3 steps).
+ * PLANV2 Phase 7 — Report builder (3 steps).
  *
  *   1. Data source  — mode + type + filters/groupBy/metrics with live preview.
  *   2. Components    — pick + order page components from PAGE_COMPONENT_META.

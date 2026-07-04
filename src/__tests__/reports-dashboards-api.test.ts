@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7/8 — Saved Reports & Dashboards API tests.
+ * PLANV2 Phase 7/8 — Saved Reports & Dashboards API tests.
  *
  * All database, auth, RBAC, and data-source-engine calls are intercepted via
  * vi.mock so no real DB or query execution is needed. Mocks model the chainable

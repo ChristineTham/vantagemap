@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7/8 — Shared client-side types for the report and dashboard
+ * PLANV2 Phase 7/8 — Shared client-side types for the report and dashboard
  * builders. These are the *editable* form shapes; `toDataSource()` in
  * `DataSourceForm` serialises them into the engine's `dataSource` JSON.
  */

@@ -1,5 +1,5 @@
 /**
- * Step 6.4 — Bulk Operations API (PLANV3: unified `documents` table)
+ * Step 6.4 — Bulk Operations API (PLANV2: unified `documents` table)
  *
  * POST /api/bulk/update — Bulk update tags, lifecycle, fields for selected fact sheets.
  * POST /api/bulk/delete — Bulk delete selected fact sheets.

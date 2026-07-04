@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Architecture Decision support tables.
+ * PLANV2 — Architecture Decision support tables.
  *
  * Decisions are a specialised document type (type_key = "Decision"); their
  * status/date/context columns live in the pooled `documents` columns. These

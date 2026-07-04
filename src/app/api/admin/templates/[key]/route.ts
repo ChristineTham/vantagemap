@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: single template definition.
+ * PLANV2 Phase 13 — Meta-model templates: single template definition.
  *
  * GET /api/admin/templates/[key] — return a stored template's full definition.
  */

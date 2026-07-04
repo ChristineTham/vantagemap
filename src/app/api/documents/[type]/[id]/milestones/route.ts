@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Milestones for a document.
+ * PLANV2 — Milestones for a document.
  * GET/POST /api/documents/[type]/[id]/milestones
  */
 

@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Data-source engine.
+ * PLANV2 — Data-source engine.
  *
  * Executes a report/dashboard data-source configuration against the unified
  * `documents` + `relationships` tables. Three modes:

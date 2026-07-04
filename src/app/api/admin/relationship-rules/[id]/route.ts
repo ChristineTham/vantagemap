@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Single relationship rule (update / delete).
+ * PLANV2 Phase 4/5 — Single relationship rule (update / delete).
  *
  * PATCH  /api/admin/relationship-rules/[id]
  * DELETE /api/admin/relationship-rules/[id]

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 4 — Document type editor (client).
+ * PLANV2 Phase 4 — Document type editor (client).
  *
  * Loads GET /api/admin/document-types/[id] (type + fields) and provides:
  *   • A metadata panel (display/plural/icon/description flags + active toggle),

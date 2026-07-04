@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: apply / switch.
+ * PLANV2 Phase 13 — Meta-model templates: apply / switch.
  *
  * POST /api/admin/templates/[key]/apply — apply a stored template to the live
  * config (merge or replace), mark it active (others inactive), invalidate the

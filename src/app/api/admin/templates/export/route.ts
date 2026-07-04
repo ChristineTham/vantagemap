@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: export live config.
+ * PLANV2 Phase 13 — Meta-model templates: export live config.
  *
  * GET /api/admin/templates/export — serialize the live meta-model config into a
  * downloadable MetaModelTemplate JSON file. Admin only.

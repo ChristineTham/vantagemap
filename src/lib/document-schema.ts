@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Dynamic document validation.
+ * PLANV2 — Dynamic document validation.
  *
  * Builds a Zod schema at runtime from a document type's field definitions and
  * splits a validated payload into built-in column values vs. custom-field JSONB.

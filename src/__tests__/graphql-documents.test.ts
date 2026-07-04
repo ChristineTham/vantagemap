@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 9 — dynamic document GraphQL schema tests.
+ * PLANV2 Phase 9 — dynamic document GraphQL schema tests.
  * DB and the document registry are mocked so no live database is required.
  */
 import { describe, it, expect, vi } from "vitest";

@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Saved report definitions and their component layouts.
+ * PLANV2 — Saved report definitions and their component layouts.
  *
  * Reports reuse the page-component library plus an explicit data-source
  * configuration (single / relationship-join / aggregate) executed by the

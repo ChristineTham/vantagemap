@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7/8 — Executed-data renderer.
+ * PLANV2 Phase 7/8 — Executed-data renderer.
  *
  * Bridges the data-source engine's `DataSourceResult` ({ items, joined?,
  * aggregates? }) to the page-component library's `PageComponentProps`

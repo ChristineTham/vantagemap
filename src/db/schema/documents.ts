@@ -1,11 +1,11 @@
 /**
- * PLANV3 — Unified Document schema.
+ * PLANV2 — Unified Document schema.
  *
  * Replaces the 12 hardcoded entity tables with a single `documents` table plus
  * a runtime configuration layer (`document_type_configs`, `document_field_configs`,
  * `document_page_components`). Type-specific columns from the old tables become a
  * shared, nullable column pool; user-defined custom fields live in `custom_fields`
- * (JSONB). See docs/PLANV3.md.
+ * (JSONB). See docs/PLANV2.md.
  *
  * Pooled "enum-like" columns are stored as `varchar` and validated at the
  * application layer from `document_field_configs.options`, so option sets are

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 — Shared building blocks for dynamic document forms.
+ * PLANV2 — Shared building blocks for dynamic document forms.
  *
  * A single field-input renderer (one control per dataType) plus value helpers,
  * used by both the create form and the edit dialog so the two stay in sync.

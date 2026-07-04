@@ -1,5 +1,5 @@
 /**
- * PLANV3 — MCP endpoint (JSON-RPC over HTTP).
+ * PLANV2 — MCP endpoint (JSON-RPC over HTTP).
  *
  * Exposes the VantageMap document model as MCP tools for AI clients. Supports
  * `initialize`, `tools/list`, and `tools/call`. Authenticated; write tools are

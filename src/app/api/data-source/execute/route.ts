@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Execute a data-source configuration (reports/dashboards).
+ * PLANV2 — Execute a data-source configuration (reports/dashboards).
  * POST /api/data-source/execute
  */
 

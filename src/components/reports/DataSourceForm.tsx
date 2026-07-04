@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 7/8 — Shared data-source sub-form.
+ * PLANV2 Phase 7/8 — Shared data-source sub-form.
  *
  * A controlled form that produces a valid `dataSource` JSON object for the
  * report and dashboard builders. It supports all three engine modes

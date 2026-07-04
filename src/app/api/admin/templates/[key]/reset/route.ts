@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: destructive reset.
+ * PLANV2 Phase 13 — Meta-model templates: destructive reset.
  *
  * POST /api/admin/templates/[key]/reset — delete ALL documents and the entire
  * live custom config, then re-apply the template from scratch. Invalidates the

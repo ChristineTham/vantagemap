@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Single document-type configuration.
+ * PLANV2 Phase 4/5 — Single document-type configuration.
  *
  * GET    /api/admin/document-types/[id] — one type config with its fields.
  * PATCH  /api/admin/document-types/[id] — update display metadata / flags.

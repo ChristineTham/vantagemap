@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: import.
+ * PLANV2 Phase 13 — Meta-model templates: import.
  *
  * POST /api/admin/templates/import — validate an uploaded template JSON and
  * store it as a new (non-builtin) template row. Admin only.

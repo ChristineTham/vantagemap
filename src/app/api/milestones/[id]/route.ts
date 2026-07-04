@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Milestone item endpoint.
+ * PLANV2 — Milestone item endpoint.
  * PATCH/DELETE /api/milestones/[id]
  */
 

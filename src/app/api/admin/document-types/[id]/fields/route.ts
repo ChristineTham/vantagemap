@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Field configuration for a document type.
+ * PLANV2 Phase 4/5 — Field configuration for a document type.
  *
  * GET  /api/admin/document-types/[id]/fields — list fields.
  * POST /api/admin/document-types/[id]/fields — add a field (builtin or custom).

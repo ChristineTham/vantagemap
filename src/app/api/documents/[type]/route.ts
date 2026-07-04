@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Unified document collection endpoint.
+ * PLANV2 — Unified document collection endpoint.
  *
  * GET  /api/documents/[type] — list documents of a type
  * POST /api/documents/[type] — create a document (dynamic validation)

@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5/14 — Apply a config change with chosen data-handling.
+ * PLANV2 Phase 4/5/14 — Apply a config change with chosen data-handling.
  *
  * POST /api/admin/config/apply — execute the config mutation plus the selected
  * data handling (retain / delete / migrate), invalidate the registry, and write

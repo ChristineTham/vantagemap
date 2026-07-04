@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 16 — KPI history (time series).
+ * PLANV2 Phase 16 — KPI history (time series).
  *
  * GET  /api/kpis/[id]/history — history rows ordered by recorded_at asc.
  * POST /api/kpis/[id]/history — Body: { value }; appends a history row AND

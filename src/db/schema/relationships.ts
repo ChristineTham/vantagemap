@@ -9,7 +9,7 @@
 import { pgTable, uuid, varchar, text, timestamp, jsonb, index, unique } from "drizzle-orm/pg-core";
 
 // ── Generic Relationship Edge Table ─────────────────────────────────────────
-// PLANV3: type columns are varchar (not the fixed fact_sheet_type enum) so that
+// PLANV2: type columns are varchar (not the fixed fact_sheet_type enum) so that
 // documents of any configured/custom type can be related.
 
 export const relationships = pgTable(

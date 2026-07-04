@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7 — Saved Reports collection API.
+ * PLANV2 Phase 7 — Saved Reports collection API.
  *
  * GET  /api/saved-reports  — list system + shared + own reports.
  * POST /api/saved-reports  — create a saved report (slug unique, validated

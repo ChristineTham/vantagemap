@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Document milestones.
+ * PLANV2 — Document milestones.
  *
  * Dated checkpoints attached to a document (primarily Initiatives, allowed on
  * any type where the type config enables milestones). Drive roadmap markers and

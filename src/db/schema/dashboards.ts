@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Saved dashboard definitions and their widget layouts.
+ * PLANV2 — Saved dashboard definitions and their widget layouts.
  *
  * Dashboards reuse the same component library and data-source engine as reports,
  * but each widget owns its own data source (vs. one shared source for a report).

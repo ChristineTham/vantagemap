@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model config <-> template bridge.
+ * PLANV2 Phase 13 — Meta-model config <-> template bridge.
  *
  * The live meta-model lives in `document_type_configs` + `document_field_configs`.
  * A template is that same shape serialized as portable JSON (see

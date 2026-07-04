@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Page-component layout for a document type.
+ * PLANV2 Phase 4/5 — Page-component layout for a document type.
  *
  * GET  /api/admin/document-types/[id]/page-components — list components (ordered).
  * POST /api/admin/document-types/[id]/page-components — add a component.

@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5/14 — Config change impact analysis (read-only).
+ * PLANV2 Phase 4/5/14 — Config change impact analysis (read-only).
  *
  * POST /api/admin/config/impact — count affected documents/relationships/field
  * values for a proposed meta-model change and return the ImpactResult. No

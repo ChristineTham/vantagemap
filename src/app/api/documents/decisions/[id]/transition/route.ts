@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 15 — Architecture Decision status transition.
+ * PLANV2 Phase 15 — Architecture Decision status transition.
  *
  * POST /api/documents/decisions/[id]/transition
  *   Body: { to, reason? }

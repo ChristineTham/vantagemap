@@ -38,7 +38,7 @@ const navItems = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-// PLANV3 dynamic-document navigation hubs.
+// PLANV2 dynamic-document navigation hubs.
 const documentHubs = [
   { href: "/dashboards", label: "Dashboards", icon: LayoutGrid },
   { href: "/saved-reports", label: "Saved Reports", icon: BarChart3 },
@@ -134,7 +134,7 @@ export function Sidebar() {
             );
           })}
 
-          {/* PLANV3 dynamic documents & hubs */}
+          {/* PLANV2 dynamic documents & hubs */}
           {!collapsed && (
             <div className="mt-3 px-3 pb-1 text-2xs font-semibold uppercase tracking-wide text-rosely-mist">
               Documents

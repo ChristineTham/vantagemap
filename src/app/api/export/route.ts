@@ -24,7 +24,7 @@ import { requireAuth } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { dispatchWebhookEvent } from "@/lib/webhook-engine";
 
-// ── Document Types (PLANV3: unified `documents` table) ────────────────────────
+// ── Document Types (PLANV2: unified `documents` table) ────────────────────────
 
 // The document type keys that may be exported. `type` carries one of these
 // keys; rows are read from the unified `documents` table filtered by `typeKey`.

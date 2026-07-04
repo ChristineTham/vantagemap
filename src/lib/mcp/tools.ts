@@ -1,5 +1,5 @@
 /**
- * PLANV3 — MCP tool definitions for the VantageMap document model.
+ * PLANV2 — MCP tool definitions for the VantageMap document model.
  *
  * Each tool delegates to the same data layer used by REST/GraphQL. Pure-ish
  * async handlers (DB-backed) so they can be unit-tested with a mocked db.

@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Document type/field configuration registry.
+ * PLANV2 — Document type/field configuration registry.
  *
  * DB-backed source of truth for which document types exist and which fields
  * each type has, with a short-lived in-memory cache. Everything that needs to

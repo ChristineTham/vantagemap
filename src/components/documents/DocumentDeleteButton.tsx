@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 — Delete a document with a confirmation dialog.
+ * PLANV2 — Delete a document with a confirmation dialog.
  *
  * DELETEs /api/documents/[slug]/[id] and, on success, routes back to the type's
  * list page.

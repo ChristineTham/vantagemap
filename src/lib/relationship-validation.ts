@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Dynamic relationship validation.
+ * PLANV2 — Dynamic relationship validation.
  *
  * Replaces the hardcoded VALID_RELATIONSHIP_PAIRS with DB-configured
  * relationship_rules. The matching logic is pure/testable; a cached loader

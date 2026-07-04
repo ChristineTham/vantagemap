@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7 — Saved Report components API.
+ * PLANV2 Phase 7 — Saved Report components API.
  *
  * GET  /api/saved-reports/[slug]/components — list components (sorted).
  * POST /api/saved-reports/[slug]/components — add a component, or reorder the

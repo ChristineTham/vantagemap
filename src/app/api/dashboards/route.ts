@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 8 — Dashboards collection API.
+ * PLANV2 Phase 8 — Dashboards collection API.
  *
  * GET  /api/dashboards — list system + shared + own dashboards.
  * POST /api/dashboards — create a dashboard (slug unique, optional isDefault,

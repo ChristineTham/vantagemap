@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Server-side document data access for pages (Server Components).
+ * PLANV2 — Server-side document data access for pages (Server Components).
  *
  * Plain data functions (return rows, not Responses) used by the dynamic
  * document pages, distinct from the Response-returning handlers in

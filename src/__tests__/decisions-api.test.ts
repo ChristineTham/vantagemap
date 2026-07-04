@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 15 — Decision transition API tests.
+ * PLANV2 Phase 15 — Decision transition API tests.
  *
  * Covers POST /api/documents/decisions/[id]/transition:
  *   - a valid transition succeeds (200)

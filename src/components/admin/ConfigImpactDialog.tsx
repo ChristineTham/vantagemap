@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 4/14 — Reusable config-change impact confirmation dialog.
+ * PLANV2 Phase 4/14 — Reusable config-change impact confirmation dialog.
  *
  * Given a proposed meta-model `change` and its parameters, this dialog:
  *   1. Calls POST /api/admin/config/impact to compute the impact.

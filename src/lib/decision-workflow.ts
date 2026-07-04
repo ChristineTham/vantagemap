@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Architecture Decision state machine.
+ * PLANV2 — Architecture Decision state machine.
  *
  * Governs the status lifecycle of a Decision document, distinct from (and
  * orthogonal to) the Quality Seal. Same shape as quality-seal.ts.

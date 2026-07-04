@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Admin document-type configuration.
+ * PLANV2 Phase 4/5 — Admin document-type configuration.
  *
  * GET  /api/admin/document-types — list all type configs (including inactive).
  * POST /api/admin/document-types — create a new document type; seeds the two

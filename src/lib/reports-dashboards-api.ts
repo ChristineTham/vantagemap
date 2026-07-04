@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7/8 — Server-side fetch helpers for saved reports & dashboards.
+ * PLANV2 Phase 7/8 — Server-side fetch helpers for saved reports & dashboards.
  *
  * These call the existing REST routes with the incoming request's cookies
  * forwarded (so server-rendered pages authenticate), mirroring the pattern in

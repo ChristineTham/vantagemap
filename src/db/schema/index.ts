@@ -27,7 +27,7 @@ export * from "./webhooks";
 export * from "./saved-searches";
 export * from "./notifications";
 
-// ── PLANV3 — Unified document meta-model ──────────────────────────────────────
+// ── PLANV2 — Unified document meta-model ──────────────────────────────────────
 export * from "./documents";
 export * from "./relationship-rules";
 export * from "./reports";

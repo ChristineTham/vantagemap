@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Universal document detail page.
+ * PLANV2 — Universal document detail page.
  *
  * Resolves the document type + record, then renders a name/description header
  * plus every enabled field's value, grouped by the field's configured `group`.

@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Relationship rule configuration.
+ * PLANV2 Phase 4/5 — Relationship rule configuration.
  *
  * GET  /api/admin/relationship-rules — list all rules.
  * POST /api/admin/relationship-rules — create a rule. Admin-only.

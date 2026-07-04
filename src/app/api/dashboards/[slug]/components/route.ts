@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 8 — Dashboard widget layout API.
+ * PLANV2 Phase 8 — Dashboard widget layout API.
  *
  * GET  /api/dashboards/[slug]/components — list widgets (sorted).
  * POST /api/dashboards/[slug]/components — add a widget, or reorder the layout.

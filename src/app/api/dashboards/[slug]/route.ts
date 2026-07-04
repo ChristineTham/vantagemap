@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 8 — Dashboard item API.
+ * PLANV2 Phase 8 — Dashboard item API.
  *
  * GET    /api/dashboards/[slug]  — dashboard + widgets, each widget's data
  *                                  executed in parallel via executeDataSource.

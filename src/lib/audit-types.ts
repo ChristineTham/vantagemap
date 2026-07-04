@@ -38,7 +38,7 @@ export type AuditTargetType =
   | "DocumentConfig"
   | "Decision"
   | "Milestone"
-  // PLANV3 dynamic document types are audited by their type key (free-form string).
+  // PLANV2 dynamic document types are audited by their type key (free-form string).
   | (string & {});
 
 /** Audit action types matching the audit_action PostgreSQL enum. */

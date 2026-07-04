@@ -1,5 +1,5 @@
 /**
- * Integration tests for the unified document CRUD handlers (PLANV3).
+ * Integration tests for the unified document CRUD handlers (PLANV2).
  * DB, auth, and RBAC are mocked so no live database is needed.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";

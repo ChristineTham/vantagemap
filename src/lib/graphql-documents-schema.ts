@@ -1,8 +1,8 @@
 /**
- * PLANV3 Phase 9 — Dynamic GraphQL schema over the unified document model.
+ * PLANV2 Phase 9 — Dynamic GraphQL schema over the unified document model.
  *
  * Unlike the legacy `graphql-schema.ts` (hardcoded per-entity object types over
- * the pre-PLANV3 tables), this schema exposes a single generic `Document` type
+ * the pre-PLANV2 tables), this schema exposes a single generic `Document` type
  * backed by the `documents` table plus the generic `relationships` edge table.
  * Type metadata comes from the runtime document registry rather than being baked
  * into the schema, so new document types require no schema changes.

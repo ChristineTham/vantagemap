@@ -5,7 +5,7 @@
  *   Returns distinct values for: type, lifecycle, health, qualitySeal, and tags.
  *   Supports filtering by type to narrow facets.
  *
- * PLANV3 cutover: aggregates over the unified `documents` table (grouping by
+ * PLANV2 cutover: aggregates over the unified `documents` table (grouping by
  * `type_key`, `lifecycle`, `health`, `quality_seal`) instead of the 12 legacy
  * per-type tables.
  */
@@ -13,7 +13,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
 // documents is the unified table this route aggregates over (via raw SQL against
-// its physical table name). Imported to anchor the PLANV3 schema contract.
+// its physical table name). Imported to anchor the PLANV2 schema contract.
 import { documents } from "@/db/schema";
 import { ok, badRequest, withErrorHandler } from "@/lib/api-response";
 import { requireAuth } from "@/lib/auth";

@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4/5 — Single page-component (update / reorder / delete).
+ * PLANV2 Phase 4/5 — Single page-component (update / reorder / delete).
  *
  * PATCH  /api/admin/document-types/[id]/page-components/[componentId]
  * DELETE /api/admin/document-types/[id]/page-components/[componentId]

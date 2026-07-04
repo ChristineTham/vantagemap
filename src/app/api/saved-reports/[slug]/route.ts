@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7 — Saved Report item API.
+ * PLANV2 Phase 7 — Saved Report item API.
  *
  * GET    /api/saved-reports/[slug]  — report + components + executed data.
  * PATCH  /api/saved-reports/[slug]  — update metadata / data source.

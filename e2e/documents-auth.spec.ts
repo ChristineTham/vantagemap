@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Authenticated e2e against the PLANV3 dynamic document model.
+ * Authenticated e2e against the PLANV2 dynamic document model.
  * Requires a seeded database — run with:
  *   node --env-file=.env.local ./node_modules/.bin/playwright test
  * Skipped automatically when no real DATABASE_URL is present (public smoke run).

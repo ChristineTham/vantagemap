@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Unified document item endpoint.
+ * PLANV2 — Unified document item endpoint.
  *
  * GET    /api/documents/[type]/[id]
  * PATCH  /api/documents/[type]/[id]

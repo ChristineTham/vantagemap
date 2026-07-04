@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: list.
+ * PLANV2 Phase 13 — Meta-model templates: list.
  *
  * GET /api/admin/templates — list stored templates (Admin only).
  */

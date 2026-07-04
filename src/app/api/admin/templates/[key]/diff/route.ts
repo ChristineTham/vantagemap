@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 13 — Meta-model templates: diff live config vs template.
+ * PLANV2 Phase 13 — Meta-model templates: diff live config vs template.
  *
  * GET /api/admin/templates/[key]/diff — compute the added/removed/changed types
  * and fields between the live meta-model config and a stored template. Admin only.

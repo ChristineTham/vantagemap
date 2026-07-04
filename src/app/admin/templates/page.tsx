@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 Phase 13 — Meta-model template gallery.
+ * PLANV2 Phase 13 — Meta-model template gallery.
  *
  * Admin-only. Lists stored templates (name / version / active / builtin) with:
  *   • Apply — choose merge or replace, confirm, then POST .../[key]/apply.

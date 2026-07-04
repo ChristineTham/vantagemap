@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Referential-integrity impact analysis (pure).
+ * PLANV2 — Referential-integrity impact analysis (pure).
  *
  * Given a proposed meta-model change plus the affected-record counts, returns a
  * structured impact: the human message, the retain-vs-delete data-handling

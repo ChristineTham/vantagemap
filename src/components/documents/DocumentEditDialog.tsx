@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 — Edit a document in a dialog.
+ * PLANV2 — Edit a document in a dialog.
  *
  * Pre-fills a form from the current document values, PATCHes changed values to
  * /api/documents/[slug]/[id], surfaces API validation errors, and refreshes the

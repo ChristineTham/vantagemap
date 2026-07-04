@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Single document type config endpoint.
+ * PLANV2 — Single document type config endpoint.
  * GET /api/types/[typeKey] — full type config with field definitions.
  */
 

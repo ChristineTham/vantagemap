@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Document type registry endpoint.
+ * PLANV2 — Document type registry endpoint.
  * GET /api/types — list active document types with field counts.
  */
 

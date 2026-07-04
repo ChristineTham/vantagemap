@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 4 — Document type editor page.
+ * PLANV2 Phase 4 — Document type editor page.
  *
  * Server Component: awaits the async route params (Next.js 16) and hands the
  * id to the client-side DocumentTypeEditor, which loads the type + fields and

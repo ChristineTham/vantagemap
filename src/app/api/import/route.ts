@@ -35,7 +35,7 @@ import { dispatchWebhookEvent } from "@/lib/webhook-engine";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_ROWS = 10_000;
 
-// ── Document Types (PLANV3: unified `documents` table) ────────────────────────
+// ── Document Types (PLANV2: unified `documents` table) ────────────────────────
 
 // The document type keys that may be imported. `factSheetType` carries one of
 // these keys; every imported row is written to the unified `documents` table

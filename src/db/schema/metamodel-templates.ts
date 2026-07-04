@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Meta-model template registry.
+ * PLANV2 — Meta-model template registry.
  *
  * A template is the entire meta-model configuration (types, fields, relations,
  * layouts, reports, dashboards) as portable JSON. Exactly one template is active

@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 8 — Set default dashboard.
+ * PLANV2 Phase 8 — Set default dashboard.
  *
  * POST /api/dashboards/[slug]/set-default
  *   Marks this dashboard as the default, clearing the flag on all others so

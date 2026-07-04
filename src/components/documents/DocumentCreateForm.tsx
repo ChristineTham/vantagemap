@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PLANV3 — Dynamic document create form.
+ * PLANV2 — Dynamic document create form.
  *
  * Renders one input per enabled field from a type's field configuration,
  * driven by each field's dataType. Validates required fields client-side,

@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Unified document CRUD handlers.
+ * PLANV2 — Unified document CRUD handlers.
  *
  * Serves every document type from the single `documents` table, validating
  * writes against the type's runtime field configuration (registry) and routing

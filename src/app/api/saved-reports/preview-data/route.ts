@@ -1,5 +1,5 @@
 /**
- * PLANV3 Phase 7 — Report builder data preview.
+ * PLANV2 Phase 7 — Report builder data preview.
  *
  * POST /api/saved-reports/preview-data
  *   Body: { dataSource }

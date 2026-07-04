@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Dynamic document list page.
+ * PLANV2 — Dynamic document list page.
  *
  * Resolves a document type by URL slug, loads its documents and configured
  * page-component layout, and renders each component through the shared

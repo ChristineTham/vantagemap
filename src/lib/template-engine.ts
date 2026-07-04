@@ -1,5 +1,5 @@
 /**
- * PLANV3 — Meta-model template engine (pure serialization + diff).
+ * PLANV2 — Meta-model template engine (pure serialization + diff).
  *
  * A template is the entire meta-model configuration as portable JSON. These
  * pure functions validate/parse template JSON and diff a template against the
