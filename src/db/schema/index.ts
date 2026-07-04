@@ -31,3 +31,12 @@ export * from "./governance";
 export * from "./webhooks";
 export * from "./saved-searches";
 export * from "./notifications";
+
+// ── PLANV3 — Unified document meta-model ──────────────────────────────────────
+export * from "./documents";
+export * from "./relationship-rules";
+export * from "./reports";
+export * from "./dashboards";
+export * from "./metamodel-templates";
+export * from "./decisions";
+export * from "./milestones";

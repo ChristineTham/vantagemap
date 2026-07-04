@@ -67,11 +67,27 @@ export const kpis = pgTable("kpis", {
     .$onUpdate(() => new Date()),
 });
 
-export const kpisRelations = relations(kpis, ({ one }) => ({
+export const kpisRelations = relations(kpis, ({ one, many }) => ({
   objective: one(strategicObjectives, {
     fields: [kpis.objectiveId],
     references: [strategicObjectives.id],
   }),
+  history: many(kpiHistory),
+}));
+
+// ── KPI History (time series for trend charts / sparklines) ─────────────────
+
+export const kpiHistory = pgTable("kpi_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  kpiId: uuid("kpi_id")
+    .notNull()
+    .references(() => kpis.id, { onDelete: "cascade" }),
+  value: numeric("value").notNull(),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const kpiHistoryRelations = relations(kpiHistory, ({ one }) => ({
+  kpi: one(kpis, { fields: [kpiHistory.kpiId], references: [kpis.id] }),
 }));
 
 // ── Initiative ──────────────────────────────────────────────────────────────
