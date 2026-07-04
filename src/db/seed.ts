@@ -13,6 +13,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { sql as rawSql } from "drizzle-orm";
 import * as schema from "./schema";
 import { auth } from "../lib/auth-server";
+import { buildEnterpriseArchitectureTypes } from "../lib/templates/enterprise-architecture";
 
 /** Password for the seeded demo accounts (development only). */
 const SEED_PASSWORD = "Password123!";
@@ -42,6 +43,20 @@ async function seed() {
       "verification",
       "rate_limit",
       "user",
+      milestones,
+      decision_links,
+      decision_transitions,
+      document_field_configs,
+      document_page_components,
+      document_type_configs,
+      documents,
+      metamodel_templates,
+      relationship_rules,
+      report_components,
+      reports,
+      dashboard_components,
+      dashboards,
+      kpi_history,
       audit_entries,
       subscriptions,
       tag_assignments,
@@ -1234,6 +1249,54 @@ async function seed() {
       diff: { lifecycle: { old: "Active", new: "Phase Out" } },
     },
   ]);
+
+  // ── Document meta-model config (Enterprise Architecture template) ───────────
+  console.log("  → Document meta-model config (Enterprise Architecture template)");
+  const eaTypes = buildEnterpriseArchitectureTypes();
+  for (const t of eaTypes) {
+    const [typeRow] = await db
+      .insert(schema.documentTypeConfigs)
+      .values({
+        typeKey: t.typeKey,
+        slug: t.slug,
+        displayName: t.displayName,
+        pluralName: t.pluralName,
+        icon: t.icon,
+        isHierarchical: t.isHierarchical,
+        milestonesEnabled: t.milestonesEnabled,
+        sortOrder: t.sortOrder,
+      })
+      .returning();
+    await db.insert(schema.documentFieldConfigs).values(
+      t.fields.map((f) => ({
+        typeConfigId: typeRow.id,
+        fieldKey: f.fieldKey,
+        fieldSource: f.fieldSource,
+        label: f.label,
+        dataType: f.dataType,
+        fieldType: f.fieldType,
+        enabled: f.enabled,
+        required: f.required,
+        options: f.options ?? undefined,
+        group: f.group ?? undefined,
+        placeholder: f.placeholder ?? undefined,
+        helpText: f.helpText ?? undefined,
+        searchable: f.searchable,
+        filterable: f.filterable,
+        showInList: f.showInList,
+        sortOrder: f.sortOrder,
+      }))
+    );
+  }
+  await db.insert(schema.metamodelTemplates).values({
+    key: "enterprise-architecture",
+    name: "Enterprise Architecture",
+    description: "The default LeanIX-style enterprise architecture meta-model.",
+    isBuiltin: true,
+    isActive: true,
+    definition: { types: eaTypes } as Record<string, unknown>,
+    appliedAt: new Date(),
+  });
 
   console.log("\n✅ Seed complete!");
   console.log("\n🔑 Demo sign-in credentials:");
